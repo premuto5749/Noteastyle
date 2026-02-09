@@ -52,24 +52,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 3. 아키텍처 개요
 
-### 시스템 구성 (Frontend + Backend 분리형)
+### 시스템 구성 (Next.js + Supabase 모놀리식)
 
 ```
-┌────────────────────┐    HTTP/REST     ┌────────────────────┐    asyncpg    ┌──────────────┐
-│  Next.js 15 (PWA)  │ ──────────────→ │  FastAPI (Python)  │ ──────────→ │ PostgreSQL 16│
-│  localhost:3000     │ ←────────────── │  localhost:8000    │ ←────────── │ localhost:5432│
-└────────────────────┘    JSON          └────────────────────┘             └──────────────┘
-                                               │
-                                     ┌─────────┼─────────┐
-                                     ▼         ▼         ▼
-                               ┌──────────┐ ┌──────┐ ┌──────────┐
-                               │ OpenAI   │ │AKOOL │ │ AWS S3   │
-                               │ Whisper  │ │Face  │ │ Photos   │
-                               │ + GPT-4o │ │Swap  │ │          │
-                               └──────────┘ └──────┘ └──────────┘
+┌──────────────────────────────────────┐
+│  Next.js 15 (PWA)                    │
+│  ├─ 페이지 (React)    localhost:3000 │
+│  └─ API Routes (/api/...)            │
+│         │                            │
+│    ┌────┼──────────┐                 │
+│    ▼    ▼          ▼                 │
+│ Supabase  OpenAI   AKOOL            │
+│ (DB)     Whisper   Face             │
+│          GPT-4o    Swap             │
+└──────────────────────────────────────┘
 ```
 
-> **premuto 프로젝트와의 차이**: premuto는 Next.js 모놀리식(Supabase 직접 연결)이지만, Noteastyle은 **Frontend + Backend 분리 아키텍처**로 FastAPI가 모든 비즈니스 로직과 DB 접근을 담당합니다.
+> **premuto 프로젝트와 동일 패턴**: Next.js 모놀리식 아키텍처로 API Routes가 비즈니스 로직을 담당하고, Supabase가 DB + Storage를 제공합니다. CORS 불필요, 배포 단순.
 
 ### 시술 기록 데이터 흐름 (Core Flow)
 
@@ -108,38 +107,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tailwind CSS v4**
 - **PWA** (Progressive Web App - 모바일/태블릿 최적화)
 
-### Backend
-- **FastAPI** (Python 3.12)
-- **SQLAlchemy 2.0** (async, asyncpg)
-- **PostgreSQL 16**
-- **Alembic** (DB migrations)
-- **Pydantic v2** + pydantic-settings
+### Backend (Next.js API Routes + Supabase)
+- **Next.js API Routes** → 비즈니스 로직 (Python 불필요)
+- **Supabase** → PostgreSQL + Storage + (향후) Auth
+- **TypeScript** → 프론트/백엔드 타입 통일
 
 ### AI / External APIs
 - **OpenAI Whisper** → 음성을 텍스트로 변환 ($0.006/분)
-- **GPT-4o Structured Output** → 텍스트를 구조화된 시술 데이터로 변환 (100% JSON 스키마 준수)
+- **GPT-4o Structured Output** → 텍스트를 구조화된 시술 데이터로 변환 (Zod 스키마)
 - **AKOOL API** → AI 페이스 스왑 (엔터프라이즈급, 4K 해상도, 상업적 라이선스)
 
 ### 인프라
-- **Docker Compose** (db, backend, frontend 3개 서비스)
-- **AWS S3** (사진 저장, ap-northeast-2)
-- 개발 시 로컬 `uploads/` 디렉터리 사용
-
-### 주요 Backend 의존성 (requirements.txt)
-```
-fastapi==0.115.6        # 웹 프레임워크
-uvicorn[standard]       # ASGI 서버
-sqlalchemy==2.0.36      # ORM (async)
-asyncpg==0.30.0         # PostgreSQL async 드라이버
-alembic==1.14.1         # DB 마이그레이션
-pydantic==2.10.4        # 데이터 검증
-openai==1.58.1          # Whisper + GPT-4o
-httpx==0.28.1           # AKOOL API 호출
-boto3==1.36.2           # AWS S3
-Pillow==11.1.0          # 이미지 처리
-python-jose             # JWT 토큰
-passlib[bcrypt]         # 비밀번호 해싱
-```
+- **Vercel** → Next.js 배포 (프로덕션)
+- **Supabase** → PostgreSQL + Storage (프로덕션)
+- **Docker Compose** → 로컬 개발 (PostgreSQL)
 
 ---
 
@@ -149,7 +130,7 @@ passlib[bcrypt]         # 비밀번호 해싱
 Noteastyle/
 ├── CLAUDE.md                  # 이 파일 (개발 가이드)
 ├── README.md                  # 프로젝트 개요
-├── docker-compose.yml         # Docker 서비스 구성 (db, backend, frontend)
+├── docker-compose.yml         # 로컬 개발용 (db + frontend)
 ├── .gitignore
 │
 ├── docs/                      # 기초 문서
@@ -160,51 +141,39 @@ Noteastyle/
 │   ├── 노터스타일 기능 목록 *.csv
 │   └── 노터스타일 기능 목록 *_all.csv
 │
-├── backend/                   # FastAPI Python Backend
-│   ├── app/
-│   │   ├── main.py            # FastAPI 앱 엔트리포인트, CORS, 라우터 등록
-│   │   ├── api/               # API 엔드포인트 (도메인별 분리)
-│   │   │   ├── shops.py       # 매장 CRUD
-│   │   │   ├── customers.py   # 고객 CRUD
-│   │   │   ├── treatments.py  # 시술 기록 CRUD
-│   │   │   ├── voice_memo.py  # 음성 메모 → AI 구조화
-│   │   │   ├── portfolio.py   # 포트폴리오 관리
-│   │   │   └── face_swap.py   # AKOOL 페이스 스왑
-│   │   ├── core/
-│   │   │   ├── config.py      # Settings (pydantic-settings, env 기반)
-│   │   │   └── database.py    # async SQLAlchemy 엔진 + 세션 팩토리
-│   │   ├── models/
-│   │   │   └── models.py      # SQLAlchemy ORM 모델 (6개 테이블)
-│   │   ├── schemas/
-│   │   │   └── schemas.py     # Pydantic v2 요청/응답 스키마
-│   │   └── services/
-│   │       ├── openai_service.py  # Whisper + GPT-4o Structured Output
-│   │       ├── akool.py           # AKOOL 페이스 스왑 서비스
-│   │       └── storage.py         # 파일 저장 (로컬/S3 분기)
-│   ├── alembic/               # DB 마이그레이션
-│   ├── alembic.ini
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env.example
+├── supabase/                  # Supabase 설정
+│   └── migrations/            # SQL 마이그레이션
+│       ├── 001_initial_schema.sql
+│       └── 002_helper_functions.sql
 │
-└── frontend/                  # Next.js 15 Frontend
+├── backend/                   # (레거시) FastAPI - 참고용으로 보존
+│
+└── frontend/                  # Next.js 15 풀스택 앱
     ├── src/
-    │   ├── app/               # App Router 페이지
-    │   │   ├── page.tsx               # 홈 대시보드 (통계, 최근 시술)
+    │   ├── app/
+    │   │   ├── page.tsx               # 홈 대시보드
     │   │   ├── record/page.tsx        # 빠른 기록 (큰 버튼 UI)
     │   │   ├── treatments/page.tsx    # 시술 목록
     │   │   ├── treatments/new/page.tsx # 상세 기록 작성
     │   │   ├── customers/page.tsx     # 고객 관리
-    │   │   └── portfolio/page.tsx     # 포트폴리오 갤러리
+    │   │   ├── portfolio/page.tsx     # 포트폴리오 갤러리
+    │   │   └── api/                   # API Routes (= 백엔드)
+    │   │       ├── health/route.ts
+    │   │       ├── shops/.../route.ts
+    │   │       ├── voice/transcribe/route.ts
+    │   │       └── face-swap/.../route.ts
     │   ├── components/        # 재사용 UI 컴포넌트
     │   └── lib/
-    │       └── api.ts         # API 클라이언트 (typed fetch 래퍼)
-    ├── public/
-    │   └── manifest.json      # PWA 매니페스트
+    │       ├── api.ts         # API 클라이언트 (typed fetch)
+    │       ├── supabase/      # Supabase 클라이언트
+    │       │   ├── client.ts  # 브라우저용
+    │       │   └── server.ts  # 서버용 (API Routes)
+    │       └── services/      # 외부 API 서비스
+    │           ├── openai-service.ts   # Whisper + GPT-4o
+    │           └── akool-service.ts    # AKOOL 페이스 스왑
+    ├── .env.example
     ├── package.json
     ├── tsconfig.json
-    ├── next.config.ts
-    ├── postcss.config.mjs
     └── Dockerfile
 ```
 
@@ -391,32 +360,27 @@ docker compose down                     # 전체 서비스 중지
 docker compose logs -f backend          # 백엔드 로그 확인
 ```
 
-### 환경 변수 (backend/.env)
+### 환경 변수 (frontend/.env)
 
 | 변수 | 설명 | 필수 |
 |------|------|------|
-| `DATABASE_URL` | PostgreSQL 연결 문자열 | Y |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL | Y |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon 키 | Y |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role 키 (API Routes용) | Y |
 | `OPENAI_API_KEY` | OpenAI API 키 (Whisper + GPT-4o) | Y |
 | `AKOOL_API_KEY` | AKOOL 페이스 스왑 API 키 | Y |
 | `AKOOL_CLIENT_ID` | AKOOL 클라이언트 ID | Y |
-| `AWS_ACCESS_KEY_ID` | AWS S3 접근 키 | N (로컬은 uploads/) |
-| `AWS_SECRET_ACCESS_KEY` | AWS S3 시크릿 키 | N |
-| `AWS_S3_BUCKET` | S3 버킷명 (기본: noteastyle-photos) | N |
-| `AWS_REGION` | AWS 리전 (기본: ap-northeast-2) | N |
-| `SECRET_KEY` | 앱 시크릿 키 | Y |
-| `CORS_ORIGINS` | CORS 허용 오리진 (기본: http://localhost:3000) | N |
+| `NEXT_PUBLIC_SHOP_ID` | MVP 단일 매장 ID | N (기본값 있음) |
 
 ---
 
 ## 10. 코딩 컨벤션
 
-### Backend (Python)
-- FastAPI 라우터는 `app/api/` 아래 **도메인별 파일로 분리** (shops, customers, treatments...)
-- 비즈니스 로직은 `app/services/`에 분리 (API 핸들러는 얇게 유지)
-- 모든 DB 작업은 **async/await** 사용 (AsyncSession)
-- Pydantic v2 스키마로 요청/응답 검증 (`from_attributes = True`)
-- 환경 변수는 `app/core/config.py`의 **Settings 클래스**로 관리 (pydantic-settings)
-- DB 의존성 주입: `get_db()` async generator → FastAPI Depends
+### API Routes (Backend)
+- API Routes는 `src/app/api/` 아래 **도메인별 디렉토리로 분리**
+- DB 접근은 `createServerClient()` → Supabase 클라이언트 사용
+- 외부 API 서비스는 `src/lib/services/`에 분리 (openai, akool)
+- 환경 변수는 `process.env`로 직접 접근 (서버 전용 키는 `NEXT_PUBLIC_` 접두사 없이)
 
 ### Frontend (TypeScript)
 - Next.js 15 **App Router** 사용 (`src/app/` 디렉토리)
@@ -427,8 +391,8 @@ docker compose logs -f backend          # 백엔드 로그 확인
 
 ### 공통
 - 민감 정보 (`.env`, API 키)는 **절대 커밋하지 않음**
-- 파일 업로드 최대 크기: 10MB
-- 사진 저장: 개발 시 로컬 `uploads/`, 프로덕션 시 AWS S3
+- 파일 업로드: Supabase Storage 사용 (`treatment-photos` 버킷)
+- TypeScript 하나로 프론트/백엔드 타입 통일
 
 ---
 
@@ -518,11 +482,13 @@ docker compose logs -f backend          # 백엔드 로그 확인
 
 | 컴포넌트 | 서비스 | 이유 |
 |---------|--------|------|
-| Frontend (Next.js) | **Vercel** | Next.js 최적 호스팅, 자동 배포, CDN |
-| Backend (FastAPI) | **Railway** | Python 지원, 간편 배포, 자동 스케일링 |
-| Database (PostgreSQL) | **Supabase** 또는 **Neon** | 관리형 PostgreSQL, 무료 티어 |
-| File Storage | **AWS S3** | 이미 설정됨, ap-northeast-2 |
+| Next.js (풀스택) | **Vercel** | Next.js 최적 호스팅, API Routes 포함 |
+| Database + Storage | **Supabase** | PostgreSQL + Storage 올인원 |
+
+> premuto와 동일한 Vercel + Supabase 2곳 관리 구성. CORS 불필요, 배포 단순.
 
 ### 개발/로컬
 
-Docker Compose로 모든 서비스 로컬 실행 (현재 구성).
+```bash
+cd frontend && npm run dev   # http://localhost:3000 (API Routes 포함)
+```

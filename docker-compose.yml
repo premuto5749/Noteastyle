@@ -11,29 +11,18 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql+asyncpg://noteastyle:noteastyle@db:5432/noteastyle
-      CORS_ORIGINS: http://localhost:3000
-    depends_on:
-      - db
-    volumes:
-      - ./backend:/app
-      - uploads:/app/uploads
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: local-dev-anon-key
+      NEXT_PUBLIC_SHOP_ID: "00000000-0000-0000-0000-000000000001"
     depends_on:
-      - backend
+      - db
 
 volumes:
   pgdata:
-  uploads:
