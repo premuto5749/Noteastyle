@@ -1,173 +1,148 @@
-# Note-a-Style 프로덕션 배포 가이드
+# Note-a-Style 배포 가이드
 
-> 이 문서는 Note-a-Style을 프로덕션 환경에 배포하기 위한 단계별 가이드입니다.
+> Next.js 모놀리식 + Supabase 아키텍처 기준
 
-## 아키텍처 비교: premuto vs Noteastyle
+## 아키텍처
 
-| | premuto | Noteastyle |
-|--|---------|------------|
-| 구조 | Next.js 모놀리식 (풀스택) | Next.js (프론트) + FastAPI (백엔드) **분리형** |
-| DB | Supabase (PostgreSQL + RLS + Auth) | 자체 PostgreSQL + SQLAlchemy + Alembic |
-| 인증 | Supabase Auth | 자체 구현 (python-jose + passlib) |
-| 배포 | Vercel 단일 배포 | Frontend + Backend **각각 배포** 필요 |
+```
+┌──────────────────────────────┐         ┌──────────────────────┐
+│         Vercel               │         │      Supabase        │
+│  ┌────────────────────────┐  │  REST   │  ┌────────────────┐  │
+│  │  Next.js 15 (App Router)│──────────→│  PostgreSQL 16   │  │
+│  │  - Pages (React 19)    │  │         │  └────────────────┘  │
+│  │  - API Routes          │  │         │  ┌────────────────┐  │
+│  │    (/api/shops, etc.)  │  │         │  │  Storage       │  │
+│  └────────────────────────┘  │         │  │  (사진 저장)    │  │
+│                              │         │  └────────────────┘  │
+└──────────────────────────────┘         └──────────────────────┘
+              │
+       ┌──────┼──────┐
+       ▼      ▼      ▼
+   OpenAI   AKOOL   (S3 선택)
+```
 
-> **핵심 차이**: premuto는 Supabase를 DB+Auth+Storage 올인원으로 사용하므로 Vercel 하나로 배포가 가능하지만, Noteastyle은 FastAPI 백엔드가 별도로 존재하므로 **백엔드 호스팅이 추가로 필요**합니다.
+> **premuto와 동일한 구성**: Vercel + Supabase 2곳만 관리. 별도 백엔드 서버 없음. CORS 불필요.
 
 ---
 
-## 권장 프로덕션 구성
+## 비용 요약
 
-```
-┌─────────────┐     ┌─────────────────┐     ┌──────────────────┐
-│   Vercel     │────→│   Railway       │────→│  Supabase/Neon   │
-│  (Frontend)  │ API │  (Backend)      │ DB  │  (PostgreSQL)    │
-│  Next.js 15  │     │  FastAPI        │     │                  │
-└─────────────┘     └─────────────────┘     └──────────────────┘
-                           │
-                    ┌──────┼──────┐
-                    ▼      ▼      ▼
-               OpenAI   AKOOL   AWS S3
-```
+### MVP 단계 (1-2개 샵)
+| 항목 | 비용 |
+|------|------|
+| Vercel (Free) | $0 |
+| Supabase (Free) | $0 |
+| **합계** | **$0/월** (AI API 비용 별도) |
 
-| 컴포넌트 | 서비스 | 무료 티어 | 유료 기준 |
-|---------|--------|----------|----------|
-| Frontend | **Vercel** | 100GB 대역폭/월 | Pro $20/월 |
-| Backend | **Railway** | $5 크레딧/월 | $5~/월 (사용량) |
-| Database | **Supabase** | 500MB, 50K 행 | Pro $25/월 |
-| Database (대안) | **Neon** | 512MB | Pro $19/월 |
-| Storage | **AWS S3** | 5GB (12개월) | ~$0.025/GB |
+### 성장 단계 (10-50개 샵)
+| 항목 | 비용 |
+|------|------|
+| Vercel (Pro) | $20/월 |
+| Supabase (Pro) | $25/월 |
+| **합계** | **$45/월** (AI API 비용 별도) |
+
+> 구 아키텍처(FastAPI + Railway) 대비 Railway $5-20/월 절감, 관리 포인트 1개 감소.
 
 ---
 
-## Step 1: Database (PostgreSQL) 설정
+## Step 1: Supabase 프로젝트 설정
 
-Supabase 또는 Neon 중 선택. **Supabase 권장** (premuto에서 검증됨).
-
-### Option A: Supabase (권장)
-
-> Supabase를 Noteastyle에서는 **PostgreSQL 호스팅 용도로만 사용**합니다.
-> premuto처럼 Supabase Auth/RLS/Storage를 사용하지 않고, 순수 DB 연결만 합니다.
-
-#### 1-1. Supabase 프로젝트 생성
+### 1-1. 프로젝트 생성
 
 1. https://supabase.com 가입/로그인
 2. "New Project" 클릭
 3. 설정:
    - **Name**: `noteastyle`
    - **Database Password**: 강력한 비밀번호 설정 (기록해둘 것!)
-   - **Region**: `Northeast Asia (Seoul)` - ap-northeast-1 선택
+   - **Region**: `Northeast Asia (Seoul)` 선택
 4. 프로젝트 생성 완료 대기 (~2분)
 
-#### 1-2. 연결 문자열 확인
+### 1-2. 키 확인
 
-1. Project Settings → Database → Connection string → URI 복사
-2. 형식:
-   ```
-   postgresql://postgres.[project-ref]:[password]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
-   ```
-3. **중요**: asyncpg 사용을 위해 앞부분을 변경:
-   ```
-   postgresql+asyncpg://postgres.[project-ref]:[password]@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
-   ```
+Project Settings → API에서 확인:
 
-#### 1-3. 마이그레이션 실행
+| 키 | 용도 | 환경 변수 |
+|----|------|----------|
+| **Project URL** | Supabase 엔드포인트 | `NEXT_PUBLIC_SUPABASE_URL` |
+| **anon public** | 클라이언트용 (RLS 적용) | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| **service_role** | 서버용 (RLS 우회) | `SUPABASE_SERVICE_ROLE_KEY` |
+
+> **service_role 키는 절대 클라이언트에 노출하지 마세요.** 서버 사이드(API Routes)에서만 사용합니다.
+
+### 1-3. 데이터베이스 스키마 생성
+
+Supabase Dashboard → SQL Editor에서 마이그레이션 파일 실행:
 
 ```bash
-# 로컬에서 Supabase DB에 마이그레이션 적용
-cd backend
-DATABASE_URL="postgresql+asyncpg://..." alembic upgrade head
+# 순서대로 실행
+supabase/migrations/001_initial_schema.sql    # 6개 테이블 생성
+supabase/migrations/002_helper_functions.sql  # 헬퍼 함수
 ```
 
-### Option B: Neon
+또는 Supabase CLI 사용:
+```bash
+npx supabase db push
+```
 
-1. https://neon.tech 가입/로그인
-2. "Create Project" → Region: `Asia Pacific (Singapore)` 선택
-3. 연결 문자열 복사 (postgresql+asyncpg:// 형식으로 변환)
-4. 마이그레이션 동일하게 실행
+### 1-4. Storage 버킷 생성 (사진 저장용)
+
+Supabase Dashboard → Storage:
+
+1. "New Bucket" 클릭
+2. 이름: `treatment-photos`
+3. Public bucket: **No** (Signed URL로 접근)
+4. File size limit: `10MB`
 
 ---
 
-## Step 2: Backend (FastAPI) - Railway 배포
+## Step 2: Vercel 배포
 
-### 2-1. Railway 프로젝트 생성
-
-1. https://railway.app 가입 (GitHub 연동)
-2. "New Project" → "Deploy from GitHub Repo" 선택
-3. `premuto5749/Noteastyle` 레포 선택
-4. **Root Directory** 설정: `/backend` (중요!)
-
-### 2-2. 환경 변수 설정
-
-Railway 프로젝트 → Variables 탭에서 설정:
-
-```env
-# Database (Step 1에서 얻은 연결 문자열)
-DATABASE_URL=postgresql+asyncpg://postgres.[ref]:[password]@...supabase.com:6543/postgres
-
-# OpenAI (필수)
-OPENAI_API_KEY=sk-...
-
-# AKOOL (필수)
-AKOOL_API_KEY=your-key
-AKOOL_CLIENT_ID=your-client-id
-
-# AWS S3 (프로덕션 사진 저장)
-AWS_ACCESS_KEY_ID=AKIA...
-AWS_SECRET_ACCESS_KEY=...
-AWS_S3_BUCKET=noteastyle-photos
-AWS_REGION=ap-northeast-2
-
-# App
-SECRET_KEY=<랜덤 문자열 생성>
-CORS_ORIGINS=https://your-app.vercel.app
-```
-
-> **SECRET_KEY 생성**: `python -c "import secrets; print(secrets.token_urlsafe(32))"`
-
-### 2-3. 빌드 설정
-
-Railway는 Dockerfile을 자동 감지합니다. 추가 설정이 필요하면:
-
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-
-### 2-4. 배포 확인
-
-Railway 배포 완료 후 제공되는 URL 확인:
-```
-https://noteastyle-backend-production.up.railway.app
-```
-
-헬스 체크:
-```bash
-curl https://your-railway-url.up.railway.app/api/health
-# → {"status":"ok","service":"Note-a-Style API"}
-```
-
----
-
-## Step 3: Frontend (Next.js) - Vercel 배포
-
-### 3-1. Vercel 프로젝트 생성
+### 2-1. 프로젝트 연결
 
 1. https://vercel.com 가입 (GitHub 연동)
 2. "Add New Project" → `premuto5749/Noteastyle` 레포 선택
 3. 설정:
    - **Framework Preset**: Next.js (자동 감지)
-   - **Root Directory**: `frontend` (중요!)
+   - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
-   - **Output Directory**: `.next`
+   - **Output Directory**: `.next` (기본값)
 
-### 3-2. 환경 변수 설정
+### 2-2. 환경 변수 설정
 
-Vercel 프로젝트 → Settings → Environment Variables:
+Vercel → Settings → Environment Variables:
 
 ```env
-# Backend API URL (Railway에서 배포된 URL)
-NEXT_PUBLIC_API_URL=https://your-railway-url.up.railway.app/api
+# Supabase (Step 1에서 확인한 키)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+
+# OpenAI (Whisper + GPT-4o)
+OPENAI_API_KEY=sk-...
+
+# AKOOL Face Swap
+AKOOL_API_KEY=your-key
+AKOOL_CLIENT_ID=your-client-id
+
+# App
+NEXT_PUBLIC_SHOP_ID=00000000-0000-0000-0000-000000000001
 ```
 
-### 3-3. vercel.json 생성 (선택)
+> `NEXT_PUBLIC_` 접두사가 있는 변수만 브라우저에 노출됩니다.
+> `SUPABASE_SERVICE_ROLE_KEY`, `OPENAI_API_KEY`, `AKOOL_*`는 서버에서만 접근 가능합니다.
+
+### 2-3. 배포 확인
+
+```bash
+# 배포 URL 확인
+https://noteastyle.vercel.app
+
+# 헬스 체크
+curl https://noteastyle.vercel.app/api/health
+# → {"status":"ok","service":"Note-a-Style API","timestamp":"..."}
+```
+
+### 2-4. vercel.json (선택)
 
 `frontend/vercel.json`:
 ```json
@@ -181,169 +156,138 @@ NEXT_PUBLIC_API_URL=https://your-railway-url.up.railway.app/api
 }
 ```
 
-> premuto 프로젝트와 동일 설정: main 브랜치만 배포, preview 비활성화.
-
-### 3-4. 배포 확인
-
-Vercel 배포 완료 후:
-```
-https://noteastyle.vercel.app
-```
-
 ---
 
-## Step 4: CORS 설정 업데이트
+## Step 3: 커스텀 도메인 (선택)
 
-Backend의 `CORS_ORIGINS` 환경 변수에 Vercel 도메인 추가:
+### Vercel 도메인 설정
 
-```env
-CORS_ORIGINS=https://noteastyle.vercel.app,https://your-custom-domain.com
-```
-
-> Railway에서 환경 변수 업데이트 후 자동 재배포됩니다.
-
----
-
-## Step 5: AWS S3 설정 (사진 저장)
-
-### 5-1. S3 버킷 생성
-
-1. AWS Console → S3 → "Create Bucket"
-2. 설정:
-   - **Bucket Name**: `noteastyle-photos`
-   - **Region**: `Asia Pacific (Seoul)` ap-northeast-2
-   - **Block Public Access**: 활성화 (Signed URL로 접근)
-
-### 5-2. IAM 사용자 생성
-
-1. AWS Console → IAM → Users → "Create User"
-2. 이름: `noteastyle-s3`
-3. 정책 연결: `AmazonS3FullAccess` (또는 아래 커스텀 정책)
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
-      "Resource": "arn:aws:s3:::noteastyle-photos/*"
-    }
-  ]
-}
-```
-
-4. Access Key 생성 → Railway 환경 변수에 설정
-
-### 5-3. CORS 정책 (S3)
-
-S3 버킷 → Permissions → CORS:
-```json
-[
-  {
-    "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET", "PUT", "POST"],
-    "AllowedOrigins": ["https://noteastyle.vercel.app"],
-    "ExposeHeaders": []
-  }
-]
-```
-
----
-
-## Step 6: 커스텀 도메인 (선택)
-
-### Vercel 커스텀 도메인
 1. Vercel → Settings → Domains → "Add Domain"
 2. `www.noteastyle.com` 추가
-3. DNS 레코드 설정 (CNAME → cname.vercel-dns.com)
+3. DNS 레코드 설정:
+   - **A Record**: `76.76.21.21`
+   - 또는 **CNAME**: `cname.vercel-dns.com`
 
-### Railway 커스텀 도메인
-1. Railway → Settings → Networking → "Custom Domain"
-2. `api.noteastyle.com` 추가
-3. DNS 레코드 설정 (CNAME 제공됨)
+최종 URL:
+```
+https://www.noteastyle.com       → 앱 전체 (프론트엔드 + API)
+https://www.noteastyle.com/api/  → API 엔드포인트
+```
 
-최종 구성:
-```
-www.noteastyle.com → Vercel (Frontend)
-api.noteastyle.com → Railway (Backend)
-```
+> 별도 `api.noteastyle.com` 불필요 — API Routes가 같은 도메인에서 서빙됩니다.
 
 ---
 
-## 환경별 구성 요약
+## 로컬 개발 환경
 
-### 개발 (로컬)
+### 방법 A: Supabase CLI (권장)
+
+```bash
+# 1. Supabase CLI 설치
+npm install -g supabase
+
+# 2. 로컬 Supabase 인스턴스 시작 (Docker 필요)
+npx supabase start
+
+# 출력 예시:
+#   API URL: http://127.0.0.1:54321
+#   anon key: eyJ...local...
+#   service_role key: eyJ...local...
+
+# 3. 마이그레이션 적용
+npx supabase db push
+
+# 4. frontend/.env.local 설정
+cat > frontend/.env.local << 'EOF'
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...local-anon-key...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...local-service-role-key...
+OPENAI_API_KEY=sk-your-key
+AKOOL_API_KEY=your-key
+AKOOL_CLIENT_ID=your-id
+NEXT_PUBLIC_SHOP_ID=00000000-0000-0000-0000-000000000001
+EOF
+
+# 5. Next.js 개발 서버 시작
+cd frontend && npm run dev
+# → http://localhost:3000
+```
+
+### 방법 B: 원격 Supabase 직접 연결
+
+```bash
+# frontend/.env.local에 프로덕션 Supabase 키 입력
+# (별도 로컬 DB 불필요)
+cd frontend && npm run dev
+```
+
+### 방법 C: Docker Compose (간이 로컬 DB)
+
 ```bash
 docker compose up -d
-# Frontend: http://localhost:3000
-# Backend: http://localhost:8000
-# DB: localhost:5432
-# 사진: 로컬 uploads/
+# PostgreSQL: localhost:5432
+# Next.js: http://localhost:3000
 ```
 
-### 프로덕션
-```
-Frontend: https://noteastyle.vercel.app (또는 커스텀 도메인)
-Backend: https://noteastyle-backend.up.railway.app
-DB: Supabase PostgreSQL (Seoul)
-사진: AWS S3 noteastyle-photos (ap-northeast-2)
-```
-
-### 환경 변수 체크리스트
-
-| 변수 | 개발 | 프로덕션 |
-|------|------|---------|
-| `DATABASE_URL` | Docker PostgreSQL | Supabase/Neon |
-| `OPENAI_API_KEY` | .env 파일 | Railway 환경 변수 |
-| `AKOOL_API_KEY` | .env 파일 | Railway 환경 변수 |
-| `AKOOL_CLIENT_ID` | .env 파일 | Railway 환경 변수 |
-| `SECRET_KEY` | 기본값 | 랜덤 생성 필수 |
-| `CORS_ORIGINS` | http://localhost:3000 | Vercel 도메인 |
-| `AWS_*` | 빈 값 (로컬 저장) | S3 키 필수 |
-| `NEXT_PUBLIC_API_URL` | http://localhost:8000/api | Railway URL |
+> **참고**: Docker Compose의 PostgreSQL은 순수 DB만 제공합니다.
+> Supabase JS 클라이언트를 사용하려면 **방법 A (Supabase CLI)** 를 권장합니다.
 
 ---
 
-## 비용 예상 (월간)
+## 환경 변수 체크리스트
 
-### MVP 단계 (1-2개 샵)
-| 항목 | 비용 |
-|------|------|
-| Vercel (Free) | $0 |
-| Railway (Starter) | ~$5 |
-| Supabase (Free) | $0 |
-| AWS S3 | ~$1 |
-| **합계** | **~$6/월** |
+| 변수 | 로컬 (Supabase CLI) | 프로덕션 (Vercel) |
+|------|---------------------|-------------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | `http://127.0.0.1:54321` | `https://xxx.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 로컬 키 (CLI 출력) | Supabase 대시보드 |
+| `SUPABASE_SERVICE_ROLE_KEY` | 로컬 키 (CLI 출력) | Supabase 대시보드 |
+| `OPENAI_API_KEY` | `.env.local` | Vercel 환경 변수 |
+| `AKOOL_API_KEY` | `.env.local` | Vercel 환경 변수 |
+| `AKOOL_CLIENT_ID` | `.env.local` | Vercel 환경 변수 |
+| `NEXT_PUBLIC_SHOP_ID` | 테스트 UUID | 실제 매장 UUID |
 
-### 성장 단계 (10-50개 샵)
-| 항목 | 비용 |
-|------|------|
-| Vercel (Pro) | $20 |
-| Railway (Pro) | ~$20 |
-| Supabase (Pro) | $25 |
-| AWS S3 | ~$10 |
-| **합계** | **~$75/월** |
+---
+
+## Supabase Storage (사진 업로드)
+
+현재 API Route (`/api/shops/[shopId]/treatments/[treatmentId]/photos`)에서 Supabase Storage에 업로드합니다.
+
+### Storage 정책 설정
+
+Supabase Dashboard → Storage → Policies:
+
+```sql
+-- 서버(service_role)에서 업로드 허용 (API Route에서 사용)
+CREATE POLICY "Service role can upload" ON storage.objects
+  FOR INSERT TO service_role WITH CHECK (bucket_id = 'treatment-photos');
+
+-- 공개 읽기 (포트폴리오용, 선택)
+CREATE POLICY "Public read for published" ON storage.objects
+  FOR SELECT TO anon USING (bucket_id = 'treatment-photos');
+```
+
+> AWS S3 대신 Supabase Storage를 사용하면 별도 AWS 계정/IAM 설정이 불필요합니다.
 
 ---
 
 ## 트러블슈팅
 
-### Railway에서 DB 연결 실패
-- `DATABASE_URL` 형식 확인: `postgresql+asyncpg://` (asyncpg 필수)
-- Supabase Connection Pooler 사용 시 포트 `6543` 확인
-- IPv6 이슈: Railway는 IPv4 사용, Supabase pooler도 IPv4 지원
+### Vercel 빌드 실패
+- **환경 변수 누락**: Vercel에 `NEXT_PUBLIC_SUPABASE_URL` 등 설정했는지 확인
+- **Root Directory**: `frontend`로 설정했는지 확인
+- **Node.js 버전**: Vercel 기본 Node 22 사용 (package.json의 engines 확인)
 
-### Vercel에서 API 호출 실패
-- `NEXT_PUBLIC_API_URL`이 정확한지 확인 (끝에 `/api` 포함)
-- Backend CORS_ORIGINS에 Vercel 도메인이 포함되어 있는지 확인
-- HTTPS 확인 (Vercel은 HTTPS 강제)
+### Supabase 연결 실패
+- **URL 형식**: `https://xxx.supabase.co` (끝에 `/` 없음)
+- **키 확인**: `anon key`와 `service_role key` 혼동 주의
+- **RLS**: service_role 키를 사용하면 RLS 우회됨 (현재 설계)
 
-### Alembic 마이그레이션 실패
-- 로컬에서 `DATABASE_URL` 환경 변수로 원격 DB 지정 후 실행
-- `alembic.ini`의 `sqlalchemy.url`은 무시됨 (config.py에서 env 우선)
+### 로컬 Supabase CLI 시작 안 됨
+- Docker Desktop이 실행 중인지 확인
+- `npx supabase stop && npx supabase start` 재시작
+- 포트 충돌: 54321 (API), 54322 (DB) 확인
 
 ### 사진 업로드 실패
-- AWS S3 버킷 리전 확인 (ap-northeast-2)
-- IAM 권한 확인 (PutObject 필요)
+- Storage 버킷 `treatment-photos` 생성 확인
 - 파일 크기 10MB 제한 확인
+- service_role 키로 접근하는지 확인 (anon 키는 정책 필요)

@@ -1,4 +1,13 @@
-version: "3.8"
+# 로컬 개발용 Docker Compose (간이 환경)
+#
+# 권장: Supabase CLI 사용 (npx supabase start)
+# 이 파일은 Supabase CLI 없이 간이로 DB만 띄울 때 사용합니다.
+# Supabase JS 클라이언트의 전체 기능(Storage, Auth 등)은
+# Supabase CLI 로컬 인스턴스에서만 지원됩니다.
+#
+# 사용법:
+#   docker compose up -d
+#   cd frontend && npm run dev
 
 services:
   db:
@@ -12,17 +21,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./supabase/migrations:/docker-entrypoint-initdb.d
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: local-dev-anon-key
-      NEXT_PUBLIC_SHOP_ID: "00000000-0000-0000-0000-000000000001"
-    depends_on:
-      - db
 
 volumes:
   pgdata:

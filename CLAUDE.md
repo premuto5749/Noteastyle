@@ -46,7 +46,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `note-a-style-full-conversation.md` | 기획 대화 전체 요약 (기술 검토, 의사결정 과정, 비용 계산) |
 | `노터스타일 기능 목록 *.csv` | 전체 기능 목록 (구분, 우선순위, 연관기능) |
 | `노터스타일 기능 목록 *_all.csv` | 기능 목록 피벗 뷰 |
-| `deployment-guide.md` | 프로덕션 배포 가이드 (Vercel + Railway + Supabase/Neon) |
+| `deployment-guide.md` | 프로덕션 배포 가이드 (Vercel + Supabase) |
 
 ---
 
@@ -182,7 +182,7 @@ Noteastyle/
 ## 6. 데이터 모델
 
 모든 엔티티는 **UUID** 기본 키, `created_at`/`updated_at` 타임스탬프 포함.
-정의 위치: `backend/app/models/models.py`
+정의 위치: `supabase/migrations/001_initial_schema.sql`
 
 ### 엔티티 관계도
 
@@ -235,8 +235,8 @@ Portfolio (포트폴리오)
 
 ## 7. API 엔드포인트 명세
 
-Base URL: `http://localhost:8000/api`
-Swagger 문서: `http://localhost:8000/docs`
+Base URL: `/api` (same-domain, CORS 불필요)
+구현 위치: `frontend/src/app/api/`
 
 ### 매장/고객/시술 CRUD
 
@@ -302,65 +302,54 @@ Swagger 문서: `http://localhost:8000/docs`
 
 ### D. 사진 저장 규칙
 
-- 개발: 로컬 `uploads/` 디렉터리 (Docker volume)
-- 프로덕션: AWS S3 `noteastyle-photos` 버킷 (ap-northeast-2)
+- **Supabase Storage** `treatment-photos` 버킷 사용
 - 최대 파일 크기: **10MB**
 - 사진 타입: `before` / `during` / `after`
+- service_role 키로 업로드 (API Routes에서)
 
 ---
 
 ## 9. 개발 환경 설정
 
-### Docker (권장)
-```bash
-docker compose up -d
+> 📘 **상세 가이드**: [docs/deployment-guide.md](docs/deployment-guide.md)
 
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs (Swagger): http://localhost:8000/docs
-# PostgreSQL: localhost:5432
+### Supabase CLI (권장)
+```bash
+# 1. 로컬 Supabase 시작 (Docker 필요)
+npx supabase start
+# → API URL: http://127.0.0.1:54321, anon/service_role 키 출력됨
+
+# 2. 마이그레이션 적용
+npx supabase db push
+
+# 3. frontend/.env.local 설정 (출력된 키 입력)
+# 4. Next.js 개발 서버 시작
+cd frontend && npm install && npm run dev
+# → http://localhost:3000 (API Routes 포함)
 ```
 
-### 로컬 개발
-
-**Backend:**
+### 또는 원격 Supabase 직접 연결
 ```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env  # API 키 설정
-alembic upgrade head
-uvicorn app.main:app --reload
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm run dev
+# frontend/.env.local에 프로덕션 Supabase 키 입력 후
+cd frontend && npm run dev
 ```
 
 ### 개발 명령어
 
 ```bash
-# Backend
-uvicorn app.main:app --reload          # 개발 서버 (핫 리로드)
-alembic upgrade head                    # DB 마이그레이션 적용
-alembic revision --autogenerate -m ""   # 새 마이그레이션 생성
+# Next.js
+cd frontend && npm run dev              # 개발 서버 (API Routes 포함)
+cd frontend && npm run build            # 프로덕션 빌드
+cd frontend && npm run lint             # ESLint
 
-# Frontend
-npm run dev                             # 개발 서버
-npm run build                           # 프로덕션 빌드
-npm run lint                            # ESLint
-
-# Docker
-docker compose up -d                    # 전체 서비스 시작
-docker compose down                     # 전체 서비스 중지
-docker compose logs -f backend          # 백엔드 로그 확인
+# Supabase
+npx supabase start                      # 로컬 Supabase 시작
+npx supabase stop                       # 로컬 Supabase 중지
+npx supabase db push                    # 마이그레이션 적용
+npx supabase db reset                   # DB 초기화 + 마이그레이션 재적용
 ```
 
-### 환경 변수 (frontend/.env)
+### 환경 변수 (frontend/.env.local)
 
 | 변수 | 설명 | 필수 |
 |------|------|------|
@@ -469,8 +458,8 @@ docker compose logs -f backend          # 백엔드 로그 확인
 |------|---------|
 | 음성 인식 (Whisper) | ~$1 |
 | 페이스 스왑 (AKOOL) | $25-50 (50-100장) |
-| 서버/DB | ~$5 |
-| **총 원가** | **$31-56 (₩41,000-74,000)** |
+| Vercel + Supabase | $0 (Free 티어) ~ $45 (Pro) |
+| **총 원가** | **$26-96 (₩34,000-127,000)** |
 
 ---
 
