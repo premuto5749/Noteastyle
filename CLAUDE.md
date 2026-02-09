@@ -47,6 +47,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `노터스타일 기능 목록 *.csv` | 전체 기능 목록 (구분, 우선순위, 연관기능) |
 | `노터스타일 기능 목록 *_all.csv` | 기능 목록 피벗 뷰 |
 | `deployment-guide.md` | 프로덕션 배포 가이드 (Vercel + Supabase) |
+| `local-dev-setup.md` | 로컬 개발환경 세팅 가이드 (VS Code + Supabase CLI) |
 
 ---
 
