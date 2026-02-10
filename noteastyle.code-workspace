@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "Noteastyle",
+      "path": "."
+    }
+    // 기존 프로젝트 추가 예시:
+    // {
+    //   "name": "premuto",
+    //   "path": "../premuto"
+    // }
+  ],
+  "settings": {
+    "typescript.tsdk": "Noteastyle/frontend/node_modules/typescript/lib",
+    "files.exclude": {
+      "**/.next": true,
+      "**/node_modules": true,
+      "**/__pycache__": true
+    }
+  }
+}
