@@ -1,12 +1,9 @@
 -- Note-a-Style Initial Schema
 -- Migrated from SQLAlchemy/Alembic models
 
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
-
 -- Shops
 create table shops (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   name varchar(200) not null,
   shop_type varchar(50) not null, -- hair, nail, skin, scalp
   address varchar(500),
@@ -18,7 +15,7 @@ create table shops (
 
 -- Designers
 create table designers (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   shop_id uuid not null references shops(id) on delete cascade,
   name varchar(100) not null,
   role varchar(50) not null default 'designer', -- owner, designer, assistant
@@ -31,7 +28,7 @@ create index idx_designers_shop_id on designers(shop_id);
 
 -- Customers
 create table customers (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   shop_id uuid not null references shops(id) on delete cascade,
   name varchar(100) not null,
   phone varchar(20),
@@ -50,7 +47,7 @@ create index idx_customers_name on customers(name);
 
 -- Treatments (core entity)
 create table treatments (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   customer_id uuid not null references customers(id),
   designer_id uuid references designers(id),
   shop_id uuid not null references shops(id),
@@ -74,7 +71,7 @@ create index idx_treatments_created_at on treatments(created_at desc);
 
 -- Treatment Photos
 create table treatment_photos (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   treatment_id uuid not null references treatments(id) on delete cascade,
   photo_url varchar(500) not null,
   photo_type varchar(20) not null, -- before, during, after
@@ -89,7 +86,7 @@ create index idx_treatment_photos_treatment_id on treatment_photos(treatment_id)
 
 -- Portfolios
 create table portfolios (
-  id uuid primary key default uuid_generate_v4(),
+  id uuid primary key default gen_random_uuid(),
   shop_id uuid not null references shops(id),
   photo_id uuid not null references treatment_photos(id),
   title varchar(200),
