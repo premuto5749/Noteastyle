@@ -135,7 +135,7 @@ function StatCard({ label, value, loading }: { label: string; value: number; loa
 function TreatmentCard({ treatment: t }: { treatment: Treatment }) {
   return (
     <Link
-      href={`/treatments`}
+      href={`/treatments/${t.id}`}
       className="block bg-white rounded-xl border border-gray-100 p-3 active:bg-gray-50"
     >
       <div className="flex items-center justify-between">

@@ -96,9 +96,10 @@ export default function TreatmentsPage() {
         ) : (
           <div className="space-y-3">
             {filtered.map((t) => (
-              <div
+              <Link
                 key={t.id}
-                className="bg-white rounded-xl border border-gray-100 p-4"
+                href={`/treatments/${t.id}`}
+                className="block bg-white rounded-xl border border-gray-100 p-4 active:bg-gray-50"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -142,7 +143,7 @@ export default function TreatmentsPage() {
                     )}
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
