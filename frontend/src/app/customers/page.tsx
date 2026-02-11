@@ -57,7 +57,7 @@ export default function CustomersPage() {
         action={
           <button
             onClick={() => setShowAdd(true)}
-            className="px-3 py-1.5 bg-[var(--primary)] text-white rounded-lg text-sm font-medium"
+            className="px-3 py-1.5 bg-white text-black rounded-lg text-sm font-medium"
           >
             + 추가
           </button>
@@ -72,12 +72,12 @@ export default function CustomersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="\uACE0\uAC1D \uC774\uB984 \uAC80\uC0C9"
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[var(--primary)]"
+            placeholder="고객 이름 검색"
+            className="flex-1 px-4 py-2.5 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
           />
           <button
             onClick={handleSearch}
-            className="px-4 py-2.5 bg-gray-100 rounded-xl text-sm font-medium text-gray-700"
+            className="px-4 py-2.5 bg-[#1a1a1a] rounded-xl text-sm font-medium text-[#a1a1a1]"
           >
             검색
           </button>
@@ -85,33 +85,33 @@ export default function CustomersPage() {
 
         {/* Add Customer Modal */}
         {showAdd && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3">
+          <div className="bg-[#111111] rounded-2xl border border-[#333333] p-4 space-y-3">
             <h3 className="font-bold text-sm">새 고객 추가</h3>
             <input
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="\uC774\uB984"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+              placeholder="이름"
+              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
               autoFocus
             />
             <input
               type="tel"
               value={newPhone}
               onChange={(e) => setNewPhone(e.target.value)}
-              placeholder="\uC804\uD654\uBC88\uD638 (\uC120\uD0DD)"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+              placeholder="전화번호 (선택)"
+              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
             />
             <div className="flex gap-2">
               <button
                 onClick={handleAddCustomer}
-                className="flex-1 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium"
+                className="flex-1 py-2 bg-white text-black rounded-lg text-sm font-medium"
               >
                 추가
               </button>
               <button
                 onClick={() => setShowAdd(false)}
-                className="flex-1 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600"
+                className="flex-1 py-2 border border-[#333333] rounded-lg text-sm font-medium text-[#a1a1a1]"
               >
                 취소
               </button>
@@ -121,10 +121,10 @@ export default function CustomersPage() {
 
         {/* Customer List */}
         {loading ? (
-          <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+          <div className="text-center py-8 text-[#555555]">불러오는 중...</div>
         ) : customers.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
-            <p className="text-gray-400 text-sm">
+          <div className="text-center py-12 bg-[#111111] rounded-xl border border-[#262626]">
+            <p className="text-[#555555] text-sm">
               {search ? "\uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4" : "\uB4F1\uB85D\uB41C \uACE0\uAC1D\uC774 \uC5C6\uC2B5\uB2C8\uB2E4"}
             </p>
           </div>
@@ -133,21 +133,21 @@ export default function CustomersPage() {
             {customers.map((c) => (
               <div
                 key={c.id}
-                className="bg-white rounded-xl border border-gray-100 p-4 active:bg-gray-50"
+                className="bg-[#111111] rounded-xl border border-[#262626] p-4 active:bg-[#1a1a1a]"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium text-sm">{c.name}</div>
                     {c.phone && (
-                      <div className="text-xs text-gray-500 mt-0.5">{c.phone}</div>
+                      <div className="text-xs text-[#666666] mt-0.5">{c.phone}</div>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-[var(--primary)] font-medium">
+                    <div className="text-xs text-white font-medium">
                       방문 {c.visit_count}회
                     </div>
                     {c.last_visit && (
-                      <div className="text-xs text-gray-400 mt-0.5">
+                      <div className="text-xs text-[#555555] mt-0.5">
                         마지막 {new Date(c.last_visit).toLocaleDateString("ko-KR")}
                       </div>
                     )}

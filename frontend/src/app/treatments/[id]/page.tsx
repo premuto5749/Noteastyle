@@ -187,7 +187,7 @@ export default function TreatmentDetailPage() {
     return (
       <div>
         <PageHeader title="시술 상세" />
-        <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+        <div className="text-center py-8 text-[#555555]">불러오는 중...</div>
       </div>
     );
   }
@@ -202,7 +202,7 @@ export default function TreatmentDetailPage() {
         action={
           <button
             onClick={() => router.back()}
-            className="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-lg"
+            className="px-3 py-1.5 text-sm text-[#a1a1a1] bg-[#1a1a1a] rounded-lg"
           >
             뒤로
           </button>
@@ -211,20 +211,20 @@ export default function TreatmentDetailPage() {
 
       <div className="p-4 space-y-4">
         {/* 시술 정보 카드 */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
+        <div className="bg-[#111111] rounded-xl border border-[#262626] p-4 space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded-md text-xs font-medium">
+            <span className="px-2 py-0.5 bg-[#1a1a1a] text-[#ededed] rounded-md text-xs font-medium">
               {SERVICE_LABELS[treatment.service_type] || treatment.service_type}
             </span>
             {treatment.service_detail && (
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-[#a1a1a1]">
                 {treatment.service_detail}
               </span>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-gray-500">날짜</div>
+            <div className="text-[#666666]">날짜</div>
             <div>
               {new Date(treatment.created_at).toLocaleDateString("ko-KR", {
                 year: "numeric",
@@ -235,39 +235,39 @@ export default function TreatmentDetailPage() {
 
             {treatment.duration_minutes && (
               <>
-                <div className="text-gray-500">소요 시간</div>
+                <div className="text-[#666666]">소요 시간</div>
                 <div>{treatment.duration_minutes}분</div>
               </>
             )}
 
             {treatment.price != null && (
               <>
-                <div className="text-gray-500">가격</div>
+                <div className="text-[#666666]">가격</div>
                 <div>{treatment.price.toLocaleString()}원</div>
               </>
             )}
 
             {treatment.area && (
               <>
-                <div className="text-gray-500">시술 부위</div>
+                <div className="text-[#666666]">시술 부위</div>
                 <div>{treatment.area}</div>
               </>
             )}
 
             {treatment.satisfaction && (
               <>
-                <div className="text-gray-500">만족도</div>
+                <div className="text-[#666666]">만족도</div>
                 <div>{"★".repeat(Number(treatment.satisfaction))}{"☆".repeat(5 - Number(treatment.satisfaction))}</div>
               </>
             )}
 
             {customer && (
               <>
-                <div className="text-gray-500">고객</div>
+                <div className="text-[#666666]">고객</div>
                 <div>
                   <Link
                     href={`/customers`}
-                    className="text-[var(--primary)] underline"
+                    className="text-white underline"
                   >
                     {customer.name}
                   </Link>
@@ -279,12 +279,12 @@ export default function TreatmentDetailPage() {
           {/* 사용 제품 */}
           {treatment.products_used && treatment.products_used.length > 0 && (
             <div>
-              <div className="text-xs text-gray-500 mb-1">사용 제품</div>
+              <div className="text-xs text-[#666666] mb-1">사용 제품</div>
               <div className="flex gap-1 flex-wrap">
                 {treatment.products_used.map((p, i) => (
                   <span
                     key={i}
-                    className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                    className="text-xs bg-[#1a1a1a] text-[#a1a1a1] px-2 py-0.5 rounded-full"
                   >
                     {p.brand} {p.code} {p.area && `(${p.area})`}
                   </span>
@@ -296,16 +296,16 @@ export default function TreatmentDetailPage() {
           {/* 메모 */}
           {treatment.customer_notes && (
             <div>
-              <div className="text-xs text-gray-500 mb-1">메모</div>
-              <p className="text-sm text-gray-700">{treatment.customer_notes}</p>
+              <div className="text-xs text-[#666666] mb-1">메모</div>
+              <p className="text-sm text-[#a1a1a1]">{treatment.customer_notes}</p>
             </div>
           )}
 
           {/* AI 요약 */}
           {treatment.ai_summary && (
             <div>
-              <div className="text-xs text-gray-500 mb-1">AI 요약</div>
-              <p className="text-sm text-gray-700 bg-purple-50 rounded-lg p-2">
+              <div className="text-xs text-[#666666] mb-1">AI 요약</div>
+              <p className="text-sm text-[#a1a1a1] bg-[#1a1a1a] rounded-lg p-2">
                 {treatment.ai_summary}
               </p>
             </div>
@@ -314,8 +314,8 @@ export default function TreatmentDetailPage() {
           {/* 다음 방문 추천 */}
           {treatment.next_visit_recommendation && (
             <div>
-              <div className="text-xs text-gray-500 mb-1">다음 방문 추천</div>
-              <p className="text-sm text-gray-700">
+              <div className="text-xs text-[#666666] mb-1">다음 방문 추천</div>
+              <p className="text-sm text-[#a1a1a1]">
                 {treatment.next_visit_recommendation}
               </p>
             </div>
@@ -323,16 +323,16 @@ export default function TreatmentDetailPage() {
         </div>
 
         {/* 사진 갤러리 */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <h2 className="font-bold text-gray-900 mb-3">
+        <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
+          <h2 className="font-bold text-[#ededed] mb-3">
             시술 사진{" "}
-            <span className="text-sm font-normal text-gray-400">
+            <span className="text-sm font-normal text-[#555555]">
               {sortedPhotos.length}장
             </span>
           </h2>
 
           {sortedPhotos.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">
+            <p className="text-sm text-[#555555] text-center py-4">
               아직 사진이 없습니다
             </p>
           ) : (
@@ -340,7 +340,7 @@ export default function TreatmentDetailPage() {
               {sortedPhotos.map((photo) => (
                 <div key={photo.id} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500 uppercase">
+                    <span className="text-xs font-medium text-[#666666] uppercase">
                       {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
                     </span>
                     <div className="flex gap-2">
@@ -349,7 +349,7 @@ export default function TreatmentDetailPage() {
                         <button
                           onClick={() => setSwapTargetPhotoId(photo.id)}
                           disabled={swapPolling}
-                          className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-md disabled:opacity-50"
+                          className="text-xs px-2 py-1 bg-[#1a1a1a] text-blue-400 rounded-md disabled:opacity-50"
                         >
                           AI 페이스 스왑
                         </button>
@@ -357,7 +357,7 @@ export default function TreatmentDetailPage() {
                       {/* 포트폴리오 추가 버튼 */}
                       <button
                         onClick={() => handleAddToPortfolio(photo)}
-                        className="text-xs px-2 py-1 bg-purple-50 text-purple-700 rounded-md"
+                        className="text-xs px-2 py-1 bg-[#1a1a1a] text-[#ededed] rounded-md"
                       >
                         {photo.is_portfolio ? "포트폴리오 추가됨" : "포트폴리오 추가"}
                       </button>
@@ -387,7 +387,7 @@ export default function TreatmentDetailPage() {
                   </div>
 
                   {photo.caption && (
-                    <p className="text-xs text-gray-500">{photo.caption}</p>
+                    <p className="text-xs text-[#666666]">{photo.caption}</p>
                   )}
                 </div>
               ))}
@@ -396,13 +396,13 @@ export default function TreatmentDetailPage() {
         </div>
 
         {/* 사진 업로드 */}
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <h2 className="font-bold text-gray-900 mb-3">사진 업로드</h2>
+        <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
+          <h2 className="font-bold text-[#ededed] mb-3">사진 업로드</h2>
           <div className="flex items-center gap-2">
             <select
               value={uploadType}
               onChange={(e) => setUploadType(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-2 py-1.5"
+              className="text-sm border border-[#333333] rounded-lg px-2 py-1.5 bg-[#111111] text-[#ededed]"
             >
               <option value="before">시술 전</option>
               <option value="during">시술 중</option>
@@ -411,8 +411,8 @@ export default function TreatmentDetailPage() {
             <label
               className={`flex-1 text-center text-sm py-2 rounded-lg cursor-pointer ${
                 uploading
-                  ? "bg-gray-100 text-gray-400"
-                  : "bg-[var(--primary)] text-white active:opacity-80"
+                  ? "bg-[#1a1a1a] text-[#555555]"
+                  : "bg-white text-black active:opacity-80"
               }`}
             >
               {uploading ? "업로드 중..." : "사진 선택"}
@@ -429,23 +429,23 @@ export default function TreatmentDetailPage() {
 
         {/* 페이스 스왑 모달 */}
         {swapTargetPhotoId && !swapPolling && (
-          <div className="bg-white rounded-xl border border-blue-200 p-4">
+          <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-gray-900">AI 페이스 스왑</h2>
+              <h2 className="font-bold text-[#ededed]">AI 페이스 스왑</h2>
               <button
                 onClick={() => setSwapTargetPhotoId(null)}
-                className="text-xs text-gray-400"
+                className="text-xs text-[#555555]"
               >
                 취소
               </button>
             </div>
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-[#666666] mb-3">
               교체할 얼굴이 담긴 소스 이미지를 선택하세요.
             </p>
             <label
               className={`block text-center text-sm py-2 rounded-lg cursor-pointer ${
                 swapUploading
-                  ? "bg-gray-100 text-gray-400"
+                  ? "bg-[#1a1a1a] text-[#555555]"
                   : "bg-blue-600 text-white active:opacity-80"
               }`}
             >
@@ -463,11 +463,11 @@ export default function TreatmentDetailPage() {
 
         {/* 페이스 스왑 진행 중 */}
         {swapPolling && (
-          <div className="bg-blue-50 rounded-xl border border-blue-200 p-4 text-center">
-            <div className="text-sm text-blue-700 font-medium">
+          <div className="bg-[#111111] rounded-xl border border-[#262626] p-4 text-center">
+            <div className="text-sm text-blue-400 font-medium">
               AI 페이스 스왑 처리 중...
             </div>
-            <p className="text-xs text-blue-500 mt-1">
+            <p className="text-xs text-blue-400/70 mt-1">
               처리가 완료되면 자동으로 결과가 표시됩니다. (Job: {swapJobId})
             </p>
           </div>

@@ -120,8 +120,8 @@ export default function QuickRecordPage() {
       <div className="p-4">
         {step === "customer" && (
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <label className="text-sm font-medium text-gray-700 block mb-2">
+            <div className="bg-[#111111] rounded-2xl p-6 border border-[#262626]">
+              <label className="text-sm font-medium text-[#a1a1a1] block mb-2">
                 고객 이름
               </label>
               <div className="flex gap-2">
@@ -130,14 +130,14 @@ export default function QuickRecordPage() {
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCustomerSubmit()}
-                  placeholder="\uC774\uB984\uC744 \uC785\uB825\uD558\uC138\uC694"
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-purple-100"
+                  placeholder="이름을 입력하세요"
+                  className="flex-1 px-4 py-3 border border-[#333333] rounded-xl text-base bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white focus:ring-2 focus:ring-[#333333]"
                   autoFocus
                 />
                 <button
                   onClick={handleCustomerSubmit}
                   disabled={!customerName.trim()}
-                  className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-medium disabled:opacity-40 active:scale-95 transition-transform"
+                  className="px-6 py-3 bg-white text-black rounded-xl font-medium disabled:opacity-40 active:scale-95 transition-transform"
                 >
                   다음
                 </button>
@@ -145,7 +145,7 @@ export default function QuickRecordPage() {
             </div>
 
             <div className="text-center">
-              <p className="text-xs text-gray-400 mb-3">또는 음성으로 한번에 기록</p>
+              <p className="text-xs text-[#555555] mb-3">또는 음성으로 한번에 기록</p>
               <VoiceMemo onResult={handleVoiceMemo} disabled={voiceProcessing} />
               {voiceProcessing && (
                 <p className="text-sm text-[var(--primary)] mt-2 animate-pulse">
@@ -158,12 +158,12 @@ export default function QuickRecordPage() {
 
         {step === "service" && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-4 border border-gray-100">
-              <div className="text-sm text-gray-500 mb-1">고객</div>
+            <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+              <div className="text-sm text-[#666666] mb-1">고객</div>
               <div className="font-bold text-lg">{customerName}</div>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-gray-100">
-              <div className="text-sm font-medium text-gray-700 mb-3">
+            <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+              <div className="text-sm font-medium text-[#a1a1a1] mb-3">
                 시술 종류를 선택하세요
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -183,21 +183,21 @@ export default function QuickRecordPage() {
 
         {step === "product" && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-4 border border-gray-100">
+            <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-500">{customerName}</div>
+                  <div className="text-sm text-[#666666]">{customerName}</div>
                   <div className="font-bold">
                     {SERVICES.find((s) => s.type === selectedService)?.label}
                   </div>
                 </div>
-                <button onClick={() => setStep("service")} className="text-sm text-[var(--primary)]">
+                <button onClick={() => setStep("service")} className="text-sm text-[#a1a1a1]">
                   변경
                 </button>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-gray-100">
-              <div className="text-sm font-medium text-gray-700 mb-3">
+            <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+              <div className="text-sm font-medium text-[#a1a1a1] mb-3">
                 사용한 제품 (여러 개 선택 가능)
               </div>
               <div className="flex flex-wrap gap-2">
@@ -218,34 +218,34 @@ export default function QuickRecordPage() {
             <button
               onClick={() => handleSave()}
               disabled={saving}
-              className="w-full py-4 bg-[var(--primary)] text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
+              className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
             >
-              {saving ? "\uC800\uC7A5 \uC911..." : "\uAE30\uB85D \uC644\uB8CC"}
+              {saving ? "저장 중..." : "기록 완료"}
             </button>
           </div>
         )}
 
         {step === "done" && (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-[#0a2a0a] rounded-full flex items-center justify-center mx-auto mb-4">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">기록 완료!</h2>
-            <p className="text-gray-500 text-sm mb-6">
+            <h2 className="text-xl font-bold text-[#ededed] mb-1">기록 완료!</h2>
+            <p className="text-[#666666] text-sm mb-6">
               {customerName}님의 시술이 기록되었습니다
             </p>
             <div className="flex gap-3 justify-center">
               <button
                 onClick={reset}
-                className="px-6 py-3 bg-[var(--primary)] text-white rounded-xl font-medium active:scale-95 transition-transform"
+                className="px-6 py-3 bg-white text-black rounded-xl font-medium active:scale-95 transition-transform"
               >
                 다음 고객 기록
               </button>
               <a
                 href="/treatments"
-                className="px-6 py-3 border border-gray-200 rounded-xl font-medium text-gray-700 active:scale-95 transition-transform"
+                className="px-6 py-3 border border-[#333333] rounded-xl font-medium text-[#a1a1a1] active:scale-95 transition-transform"
               >
                 시술 목록
               </a>

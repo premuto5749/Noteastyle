@@ -18,7 +18,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#8b5cf6",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased bg-background pb-20">
+      <body className="antialiased bg-background text-foreground pb-20">
         <main className="min-h-screen">{children}</main>
         <BottomNav />
       </body>

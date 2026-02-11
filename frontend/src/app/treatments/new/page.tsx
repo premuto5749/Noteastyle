@@ -94,8 +94,8 @@ export default function NewTreatmentPage() {
 
       <div className="p-4 space-y-4">
         {/* Voice shortcut */}
-        <div className="bg-purple-50 rounded-2xl p-4 border border-purple-100">
-          <p className="text-sm text-purple-800 font-medium mb-3 text-center">
+        <div className="bg-[#1a1a1a] rounded-2xl p-4 border border-[#262626]">
+          <p className="text-sm text-[#ededed] font-medium mb-3 text-center">
             음성으로 자동 입력
           </p>
           <VoiceMemo onResult={handleVoiceMemo} disabled={voiceProcessing} />
@@ -107,20 +107,20 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Customer */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <label className="text-sm font-medium text-gray-700 block mb-2">고객 이름 *</label>
+        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+          <label className="text-sm font-medium text-[#a1a1a1] block mb-2">고객 이름 *</label>
           <input
             type="text"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="\uC774\uB984"
-            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[var(--primary)]"
+            placeholder="이름"
+            className="w-full px-3 py-2.5 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
           />
         </div>
 
         {/* Service */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <label className="text-sm font-medium text-gray-700 block mb-3">시술 종류 *</label>
+        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+          <label className="text-sm font-medium text-[#a1a1a1] block mb-3">시술 종류 *</label>
           <div className="grid grid-cols-3 gap-2">
             {SERVICES.map((s) => (
               <ServiceButton
@@ -135,17 +135,17 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Products */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100">
-          <label className="text-sm font-medium text-gray-700 block mb-2">사용 제품</label>
+        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
+          <label className="text-sm font-medium text-[#a1a1a1] block mb-2">사용 제품</label>
           {products.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {products.map((p, i) => (
                 <span
                   key={i}
-                  className="flex items-center gap-1 text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded-full"
+                  className="flex items-center gap-1 text-xs bg-[#1a1a1a] text-[#ededed] px-2 py-1 rounded-full"
                 >
                   {p.brand} {p.code} {p.area && `(${p.area})`}
-                  <button onClick={() => removeProduct(i)} className="ml-1 text-purple-400 hover:text-purple-700">
+                  <button onClick={() => removeProduct(i)} className="ml-1 text-[#555555] hover:text-[#ededed]">
                     x
                   </button>
                 </span>
@@ -157,19 +157,19 @@ export default function NewTreatmentPage() {
               type="text"
               value={productBrand}
               onChange={(e) => setProductBrand(e.target.value)}
-              placeholder="\uBE0C\uB79C\uB4DC (예: 로레알)"
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+              placeholder="브랜드 (예: 로레알)"
+              className="flex-1 px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
             />
             <input
               type="text"
               value={productCode}
               onChange={(e) => setProductCode(e.target.value)}
-              placeholder="\uCF54\uB4DC (예: 7.1)"
-              className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+              placeholder="코드 (예: 7.1)"
+              className="w-24 px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
             />
             <button
               onClick={addProduct}
-              className="px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium"
+              className="px-3 py-2 bg-[#1a1a1a] rounded-lg text-sm font-medium text-[#a1a1a1]"
             >
               +
             </button>
@@ -177,48 +177,48 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Details */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 space-y-3">
-          <label className="text-sm font-medium text-gray-700 block">상세 정보</label>
+        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626] space-y-3">
+          <label className="text-sm font-medium text-[#a1a1a1] block">상세 정보</label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 block mb-1">시술 부위</label>
+              <label className="text-xs text-[#666666] block mb-1">시술 부위</label>
               <input
                 type="text"
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
-                placeholder="\uC608: \uBFCC\uB9AC, \uC804\uCCB4"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+                placeholder="예: 뿌리, 전체"
+                className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">소요 시간 (분)</label>
+              <label className="text-xs text-[#666666] block mb-1">소요 시간 (분)</label>
               <input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="30"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+                className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
               />
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">가격 (원)</label>
+            <label className="text-xs text-[#666666] block mb-1">가격 (원)</label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="50000"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)]"
+              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">메모</label>
+            <label className="text-xs text-[#666666] block mb-1">메모</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="\uC2DC\uC220 \uAD00\uB828 \uBA54\uBAA8..."
+              placeholder="시술 관련 메모..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[var(--primary)] resize-none"
+              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white resize-none"
             />
           </div>
         </div>
@@ -227,9 +227,9 @@ export default function NewTreatmentPage() {
         <button
           onClick={handleSubmit}
           disabled={saving || !customerName.trim() || !selectedService}
-          className="w-full py-4 bg-[var(--primary)] text-white rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
         >
-          {saving ? "\uC800\uC7A5 \uC911..." : "\uAE30\uB85D \uC800\uC7A5"}
+          {saving ? "저장 중..." : "기록 저장"}
         </button>
       </div>
     </div>

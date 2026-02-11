@@ -45,7 +45,7 @@ export default function TreatmentsPage() {
         action={
           <Link
             href="/treatments/new"
-            className="px-3 py-1.5 bg-[var(--primary)] text-white rounded-lg text-sm font-medium"
+            className="px-3 py-1.5 bg-white text-black rounded-lg text-sm font-medium"
           >
             + 새 기록
           </Link>
@@ -59,8 +59,8 @@ export default function TreatmentsPage() {
             onClick={() => setFilter(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
               !filter
-                ? "bg-[var(--primary)] text-white"
-                : "bg-gray-100 text-gray-600"
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-[#a1a1a1]"
             }`}
           >
             전체
@@ -71,8 +71,8 @@ export default function TreatmentsPage() {
               onClick={() => setFilter(key)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
                 filter === key
-                  ? "bg-[var(--primary)] text-white"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-white text-black"
+                  : "bg-[#1a1a1a] text-[#a1a1a1]"
               }`}
             >
               {label}
@@ -82,13 +82,13 @@ export default function TreatmentsPage() {
 
         {/* Treatment List */}
         {loading ? (
-          <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+          <div className="text-center py-8 text-[#555555]">불러오는 중...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
-            <p className="text-gray-400 text-sm">시술 기록이 없습니다</p>
+          <div className="text-center py-12 bg-[#111111] rounded-xl border border-[#262626]">
+            <p className="text-[#555555] text-sm">시술 기록이 없습니다</p>
             <Link
               href="/record"
-              className="inline-block mt-3 px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm"
+              className="inline-block mt-3 px-4 py-2 bg-white text-black rounded-lg text-sm"
             >
               기록 시작하기
             </Link>
@@ -99,16 +99,16 @@ export default function TreatmentsPage() {
               <Link
                 key={t.id}
                 href={`/treatments/${t.id}`}
-                className="block bg-white rounded-xl border border-gray-100 p-4 active:bg-gray-50"
+                className="block bg-[#111111] rounded-xl border border-[#262626] p-4 active:bg-[#1a1a1a]"
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded-md text-xs font-medium">
+                      <span className="px-2 py-0.5 bg-[#1a1a1a] text-[#ededed] rounded-md text-xs font-medium">
                         {SERVICE_LABELS[t.service_type] || t.service_type}
                       </span>
                       {t.service_detail && (
-                        <span className="text-sm text-gray-600">{t.service_detail}</span>
+                        <span className="text-sm text-[#a1a1a1]">{t.service_detail}</span>
                       )}
                     </div>
                     {t.products_used && t.products_used.length > 0 && (
@@ -116,7 +116,7 @@ export default function TreatmentsPage() {
                         {t.products_used.map((p, i) => (
                           <span
                             key={i}
-                            className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                            className="text-xs bg-[#1a1a1a] text-[#a1a1a1] px-2 py-0.5 rounded-full"
                           >
                             {p.brand} {p.code}
                           </span>
@@ -124,20 +124,20 @@ export default function TreatmentsPage() {
                       </div>
                     )}
                     {t.customer_notes && (
-                      <p className="text-xs text-gray-500 mt-2">{t.customer_notes}</p>
+                      <p className="text-xs text-[#666666] mt-2">{t.customer_notes}</p>
                     )}
                   </div>
                   <div className="text-right shrink-0 ml-3">
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-[#555555]">
                       {new Date(t.created_at).toLocaleDateString("ko-KR")}
                     </div>
                     {t.duration_minutes && (
-                      <div className="text-xs text-gray-400 mt-0.5">
+                      <div className="text-xs text-[#555555] mt-0.5">
                         {t.duration_minutes}분
                       </div>
                     )}
                     {t.photos.length > 0 && (
-                      <div className="text-xs text-[var(--primary)] mt-1">
+                      <div className="text-xs text-[#a1a1a1] mt-1">
                         사진 {t.photos.length}장
                       </div>
                     )}
