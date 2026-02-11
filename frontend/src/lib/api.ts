@@ -190,3 +190,29 @@ export function togglePortfolioPublish(id: string) {
     method: "PUT",
   });
 }
+
+// Face Swap
+export interface FaceSwapJob {
+  _id: string;
+  status: number;
+  url?: string;
+  [key: string]: unknown;
+}
+
+export function startFaceSwap(sourcePhotoId: string, targetPhotoId: string) {
+  return request<FaceSwapJob>(
+    `/face-swap/?source_photo_id=${encodeURIComponent(sourcePhotoId)}&target_photo_id=${encodeURIComponent(targetPhotoId)}`,
+    { method: "POST" }
+  );
+}
+
+export function getFaceSwapStatus(jobId: string) {
+  return request<FaceSwapJob>(`/face-swap/status/${jobId}`);
+}
+
+export function completeFaceSwap(photoId: string, faceSwappedUrl: string) {
+  return request<{ status: string; photo_id: string; face_swapped_url: string }>(
+    `/face-swap/complete/${photoId}`,
+    { method: "POST", body: JSON.stringify({ face_swapped_url: faceSwappedUrl }) }
+  );
+}

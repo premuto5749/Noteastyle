@@ -48,8 +48,8 @@ export default function PortfolioPage() {
             onClick={() => setShowPublished(false)}
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               !showPublished
-                ? "bg-[var(--primary)] text-white"
-                : "bg-gray-100 text-gray-600"
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-[#a1a1a1]"
             }`}
           >
             전체
@@ -58,8 +58,8 @@ export default function PortfolioPage() {
             onClick={() => setShowPublished(true)}
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               showPublished
-                ? "bg-[var(--primary)] text-white"
-                : "bg-gray-100 text-gray-600"
+                ? "bg-white text-black"
+                : "bg-[#1a1a1a] text-[#a1a1a1]"
             }`}
           >
             공개됨
@@ -67,20 +67,20 @@ export default function PortfolioPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+          <div className="text-center py-8 text-[#555555]">불러오는 중...</div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-gray-100">
-            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2">
+          <div className="text-center py-12 bg-[#111111] rounded-xl border border-[#262626]">
+            <div className="w-16 h-16 bg-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <p className="text-gray-500 text-sm font-medium mb-1">
+            <p className="text-[#666666] text-sm font-medium mb-1">
               아직 포트폴리오가 없습니다
             </p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-[#555555] text-xs">
               시술 사진에서 AI 페이스 스왑을 적용하면
               <br />
               자동으로 포트폴리오가 생성됩니다
@@ -91,9 +91,9 @@ export default function PortfolioPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+                className="bg-[#111111] rounded-xl border border-[#262626] overflow-hidden"
               >
-                <div className="aspect-square bg-gray-100 relative">
+                <div className="aspect-square bg-[#1a1a1a] relative">
                   {item.photo.face_swapped_url ? (
                     <img
                       src={item.photo.face_swapped_url}
@@ -101,7 +101,7 @@ export default function PortfolioPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                    <div className="w-full h-full flex items-center justify-center text-[#333333]">
                       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <circle cx="8.5" cy="8.5" r="1.5" />
@@ -124,7 +124,7 @@ export default function PortfolioPage() {
                       {item.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="text-xs bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded"
+                          className="text-xs bg-[#1a1a1a] text-[#a1a1a1] px-1.5 py-0.5 rounded"
                         >
                           #{tag}
                         </span>
@@ -135,8 +135,8 @@ export default function PortfolioPage() {
                     onClick={() => handleTogglePublish(item.id)}
                     className={`mt-2 w-full py-1.5 rounded-lg text-xs font-medium ${
                       item.is_published
-                        ? "bg-gray-100 text-gray-600"
-                        : "bg-[var(--primary)] text-white"
+                        ? "bg-[#1a1a1a] text-[#a1a1a1]"
+                        : "bg-white text-black"
                     }`}
                   >
                     {item.is_published ? "\uBE44\uACF5\uAC1C" : "\uACF5\uAC1C\uD558\uAE30"}
