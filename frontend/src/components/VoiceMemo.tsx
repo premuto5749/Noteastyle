@@ -32,11 +32,17 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
 
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        if (blob.size === 0) {
+          alert("녹음된 오디오가 비어 있습니다. 다시 시도해주세요.");
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        console.log(`[VoiceMemo] 녹음 완료: ${blob.size} bytes, chunks: ${chunksRef.current.length}`);
         onResult(blob);
         stream.getTracks().forEach((t) => t.stop());
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(1000);
       setRecording(true);
       setDuration(0);
       timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);

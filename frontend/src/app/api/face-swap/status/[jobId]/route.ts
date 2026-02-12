@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFaceSwapStatus } from "@/lib/services/akool-service";
+import { getFaceSwapStatus } from "@/lib/services/replicate-service";
 
 export async function GET(
   _request: NextRequest,

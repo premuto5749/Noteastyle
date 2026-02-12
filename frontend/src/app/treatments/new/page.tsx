@@ -59,8 +59,10 @@ export default function NewTreatmentPage() {
       if (result.area) setArea(result.area);
       if (result.duration_minutes) setDuration(String(result.duration_minutes));
       if (result.summary) setNotes(result.summary);
-    } catch {
-      alert("\uC74C\uC131 \uC778\uC2DD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "음성 인식에 실패했습니다.";
+      alert(message + " 다시 시도해주세요.");
+      console.error("[VoiceMemo] 에러:", err);
     } finally {
       setVoiceProcessing(false);
     }

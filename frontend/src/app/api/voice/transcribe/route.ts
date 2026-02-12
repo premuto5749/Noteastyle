@@ -11,6 +11,12 @@ export async function POST(request: NextRequest) {
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
+    console.log(`[transcribe] 파일 수신: ${file.name}, size: ${buffer.length} bytes`);
+
+    if (buffer.length === 0) {
+      return NextResponse.json({ detail: "오디오 파일이 비어 있습니다." }, { status: 400 });
+    }
+
     const extraction = await transcribeAndExtract(buffer, file.name || "voice-memo.webm");
 
     return NextResponse.json({
@@ -29,6 +35,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Transcription failed";
+    console.error("[transcribe] 에러:", err);
     return NextResponse.json({ detail: message }, { status: 500 });
   }
 }

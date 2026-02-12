@@ -97,8 +97,10 @@ export default function QuickRecordPage() {
       if (result.service_type && customerId) {
         await handleSave(result.service_type, result.products_used || []);
       }
-    } catch {
-      alert("\uC74C\uC131 \uC778\uC2DD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "음성 인식에 실패했습니다.";
+      alert(message + " 다시 시도해주세요.");
+      console.error("[VoiceMemo] 에러:", err);
     } finally {
       setVoiceProcessing(false);
     }

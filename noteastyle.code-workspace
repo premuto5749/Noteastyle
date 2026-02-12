@@ -4,11 +4,10 @@
       "name": "Noteastyle",
       "path": "."
     }
-    // 기존 프로젝트 추가 예시:
-    // {
-    //   "name": "premuto",
-    //   "path": "../premuto"
-    // }
+    {
+      "name": "premuto-1",
+      "path": "../premuto-1"    // ← 실제 경로로 수정
+    }
   ],
   "settings": {
     "typescript.tsdk": "Noteastyle/frontend/node_modules/typescript/lib",
