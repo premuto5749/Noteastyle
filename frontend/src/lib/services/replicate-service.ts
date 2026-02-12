@@ -4,7 +4,7 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
-const MODEL = "codeplugtech/face-swap" as const;
+const VERSION = "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b34";
 
 /**
  * Start a face swap prediction on Replicate.
@@ -12,7 +12,7 @@ const MODEL = "codeplugtech/face-swap" as const;
  */
 export async function faceSwap(sourceImageUrl: string, targetImageUrl: string) {
   const prediction = await replicate.predictions.create({
-    model: MODEL,
+    version: VERSION,
     input: {
       swap_image: sourceImageUrl,
       input_image: targetImageUrl,
