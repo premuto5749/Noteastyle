@@ -41,7 +41,7 @@ export function getCustomer(id: string) {
 }
 
 export function createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string }) {
-  return request<Customer>(`/shops/${SHOP_ID}/customers/`, {
+  return request<Customer>(`/shops/${SHOP_ID}/customers`, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -105,7 +105,7 @@ export function createTreatment(data: {
   customer_notes?: string;
   next_visit_recommendation?: string;
 }) {
-  return request<Treatment>(`/shops/${SHOP_ID}/treatments/`, {
+  return request<Treatment>(`/shops/${SHOP_ID}/treatments`, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -182,7 +182,7 @@ export function createPortfolioItem(data: {
   description?: string;
   tags?: string[];
 }) {
-  return request<PortfolioItem>(`/shops/${SHOP_ID}/portfolio/`, {
+  return request<PortfolioItem>(`/shops/${SHOP_ID}/portfolio`, {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -204,7 +204,7 @@ export interface FaceSwapJob {
 
 export function startFaceSwap(sourcePhotoId: string, targetPhotoId: string) {
   return request<FaceSwapJob>(
-    `/face-swap/?source_photo_id=${encodeURIComponent(sourcePhotoId)}&target_photo_id=${encodeURIComponent(targetPhotoId)}`,
+    `/face-swap?source_photo_id=${encodeURIComponent(sourcePhotoId)}&target_photo_id=${encodeURIComponent(targetPhotoId)}`,
     { method: "POST" }
   );
 }
