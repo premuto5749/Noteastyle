@@ -27,11 +27,20 @@ export type TreatmentExtractionResult = z.infer<typeof TreatmentExtraction>;
 
 export async function transcribeAudio(audioBuffer: Buffer, filename: string): Promise<string> {
   const file = new File([new Uint8Array(audioBuffer)], filename, { type: "audio/webm" });
+  console.log(`[transcribeAudio] 파일 생성: ${filename}, size: ${audioBuffer.length} bytes`);
+
   const transcription = await getOpenAI().audio.transcriptions.create({
-    model: "gpt-4o-mini-transcribe",
+    model: "whisper-1",
     file,
     language: "ko",
   });
+
+  console.log(`[transcribeAudio] 변환 결과: "${transcription.text}"`);
+
+  if (!transcription.text || transcription.text.trim().length === 0) {
+    throw new Error("음성이 인식되지 않았습니다. 더 크게 말하거나 더 길게 녹음해주세요.");
+  }
+
   return transcription.text;
 }
 

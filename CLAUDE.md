@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 슬로건: **"시술 기록의 신"**
 
 ### 핵심 가치
-- 초상권 침해 없이 AI 페이스 스왑으로 포트폴리오 생성 (AKOOL API)
+- 초상권 침해 없이 AI 페이스 스왑으로 포트폴리오 생성 (Replicate API)
 - 시술 사진 위에 직접 시술 내용 기록 (AI 스타일 노트)
 - 음성 메모 30초 → AI가 시술 데이터 자동 구조화 (Whisper + GPT-4o)
 - 큰 버튼 탭 1초 만에 빠른 기록 (팔꿈치로도 가능)
@@ -63,7 +63,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │         │                            │
 │    ┌────┼──────────┐                 │
 │    ▼    ▼          ▼                 │
-│ Supabase  OpenAI   AKOOL            │
+│ Supabase  OpenAI   Replicate        │
 │ (DB)     Whisper   Face             │
 │          GPT-4o    Swap             │
 └──────────────────────────────────────┘
@@ -92,7 +92,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```
 시술 사진 (before/after)
-  └→ POST /api/face-swap/ (AKOOL API 호출)
+  └→ POST /api/face-swap/ (Replicate API 호출)
       └→ 비동기 처리 → GET /api/face-swap/status/{id} (폴링)
           └→ 완료 시 face_swapped_url 저장
               └→ 포트폴리오 자동 생성 가능
@@ -116,7 +116,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### AI / External APIs
 - **OpenAI Whisper** → 음성을 텍스트로 변환 ($0.006/분)
 - **GPT-4o Structured Output** → 텍스트를 구조화된 시술 데이터로 변환 (Zod 스키마)
-- **AKOOL API** → AI 페이스 스왑 (엔터프라이즈급, 4K 해상도, 상업적 라이선스)
+- **Replicate API** → AI 페이스 스왑 (`codeplugtech/face-swap` 모델, 건당 ~$0.0027)
 
 ### 인프라
 - **Vercel** → Next.js 배포 (프로덕션)
@@ -171,7 +171,7 @@ Noteastyle/
     │       │   └── server.ts  # 서버용 (API Routes)
     │       └── services/      # 외부 API 서비스
     │           ├── openai-service.ts   # Whisper + GPT-4o
-    │           └── akool-service.ts    # AKOOL 페이스 스왑
+    │           └── replicate-service.ts # Replicate 페이스 스왑
     ├── .env.example
     ├── package.json
     ├── tsconfig.json
@@ -221,7 +221,7 @@ Treatment (시술 기록) ← 핵심 엔티티
 TreatmentPhoto (시술 사진)
 ├── treatment_id (FK → Treatment)
 ├── photo_url, photo_type (before/during/after)
-├── face_swapped_url (AKOOL 처리 결과)
+├── face_swapped_url (Replicate 처리 결과)
 ├── is_portfolio (포트폴리오 사용 여부)
 └── notes
 
@@ -259,7 +259,7 @@ Base URL: `/api` (same-domain, CORS 불필요)
 | Method | Path | 설명 |
 |--------|------|------|
 | POST | `/voice/transcribe` | 음성 메모 → Whisper → GPT-4o → 구조화 데이터 |
-| POST | `/face-swap/` | AKOOL 페이스 스왑 시작 (비동기) |
+| POST | `/face-swap/` | Replicate 페이스 스왑 시작 (비동기) |
 | GET | `/face-swap/status/{id}` | 페이스 스왑 처리 상태 확인 |
 
 ### 포트폴리오
@@ -296,10 +296,9 @@ Base URL: `/api` (same-domain, CORS 불필요)
 
 ### C. 페이스 스왑 규칙
 
-- AKOOL API 사용 (엔터프라이즈급, 상업적 라이선스)
-- 이미지 1장당 4 크레딧, 4장 생성
+- Replicate API 사용 (`codeplugtech/face-swap` 모델)
 - 비동기 처리: 요청 → 폴링으로 상태 확인 → 완료 시 URL 저장
-- 비용: 월 100장 기준 **$50**
+- 비용: 건당 ~$0.0027, 월 100장 기준 **~$0.27**
 
 ### D. 사진 저장 규칙
 
@@ -358,8 +357,7 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon 키 | Y |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role 키 (API Routes용) | Y |
 | `OPENAI_API_KEY` | OpenAI API 키 (Whisper + GPT-4o) | Y |
-| `AKOOL_API_KEY` | AKOOL 페이스 스왑 API 키 | Y |
-| `AKOOL_CLIENT_ID` | AKOOL 클라이언트 ID | Y |
+| `REPLICATE_API_TOKEN` | Replicate API 토큰 (페이스 스왑) | Y |
 | `NEXT_PUBLIC_SHOP_ID` | MVP 단일 매장 ID | N (기본값 있음) |
 
 ---
@@ -369,7 +367,7 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 ### API Routes (Backend)
 - API Routes는 `src/app/api/` 아래 **도메인별 디렉토리로 분리**
 - DB 접근은 `createServerClient()` → Supabase 클라이언트 사용
-- 외부 API 서비스는 `src/lib/services/`에 분리 (openai, akool)
+- 외부 API 서비스는 `src/lib/services/`에 분리 (openai, replicate)
 - 환경 변수는 `process.env`로 직접 접근 (서버 전용 키는 `NEXT_PUBLIC_` 접두사 없이)
 
 ### Frontend (TypeScript)
@@ -429,7 +427,7 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 - [x] 상세 시술 기록 (제품, 부위, 시간)
 - [x] 시술 사진 업로드 (before/during/after)
 - [ ] 음성 메모 → AI 구조화 (Whisper + GPT-4o)
-- [ ] AI 페이스 스왑 (AKOOL API)
+- [ ] AI 페이스 스왑 (Replicate API)
 - [ ] 포트폴리오 자동 생성
 
 ### Phase 1 - 2순위 (예정)
@@ -458,9 +456,9 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 | 항목 | 월 비용 |
 |------|---------|
 | 음성 인식 (Whisper) | ~$1 |
-| 페이스 스왑 (AKOOL) | $25-50 (50-100장) |
+| 페이스 스왑 (Replicate) | ~$0.27 (100장) |
 | Vercel + Supabase | $0 (Free 티어) ~ $45 (Pro) |
-| **총 원가** | **$26-96 (₩34,000-127,000)** |
+| **총 원가** | **~$1-46 (₩1,300-61,000)** |
 
 ---
 

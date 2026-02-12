@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { faceSwap } from "@/lib/services/akool-service";
+import { faceSwap } from "@/lib/services/replicate-service";
 
 export async function POST(request: NextRequest) {
   const supabase = createServerClient();

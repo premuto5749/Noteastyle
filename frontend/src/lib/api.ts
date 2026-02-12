@@ -150,7 +150,10 @@ export async function transcribeVoiceMemo(audioBlob: Blob): Promise<VoiceMemoRes
     method: "POST",
     body: formData,
   });
-  if (!res.ok) throw new Error("Failed to transcribe voice memo");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ detail: "알 수 없는 오류" }));
+    throw new Error(errorData.detail || "음성 인식에 실패했습니다.");
+  }
   return res.json();
 }
 
