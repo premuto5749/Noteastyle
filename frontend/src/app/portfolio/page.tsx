@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { getPortfolio, togglePortfolioPublish, type PortfolioItem } from "@/lib/api";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function PortfolioPage() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
@@ -131,16 +132,23 @@ export default function PortfolioPage() {
                       ))}
                     </div>
                   )}
-                  <button
-                    onClick={() => handleTogglePublish(item.id)}
-                    className={`mt-2 w-full py-1.5 rounded-lg text-xs font-medium ${
-                      item.is_published
-                        ? "bg-[#1a1a1a] text-[#a1a1a1]"
-                        : "bg-white text-black"
-                    }`}
-                  >
-                    {item.is_published ? "\uBE44\uACF5\uAC1C" : "\uACF5\uAC1C\uD558\uAE30"}
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => handleTogglePublish(item.id)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${
+                        item.is_published
+                          ? "bg-[#1a1a1a] text-[#a1a1a1]"
+                          : "bg-white text-black"
+                      }`}
+                    >
+                      {item.is_published ? "\uBE44\uACF5\uAC1C" : "\uACF5\uAC1C\uD558\uAE30"}
+                    </button>
+                    <ShareButton
+                      imageUrl={item.photo.face_swapped_url || item.photo.photo_url}
+                      title={item.title || "포트폴리오"}
+                      className="py-1.5 px-3 rounded-lg text-xs font-medium bg-[#1a1a1a] text-[#a1a1a1]"
+                    />
+                  </div>
                 </div>
               </div>
             ))}

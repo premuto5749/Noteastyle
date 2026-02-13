@@ -16,6 +16,7 @@ import {
   type Customer,
   type TreatmentPhoto,
 } from "@/lib/api";
+import { ShareButton } from "@/components/ShareButton";
 
 const SERVICE_LABELS: Record<string, string> = {
   cut: "커트",
@@ -99,16 +100,17 @@ export default function TreatmentDetailPage() {
         )
     : [];
 
-  // Photo upload handler
+  // Photo/video upload handler
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !treatment) return;
     setUploading(true);
     try {
-      await uploadTreatmentPhoto(treatment.id, file, uploadType);
+      const isVideo = file.type.startsWith("video/");
+      await uploadTreatmentPhoto(treatment.id, file, uploadType, undefined, isVideo ? { mediaType: "video" } : undefined);
       await loadData();
     } catch {
-      alert("사진 업로드에 실패했습니다.");
+      alert("업로드에 실패했습니다.");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -322,19 +324,34 @@ export default function TreatmentDetailPage() {
           )}
         </div>
 
-        {/* 사진 갤러리 */}
+        {/* 사진/영상 갤러리 */}
         <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
           <h2 className="font-bold text-[#ededed] mb-3">
-            시술 사진{" "}
+            시술 사진/영상{" "}
             <span className="text-sm font-normal text-[#555555]">
-              {sortedPhotos.length}장
+              {(() => {
+                const photoCount = sortedPhotos.filter((p) => (p.media_type || "photo") === "photo").length;
+                const videoCount = sortedPhotos.filter((p) => p.media_type === "video").length;
+                const parts = [];
+                if (photoCount > 0) parts.push(`사진 ${photoCount}장`);
+                if (videoCount > 0) parts.push(`영상 ${videoCount}편`);
+                return parts.join(" ") || "0장";
+              })()}
             </span>
           </h2>
 
           {sortedPhotos.length === 0 ? (
-            <p className="text-sm text-[#555555] text-center py-4">
-              아직 사진이 없습니다
-            </p>
+            <div className="text-center py-4">
+              <p className="text-sm text-[#555555] mb-3">
+                아직 사진/영상이 없습니다
+              </p>
+              <a
+                href={`/treatments/${id}/capture`}
+                className="inline-block px-4 py-2 bg-white text-black rounded-lg text-sm font-medium active:scale-95 transition-transform"
+              >
+                촬영하기
+              </a>
+            </div>
           ) : (
             <div className="space-y-4">
               {sortedPhotos.map((photo) => (
@@ -342,10 +359,18 @@ export default function TreatmentDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium text-[#666666] uppercase">
                       {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
+                      {photo.media_type === "video" && (
+                        <span className="ml-1 text-blue-400">영상</span>
+                      )}
                     </span>
                     <div className="flex gap-2">
-                      {/* 페이스 스왑 버튼 */}
-                      {!photo.face_swapped_url && (
+                      {/* 공유 버튼 */}
+                      <ShareButton
+                        imageUrl={photo.face_swapped_url || photo.photo_url}
+                        title={treatment ? `${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}` : "시술 사진"}
+                      />
+                      {/* 페이스 스왑 버튼 (사진만) */}
+                      {!photo.face_swapped_url && (photo.media_type || "photo") === "photo" && (
                         <button
                           onClick={() => setSwapTargetPhotoId(photo.id)}
                           disabled={swapPolling}
@@ -353,6 +378,12 @@ export default function TreatmentDetailPage() {
                         >
                           AI 페이스 스왑
                         </button>
+                      )}
+                      {/* 영상은 face swap 불가 표시 */}
+                      {photo.media_type === "video" && !photo.face_swapped_url && (
+                        <span className="text-xs px-2 py-1 text-[#555555]">
+                          사진만 스왑 가능
+                        </span>
                       )}
                       {/* 포트폴리오 추가 버튼 */}
                       <button
@@ -365,12 +396,24 @@ export default function TreatmentDetailPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={photo.photo_url}
-                      alt={`${photo.photo_type} 사진`}
-                      className="w-full rounded-lg object-cover max-h-64"
-                    />
+                    {photo.media_type === "video" ? (
+                      <video
+                        src={photo.photo_url}
+                        controls
+                        playsInline
+                        poster={photo.thumbnail_url || undefined}
+                        className="w-full rounded-lg max-h-64"
+                      />
+                    ) : (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.photo_url}
+                          alt={`${photo.photo_type} 사진`}
+                          className="w-full rounded-lg object-cover max-h-64"
+                        />
+                      </>
+                    )}
                     {photo.face_swapped_url && (
                       <div className="relative w-full">
                         <span className="absolute top-1 left-1 text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded">
@@ -395,9 +438,17 @@ export default function TreatmentDetailPage() {
           )}
         </div>
 
-        {/* 사진 업로드 */}
+        {/* 사진/영상 업로드 */}
         <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
-          <h2 className="font-bold text-[#ededed] mb-3">사진 업로드</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-bold text-[#ededed]">파일 업로드</h2>
+            <a
+              href={`/treatments/${id}/capture`}
+              className="text-xs text-blue-400"
+            >
+              촬영하기
+            </a>
+          </div>
           <div className="flex items-center gap-2">
             <select
               value={uploadType}
@@ -415,10 +466,10 @@ export default function TreatmentDetailPage() {
                   : "bg-white text-black active:opacity-80"
               }`}
             >
-              {uploading ? "업로드 중..." : "사진 선택"}
+              {uploading ? "업로드 중..." : "사진/영상 선택"}
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 className="hidden"
                 onChange={handlePhotoUpload}
                 disabled={uploading}

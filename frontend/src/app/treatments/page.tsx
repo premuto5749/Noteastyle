@@ -138,7 +138,15 @@ export default function TreatmentsPage() {
                     )}
                     {t.photos.length > 0 && (
                       <div className="text-xs text-[#a1a1a1] mt-1">
-                        사진 {t.photos.length}장
+                        {(() => {
+                          const photos = t.photos.filter((p) => p.photo_type !== "source");
+                          const photoCount = photos.filter((p) => (p.media_type || "photo") === "photo").length;
+                          const videoCount = photos.filter((p) => p.media_type === "video").length;
+                          const parts = [];
+                          if (photoCount > 0) parts.push(`사진 ${photoCount}장`);
+                          if (videoCount > 0) parts.push(`영상 ${videoCount}편`);
+                          return parts.join(" ");
+                        })()}
                       </div>
                     )}
                   </div>
