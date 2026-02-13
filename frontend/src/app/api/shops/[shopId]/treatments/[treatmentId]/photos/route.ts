@@ -25,14 +25,18 @@ export async function POST(
   const file = formData.get("file") as File | null;
   const photoType = (formData.get("photo_type") as string) || "after";
   const caption = formData.get("caption") as string | null;
+  const mediaType = (formData.get("media_type") as string) || "photo";
+  const videoDuration = formData.get("video_duration_seconds") as string | null;
+  const thumbnail = formData.get("thumbnail") as File | null;
 
   if (!file) {
     return NextResponse.json({ detail: "No file provided" }, { status: 400 });
   }
 
-  // Upload to Supabase Storage
-  const ext = file.name.split(".").pop() || "jpg";
-  const filePath = `photos/${treatmentId}/${randomUUID()}.${ext}`;
+  // Upload main file to Supabase Storage
+  const ext = file.name.split(".").pop() || (mediaType === "video" ? "webm" : "jpg");
+  const prefix = mediaType === "video" ? "videos" : "photos";
+  const filePath = `${prefix}/${treatmentId}/${randomUUID()}.${ext}`;
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error: uploadError } = await supabase.storage
@@ -47,7 +51,26 @@ export async function POST(
     .from("treatment-photos")
     .getPublicUrl(filePath);
 
-  // Save photo record
+  // Upload thumbnail if provided (for videos)
+  let thumbnailUrl: string | null = null;
+  if (thumbnail && mediaType === "video") {
+    const thumbExt = thumbnail.name.split(".").pop() || "jpg";
+    const thumbPath = `thumbnails/${treatmentId}/${randomUUID()}.${thumbExt}`;
+    const thumbBuffer = Buffer.from(await thumbnail.arrayBuffer());
+
+    const { error: thumbError } = await supabase.storage
+      .from("treatment-photos")
+      .upload(thumbPath, thumbBuffer, { contentType: thumbnail.type });
+
+    if (!thumbError) {
+      const { data: thumbUrlData } = supabase.storage
+        .from("treatment-photos")
+        .getPublicUrl(thumbPath);
+      thumbnailUrl = thumbUrlData.publicUrl;
+    }
+  }
+
+  // Save record
   const { data: photo, error } = await supabase
     .from("treatment_photos")
     .insert({
@@ -55,6 +78,9 @@ export async function POST(
       photo_url: urlData.publicUrl,
       photo_type: photoType,
       caption: caption,
+      media_type: mediaType,
+      video_duration_seconds: videoDuration ? parseInt(videoDuration) : null,
+      thumbnail_url: thumbnailUrl,
     })
     .select()
     .single();

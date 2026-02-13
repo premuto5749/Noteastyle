@@ -32,6 +32,7 @@ export default function NewTreatmentPage() {
   const [duration, setDuration] = useState("");
   const [price, setPrice] = useState("");
   const [notes, setNotes] = useState("");
+  const [naverBookingId, setNaverBookingId] = useState("");
   const [saving, setSaving] = useState(false);
   const [voiceProcessing, setVoiceProcessing] = useState(false);
 
@@ -72,8 +73,11 @@ export default function NewTreatmentPage() {
     if (!customerName.trim() || !selectedService) return;
     setSaving(true);
     try {
-      const customer = await createCustomer({ name: customerName.trim() });
-      await createTreatment({
+      const customer = await createCustomer({
+        name: customerName.trim(),
+        naver_booking_id: naverBookingId.trim() || undefined,
+      });
+      const result = await createTreatment({
         customer_id: customer.id,
         service_type: selectedService,
         products_used: products.length > 0 ? products : undefined,
@@ -82,7 +86,7 @@ export default function NewTreatmentPage() {
         price: price ? parseInt(price) : undefined,
         customer_notes: notes || undefined,
       });
-      router.push("/treatments");
+      router.push(`/treatments/${result.id}/capture`);
     } catch {
       alert("\uC800\uC7A5\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
     } finally {
@@ -109,15 +113,27 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Customer */}
-        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
-          <label className="text-sm font-medium text-[#a1a1a1] block mb-2">고객 이름 *</label>
-          <input
-            type="text"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="이름"
-            className="w-full px-3 py-2.5 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
-          />
+        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626] space-y-3">
+          <div>
+            <label className="text-sm font-medium text-[#a1a1a1] block mb-2">고객 이름 *</label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="이름"
+              className="w-full px-3 py-2.5 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[#666666] block mb-1">네이버 예약번호 (선택)</label>
+            <input
+              type="text"
+              value={naverBookingId}
+              onChange={(e) => setNaverBookingId(e.target.value)}
+              placeholder="예약번호 입력"
+              className="w-full px-3 py-2 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+            />
+          </div>
         </div>
 
         {/* Service */}

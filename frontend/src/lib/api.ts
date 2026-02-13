@@ -40,7 +40,7 @@ export function getCustomer(id: string) {
   return request<Customer>(`/shops/${SHOP_ID}/customers/${id}`);
 }
 
-export function createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string }) {
+export function createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string; naver_booking_id?: string }) {
   return request<Customer>(`/shops/${SHOP_ID}/customers`, {
     method: "POST",
     body: JSON.stringify(data),
@@ -63,6 +63,9 @@ export interface TreatmentPhoto {
   is_portfolio: boolean;
   caption: string | null;
   taken_at: string;
+  media_type: "photo" | "video";
+  video_duration_seconds: number | null;
+  thumbnail_url: string | null;
 }
 
 export interface Treatment {
@@ -113,20 +116,32 @@ export function createTreatment(data: {
 
 export async function uploadTreatmentPhoto(
   treatmentId: string,
-  file: File,
+  file: File | Blob,
   photoType: string = "after",
-  caption?: string
+  caption?: string,
+  options?: {
+    mediaType?: "photo" | "video";
+    videoDuration?: number;
+    thumbnail?: Blob;
+  }
 ) {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", file instanceof Blob && !(file instanceof File)
+    ? new File([file], `capture.${options?.mediaType === "video" ? "webm" : "jpg"}`, { type: file.type })
+    : file);
   formData.append("photo_type", photoType);
   if (caption) formData.append("caption", caption);
+  if (options?.mediaType) formData.append("media_type", options.mediaType);
+  if (options?.videoDuration != null) formData.append("video_duration_seconds", String(options.videoDuration));
+  if (options?.thumbnail) {
+    formData.append("thumbnail", new File([options.thumbnail], "thumbnail.jpg", { type: "image/jpeg" }));
+  }
 
   const res = await fetch(
     `${API_BASE}/shops/${SHOP_ID}/treatments/${treatmentId}/photos`,
     { method: "POST", body: formData }
   );
-  if (!res.ok) throw new Error("Failed to upload photo");
+  if (!res.ok) throw new Error("Failed to upload media");
   return res.json() as Promise<TreatmentPhoto>;
 }
 

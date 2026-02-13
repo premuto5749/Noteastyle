@@ -39,18 +39,22 @@ export default function QuickRecordPage() {
   const [saving, setSaving] = useState(false);
   const [voiceProcessing, setVoiceProcessing] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [naverBookingId, setNaverBookingId] = useState("");
 
   const handleCustomerSubmit = useCallback(async () => {
     if (!customerName.trim()) return;
     try {
-      const customer = await createCustomer({ name: customerName.trim() });
+      const customer = await createCustomer({
+        name: customerName.trim(),
+        naver_booking_id: naverBookingId.trim() || undefined,
+      });
       setCustomerId(customer.id);
       setStep("service");
     } catch {
       setCustomerId("demo-id");
       setStep("service");
     }
-  }, [customerName]);
+  }, [customerName, naverBookingId]);
 
   const handleServiceSelect = (type: string) => {
     setSelectedService(type);
@@ -113,6 +117,7 @@ export default function QuickRecordPage() {
     setSelectedService(null);
     setSelectedProducts([]);
     setSavedId(null);
+    setNaverBookingId("");
   };
 
   return (
@@ -143,6 +148,18 @@ export default function QuickRecordPage() {
                 >
                   다음
                 </button>
+              </div>
+              <div className="mt-3">
+                <label className="text-xs text-[#666666] block mb-1">
+                  네이버 예약번호 (선택)
+                </label>
+                <input
+                  type="text"
+                  value={naverBookingId}
+                  onChange={(e) => setNaverBookingId(e.target.value)}
+                  placeholder="예약번호 입력"
+                  className="w-full px-4 py-2 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+                />
               </div>
             </div>
 
@@ -238,19 +255,29 @@ export default function QuickRecordPage() {
             <p className="text-[#666666] text-sm mb-6">
               {customerName}님의 시술이 기록되었습니다
             </p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={reset}
-                className="px-6 py-3 bg-white text-black rounded-xl font-medium active:scale-95 transition-transform"
-              >
-                다음 고객 기록
-              </button>
-              <a
-                href="/treatments"
-                className="px-6 py-3 border border-[#333333] rounded-xl font-medium text-[#a1a1a1] active:scale-95 transition-transform"
-              >
-                시술 목록
-              </a>
+            <div className="flex flex-col gap-3 items-center">
+              {savedId && savedId !== "demo-id" && (
+                <a
+                  href={`/treatments/${savedId}/capture`}
+                  className="w-full max-w-xs py-3 bg-white text-black rounded-xl font-bold text-center active:scale-95 transition-transform"
+                >
+                  사진/영상 촬영
+                </a>
+              )}
+              <div className="flex gap-3">
+                <button
+                  onClick={reset}
+                  className="px-6 py-3 border border-[#333333] rounded-xl font-medium text-[#a1a1a1] active:scale-95 transition-transform"
+                >
+                  다음 고객 기록
+                </button>
+                <a
+                  href="/treatments"
+                  className="px-6 py-3 border border-[#333333] rounded-xl font-medium text-[#a1a1a1] active:scale-95 transition-transform"
+                >
+                  시술 목록
+                </a>
+              </div>
             </div>
           </div>
         )}
