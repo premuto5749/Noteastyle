@@ -24,6 +24,7 @@ export function MediaCapture({ mode, onCapture, onClose }: MediaCaptureProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
+  const durationRef = useRef(0);
 
   const [ready, setReady] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -132,7 +133,7 @@ export function MediaCapture({ mode, onCapture, onClose }: MediaCaptureProps) {
         blob: videoBlob,
         type: "video",
         thumbnailBlob: thumbnailBlob || undefined,
-        durationSeconds: duration,
+        durationSeconds: durationRef.current,
         previewUrl,
         thumbnailUrl,
       });
@@ -144,16 +145,15 @@ export function MediaCapture({ mode, onCapture, onClose }: MediaCaptureProps) {
     recorder.start(1000);
     setRecording(true);
     setDuration(0);
+    durationRef.current = 0;
     timerRef.current = setInterval(() => {
-      setDuration((d) => {
-        if (d + 1 >= MAX_VIDEO_DURATION) {
-          mediaRecorderRef.current?.stop();
-          return d + 1;
-        }
-        return d + 1;
-      });
+      durationRef.current += 1;
+      setDuration(durationRef.current);
+      if (durationRef.current >= MAX_VIDEO_DURATION) {
+        mediaRecorderRef.current?.stop();
+      }
     }, 1000);
-  }, [captureFrame, onCapture, duration]);
+  }, [captureFrame, onCapture]);
 
   const stopRecording = useCallback(() => {
     mediaRecorderRef.current?.stop();
