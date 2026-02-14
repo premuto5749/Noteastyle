@@ -70,20 +70,46 @@ export async function POST(
     }
   }
 
-  // Save record
-  const { data: photo, error } = await supabase
+  // Build insert data — only include video columns when they have non-default values.
+  // This ensures backward-compatibility if migration 003 hasn't been applied yet.
+  const insertData: Record<string, unknown> = {
+    treatment_id: treatmentId,
+    photo_url: urlData.publicUrl,
+    photo_type: photoType,
+    caption: caption,
+  };
+
+  // Only include new columns when they carry non-default values
+  const hasVideoColumns = mediaType === "video" || videoDuration || thumbnailUrl;
+  if (hasVideoColumns) {
+    insertData.media_type = mediaType;
+    if (videoDuration) insertData.video_duration_seconds = parseInt(videoDuration);
+    if (thumbnailUrl) insertData.thumbnail_url = thumbnailUrl;
+  }
+
+  // Try insert — if new columns fail (migration not applied), retry without them
+  let { data: photo, error } = await supabase
     .from("treatment_photos")
-    .insert({
+    .insert(insertData)
+    .select()
+    .single();
+
+  if (error && hasVideoColumns) {
+    // Fallback: retry without video columns (migration 003 not yet applied)
+    const fallbackData = {
       treatment_id: treatmentId,
       photo_url: urlData.publicUrl,
       photo_type: photoType,
       caption: caption,
-      media_type: mediaType,
-      video_duration_seconds: videoDuration ? parseInt(videoDuration) : null,
-      thumbnail_url: thumbnailUrl,
-    })
-    .select()
-    .single();
+    };
+    const fallback = await supabase
+      .from("treatment_photos")
+      .insert(fallbackData)
+      .select()
+      .single();
+    photo = fallback.data;
+    error = fallback.error;
+  }
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(photo, { status: 201 });
