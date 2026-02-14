@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 interface VoiceMemoProps {
   onResult: (audioBlob: Blob) => void;
@@ -11,16 +11,37 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
   const [recording, setRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
+
+  // Cleanup on unmount: stop timer, recorder, and media stream
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      // Determine best supported audio format
+      let mimeType = "audio/webm;codecs=opus";
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/webm";
+      }
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/mp4";
+      }
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-          ? "audio/webm;codecs=opus"
-          : "audio/webm",
+        mimeType: MediaRecorder.isTypeSupported(mimeType) ? mimeType : undefined,
       });
 
       chunksRef.current = [];
@@ -31,13 +52,12 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
         if (blob.size === 0) {
           alert("녹음된 오디오가 비어 있습니다. 다시 시도해주세요.");
           stream.getTracks().forEach((t) => t.stop());
           return;
         }
-        console.log(`[VoiceMemo] 녹음 완료: ${blob.size} bytes, chunks: ${chunksRef.current.length}`);
         onResult(blob);
         stream.getTracks().forEach((t) => t.stop());
       };

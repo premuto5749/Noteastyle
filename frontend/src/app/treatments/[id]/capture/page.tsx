@@ -33,7 +33,7 @@ export default function CapturePage() {
 
   const handleSave = async () => {
     if (items.length === 0) {
-      router.push("/treatments");
+      router.push(`/treatments/${treatmentId}`);
       return;
     }
 
@@ -58,16 +58,15 @@ export default function CapturePage() {
         );
       }
 
-      // Cleanup preview URLs
-      items.forEach((item) => {
-        URL.revokeObjectURL(item.previewUrl);
-        if (item.thumbnailUrl) URL.revokeObjectURL(item.thumbnailUrl);
-      });
-
       router.push(`/treatments/${treatmentId}`);
     } catch {
       alert("업로드에 실패했습니다. 다시 시도해주세요.");
     } finally {
+      // Cleanup preview URLs regardless of success/failure
+      items.forEach((item) => {
+        URL.revokeObjectURL(item.previewUrl);
+        if (item.thumbnailUrl) URL.revokeObjectURL(item.thumbnailUrl);
+      });
       setUploading(false);
     }
   };
@@ -78,7 +77,7 @@ export default function CapturePage() {
         title="사진/영상 촬영"
         action={
           <button
-            onClick={() => router.push("/treatments")}
+            onClick={() => router.push(`/treatments/${treatmentId}`)}
             className="px-3 py-1.5 text-sm text-[#a1a1a1] bg-[#1a1a1a] rounded-lg"
           >
             건너뛰기

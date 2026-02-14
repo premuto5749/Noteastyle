@@ -16,9 +16,9 @@ export default function HomePage() {
           getCustomers(),
           getTreatments(),
         ]);
-        const today = new Date().toISOString().slice(0, 10);
+        const today = new Date().toLocaleDateString("ko-KR");
         const todayCount = treatments.filter((t) =>
-          t.created_at.startsWith(today)
+          new Date(t.created_at).toLocaleDateString("ko-KR") === today
         ).length;
         setStats({
           customers: customers.length,

@@ -12,6 +12,7 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     async function load() {
+      setLoading(true);
       try {
         const data = await getPortfolio(showPublished);
         setItems(data);
@@ -27,11 +28,16 @@ export default function PortfolioPage() {
   const handleTogglePublish = async (id: string) => {
     try {
       const updated = await togglePortfolioPublish(id);
-      setItems((prev) =>
-        prev.map((item) => (item.id === id ? updated : item))
-      );
+      if (showPublished && !updated.is_published) {
+        // Remove from list when unpublishing in "published only" view
+        setItems((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        setItems((prev) =>
+          prev.map((item) => (item.id === id ? updated : item))
+        );
+      }
     } catch {
-      alert("\uC0C1\uD0DC \uBCC0\uACBD\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
+      alert("상태 변경에 실패했습니다.");
     }
   };
 
@@ -96,6 +102,7 @@ export default function PortfolioPage() {
               >
                 <div className="aspect-square bg-[#1a1a1a] relative">
                   {item.photo.face_swapped_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={item.photo.face_swapped_url}
                       alt={item.title || "포트폴리오"}

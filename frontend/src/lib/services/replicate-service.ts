@@ -22,7 +22,7 @@ export async function faceSwap(sourceImageUrl: string, targetImageUrl: string) {
   return {
     _id: prediction.id,
     status: mapStatus(prediction.status),
-    url: typeof prediction.output === "string" ? prediction.output : undefined,
+    url: extractOutputUrl(prediction.output),
   };
 }
 
@@ -36,8 +36,17 @@ export async function getFaceSwapStatus(jobId: string) {
   return {
     _id: prediction.id,
     status: mapStatus(prediction.status),
-    url: typeof prediction.output === "string" ? prediction.output : undefined,
+    url: extractOutputUrl(prediction.output),
   };
+}
+
+/**
+ * Extract URL from Replicate output (can be a string or array of strings).
+ */
+function extractOutputUrl(output: unknown): string | undefined {
+  if (typeof output === "string") return output;
+  if (Array.isArray(output) && typeof output[0] === "string") return output[0];
+  return undefined;
 }
 
 /**
