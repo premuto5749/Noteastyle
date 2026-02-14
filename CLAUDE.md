@@ -19,10 +19,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 큰 버튼 탭 1초 만에 빠른 기록 (팔꿈치로도 가능)
 
 ### 산업 배경
-- 2024년 기준 뷰티 관련 업장 약 120,000개 (부동산보다 많음)
-- 예약관리에만 집중된 획일화된 솔루션 사용 중
-- 관리 업무, 홍보/마케팅, 기자재 소싱을 모두 별도 관리 → 비용 증가
-- K-뷰티는 세계적 영향력을 가지고 있으나 디지털/전산화가 부족
+- 2024년 기준 뷰티 관련 업장 약 120,000개 (생활서비스업종 1/3, 부동산보다 많음)
+- 예약관리에만 집중된 획일화된 솔루션 사용 중 (핸드SOS, 헤어짱, 스마일패드, 뷰카, 공비서 등)
+- 관리 업무, 홍보/마케팅, 기자재 소싱을 모두 별도 관리 → 비용 증가 → 악순환 구조
+- K-뷰티는 세계적 영향력을 가지고 있으나 디지털/전산화가 크게 부족
+- "샵 유목민" 현상: 만족스러운 매장을 찾지 못해 떠도는 소비자
+
+> **상세 시장 분석/경쟁사**: [docs/PRD.md](docs/PRD.md) 참조
 
 ---
 
@@ -37,6 +40,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | **CLAUDE.md** (이 파일) | 개발 가이드라인 및 프로젝트 규칙 |
 | **README.md** | 프로젝트 개요 및 Quick Start |
 
+### 핵심 기획 문서 (docs/)
+
+| 파일 | 내용 |
+|------|------|
+| **`PRD.md`** | **제품 요구사항 문서** -- 시장 분석, 경쟁사, 51개 전체 기능 목록, Phase별 로드맵, KPI |
+| **`schema.md`** | **DB 스키마 문서** -- 6개 테이블 상세, ER 다이어그램, TypeScript 인터페이스 매핑, 알려진 이슈 |
+
 ### 기초 문서 (docs/)
 
 | 파일 | 내용 |
@@ -44,8 +54,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `About_Note-a-Style_노터스타일에_대하여.pdf` | 프로젝트 비전, AI 기능 소개, Value Chain 설명 |
 | `Pain_Point__Hurdle.pdf` | K-뷰티 산업 Pain Point, 비효율 분석, 악순환 구조 |
 | `note-a-style-full-conversation.md` | 기획 대화 전체 요약 (기술 검토, 의사결정 과정, 비용 계산) |
-| `노터스타일 기능 목록 *.csv` | 전체 기능 목록 (구분, 우선순위, 연관기능) |
-| `노터스타일 기능 목록 *_all.csv` | 기능 목록 피벗 뷰 |
+| `노터스타일 기능 목록 *.csv` | 전체 기능 목록 51개 (구분, 우선순위, 연관기능) |
 | `deployment-guide.md` | 프로덕션 배포 가이드 (Vercel + Supabase) |
 | `local-dev-setup.md` | 로컬 개발환경 세팅 가이드 (VS Code + Supabase CLI) |
 
@@ -134,36 +143,55 @@ Noteastyle/
 ├── docker-compose.yml         # 로컬 개발용 (db + frontend)
 ├── .gitignore
 │
-├── docs/                      # 기초 문서
+├── docs/                      # 문서
+│   ├── PRD.md                 # 제품 요구사항 문서 (핵심)
+│   ├── schema.md              # DB 스키마 문서 (핵심)
 │   ├── About_Note-a-Style_노터스타일에_대하여.pdf
 │   ├── Pain_Point__Hurdle.pdf
 │   ├── note-a-style-full-conversation.md
 │   ├── deployment-guide.md    # 프로덕션 배포 가이드
-│   ├── 노터스타일 기능 목록 *.csv
-│   └── 노터스타일 기능 목록 *_all.csv
+│   ├── local-dev-setup.md     # 로컬 개발환경 세팅 가이드
+│   └── 노터스타일 기능 목록 *.csv
 │
 ├── supabase/                  # Supabase 설정
 │   └── migrations/            # SQL 마이그레이션
 │       ├── 001_initial_schema.sql
-│       └── 002_helper_functions.sql
+│       ├── 002_helper_functions.sql
+│       └── 003_video_support.sql
 │
 ├── backend/                   # (레거시) FastAPI - 참고용으로 보존
 │
 └── frontend/                  # Next.js 15 풀스택 앱
     ├── src/
     │   ├── app/
+    │   │   ├── layout.tsx             # 루트 레이아웃
+    │   │   ├── globals.css            # 글로벌 스타일 (Tailwind v4)
     │   │   ├── page.tsx               # 홈 대시보드
     │   │   ├── record/page.tsx        # 빠른 기록 (큰 버튼 UI)
     │   │   ├── treatments/page.tsx    # 시술 목록
     │   │   ├── treatments/new/page.tsx # 상세 기록 작성
+    │   │   ├── treatments/[id]/page.tsx       # 시술 상세
+    │   │   ├── treatments/[id]/capture/page.tsx # 사진/영상 촬영
     │   │   ├── customers/page.tsx     # 고객 관리
     │   │   ├── portfolio/page.tsx     # 포트폴리오 갤러리
     │   │   └── api/                   # API Routes (= 백엔드)
     │   │       ├── health/route.ts
-    │   │       ├── shops/.../route.ts
+    │   │       ├── shops/route.ts
+    │   │       ├── shops/[shopId]/route.ts
+    │   │       ├── shops/[shopId]/customers/...
+    │   │       ├── shops/[shopId]/treatments/...
+    │   │       ├── shops/[shopId]/portfolio/...
     │   │       ├── voice/transcribe/route.ts
-    │   │       └── face-swap/.../route.ts
+    │   │       └── face-swap/...
     │   ├── components/        # 재사용 UI 컴포넌트
+    │   │   ├── BottomNav.tsx          # 하단 네비게이션
+    │   │   ├── MediaCapture.tsx       # 사진/영상 촬영 (카메라)
+    │   │   ├── MediaGrid.tsx          # 미디어 그리드/프리뷰
+    │   │   ├── PageHeader.tsx         # 페이지 헤더
+    │   │   ├── ProductButton.tsx      # 제품 선택 버튼
+    │   │   ├── ServiceButton.tsx      # 시술 종류 버튼
+    │   │   ├── ShareButton.tsx        # SNS 공유 버튼
+    │   │   └── VoiceMemo.tsx          # 음성 메모 녹음
     │   └── lib/
     │       ├── api.ts         # API 클라이언트 (typed fetch)
     │       ├── supabase/      # Supabase 클라이언트
@@ -172,6 +200,8 @@ Noteastyle/
     │       └── services/      # 외부 API 서비스
     │           ├── openai-service.ts   # Whisper + GPT-4o
     │           └── replicate-service.ts # Replicate 페이스 스왑
+    ├── public/
+    │   └── manifest.json      # PWA 매니페스트
     ├── .env.example
     ├── package.json
     ├── tsconfig.json
@@ -182,54 +212,46 @@ Noteastyle/
 
 ## 6. 데이터 모델
 
-모든 엔티티는 **UUID** 기본 키, `created_at`/`updated_at` 타임스탬프 포함.
-정의 위치: `supabase/migrations/001_initial_schema.sql`
+> **상세 스키마**: [docs/schema.md](docs/schema.md) 참조
+
+모든 엔티티는 **UUID** 기본 키, `created_at` 타임스탬프 포함.
+정의 위치: `supabase/migrations/001_initial_schema.sql`, `003_video_support.sql`
 
 ### 엔티티 관계도
 
 ```
 Shop (매장)
-├── name, type (hair/nail/skin/scalp), address, phone
-├── subscription_plan (basic/premium)
-├── 1:N → Designer[]
-├── 1:N → Customer[]
-├── 1:N → Treatment[]
-└── 1:N → Portfolio[]
+├── name, shop_type (hair/nail/skin/scalp), address, phone
+├── subscription_plan (basic/premium), updated_at (트리거)
+├── 1:N → Designer[], Customer[], Treatment[], Portfolio[]
 
 Designer (디자이너)
 ├── shop_id (FK → Shop)
-├── name, role (owner/designer/assistant), phone, specialty
-└── 1:N → Treatment[]
+├── name, role (owner/designer/assistant), phone, is_active
 
 Customer (고객)
 ├── shop_id (FK → Shop)
-├── name, phone, gender, birth_date
-├── visit_count, notes, naver_booking_id
-└── 1:N → Treatment[]
+├── name, phone, gender, birth_date, notes, naver_booking_id
+├── visit_count (RPC 증가), last_visit (RPC 갱신), updated_at (트리거)
 
 Treatment (시술 기록) ← 핵심 엔티티
 ├── shop_id, customer_id, designer_id (FK)
-├── service_type, service_detail
-├── products_used: JSON (List[ProductUsed])
-│   └── ProductUsed: { product_name, amount, color_code }
-├── duration_minutes, price
-├── satisfaction (1-5), customer_memo, ai_summary
-├── voice_memo_text (Whisper 변환 텍스트)
-├── 1:N → TreatmentPhoto[]
-└── 1:N → Portfolio[]
+├── service_type, service_detail, area
+├── products_used: JSONB [{ brand, code, area }]
+├── duration_minutes, price, satisfaction (high/medium/low)
+├── customer_notes, voice_memo_url, ai_summary, next_visit_recommendation
 
-TreatmentPhoto (시술 사진)
-├── treatment_id (FK → Treatment)
-├── photo_url, photo_type (before/during/after)
-├── face_swapped_url (Replicate 처리 결과)
-├── is_portfolio (포트폴리오 사용 여부)
-└── notes
+TreatmentPhoto (시술 사진/영상)
+├── treatment_id (FK → Treatment, CASCADE)
+├── photo_url, photo_type (before/during/after/source)
+├── face_swapped_url (Replicate 결과)
+├── is_portfolio, caption, taken_at
+├── media_type (photo/video), video_duration_seconds, thumbnail_url
 
 Portfolio (포트폴리오)
-├── shop_id, treatment_id (FK)
-├── title, description, tags: JSON
-├── before_photo_url, after_photo_url
-└── is_published
+├── shop_id (FK → Shop), photo_id (FK → TreatmentPhoto)
+├── title, description, tags: JSONB
+├── is_published
 ```
 
 ---
@@ -259,15 +281,17 @@ Base URL: `/api` (same-domain, CORS 불필요)
 | Method | Path | 설명 |
 |--------|------|------|
 | POST | `/voice/transcribe` | 음성 메모 → Whisper → GPT-4o → 구조화 데이터 |
-| POST | `/face-swap/` | Replicate 페이스 스왑 시작 (비동기) |
-| GET | `/face-swap/status/{id}` | 페이스 스왑 처리 상태 확인 |
+| POST | `/face-swap` | Replicate 페이스 스왑 시작 (비동기) |
+| GET | `/face-swap/status/{id}` | 페이스 스왑 처리 상태 확인 (폴링) |
+| POST | `/face-swap/complete/{photoId}` | 페이스 스왑 완료 URL 저장 |
 
 ### 포트폴리오
 
 | Method | Path | 설명 |
 |--------|------|------|
-| POST | `/shops/{id}/portfolio/` | 포트폴리오 생성 |
-| GET | `/shops/{id}/portfolio/` | 포트폴리오 목록 |
+| POST | `/shops/{id}/portfolio` | 포트폴리오 생성 |
+| GET | `/shops/{id}/portfolio` | 포트폴리오 목록 (?published_only=true) |
+| PUT | `/shops/{id}/portfolio/{id}/publish` | 공개/비공개 토글 |
 
 ---
 
@@ -421,27 +445,38 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 
 ## 12. MVP 기능 우선순위
 
+> **전체 기능 로드맵 (51개)**: [docs/PRD.md](docs/PRD.md) 참조
+
 ### Phase 1 - 1순위 (필수)
 - [x] 매장/고객/시술 CRUD
 - [x] 빠른 시술 기록 (큰 버튼 UI)
 - [x] 상세 시술 기록 (제품, 부위, 시간)
-- [x] 시술 사진 업로드 (before/during/after)
-- [ ] 음성 메모 → AI 구조화 (Whisper + GPT-4o)
-- [ ] AI 페이스 스왑 (Replicate API)
-- [ ] 포트폴리오 자동 생성
+- [x] 시술 사진/영상 업로드 및 촬영 (before/during/after)
+- [x] SNS 공유 (Web Share API)
+- [x] 네이버 예약 ID 기록
+- [x] 음성 메모 → AI 구조화 API (Whisper + GPT-4o)
+- [x] AI 페이스 스왑 API (Replicate)
+- [x] 포트폴리오 생성/공개/비공개 관리
 
 ### Phase 1 - 2순위 (예정)
-- [ ] 네이버 예약 연동 (고객 자동 생성)
+- [ ] 예약 정보 입력 + 예약 보드
+- [ ] 네이버 예약 실시간 연동 (고객 자동 생성)
 - [ ] 자동 모자이크 (수동 모자이크 우선)
-- [ ] AI 얼굴 변경 심화
 - [ ] 예약 변경 Drag & Drop
+- [ ] 리뷰 게시 동의 + 쿠폰 인센티브
 
-### Phase 2-3 (미래)
-- 기자재 재고 관리 / 마켓플레이스
-- AI 상담 챗봇
-- 수익 분석
+### Phase 2 (확장)
+- 리뷰 작성, 결제정보(쿠폰/회원권/자동결제)
+- 설정 고도화 (고객 불러오기/내보내기, 블랙리스트, 직급)
+- 매출/고객 동향 분석
 - AI 스타일러 (스타일 미리보기)
-- 구인구직 / 디자이너 포트폴리오
+- 메시지/알림톡/푸쉬 알림
+
+### Phase 3 (플랫폼화)
+- 기자재 마켓플레이스 (자재목록, 견적, 장바구니, 공동구매, 월 구독)
+- 구인구직 (디자이너 포트폴리오, 채용공고, 전자계약, 노무상담)
+- 공급업체 포털 (상품등록, 비교견적, 상위노출)
+- AI 상담 챗봇 (24/7 자동응대)
 
 ---
 
