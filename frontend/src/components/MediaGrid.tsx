@@ -15,7 +15,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
   if (items.length === 0) return null;
 
   const formatDuration = (s?: number) => {
-    if (!s) return "";
+    if (s == null) return "";
     const min = Math.floor(s / 60);
     const sec = s % 60;
     return `${min}:${sec.toString().padStart(2, "0")}`;

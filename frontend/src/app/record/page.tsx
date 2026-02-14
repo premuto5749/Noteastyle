@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { ServiceButton } from "@/components/ServiceButton";
 import { ProductButton } from "@/components/ProductButton";
@@ -51,8 +52,7 @@ export default function QuickRecordPage() {
       setCustomerId(customer.id);
       setStep("service");
     } catch {
-      setCustomerId("demo-id");
-      setStep("service");
+      alert("고객 등록에 실패했습니다. 네트워크 연결을 확인해주세요.");
     }
   }, [customerName, naverBookingId]);
 
@@ -84,8 +84,7 @@ export default function QuickRecordPage() {
       setSavedId(result.id);
       setStep("done");
     } catch {
-      setSavedId("demo-id");
-      setStep("done");
+      alert("시술 기록 저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setSaving(false);
     }
@@ -256,13 +255,13 @@ export default function QuickRecordPage() {
               {customerName}님의 시술이 기록되었습니다
             </p>
             <div className="flex flex-col gap-3 items-center">
-              {savedId && savedId !== "demo-id" && (
-                <a
+              {savedId && (
+                <Link
                   href={`/treatments/${savedId}/capture`}
                   className="w-full max-w-xs py-3 bg-white text-black rounded-xl font-bold text-center active:scale-95 transition-transform"
                 >
                   사진/영상 촬영
-                </a>
+                </Link>
               )}
               <div className="flex gap-3">
                 <button
@@ -271,12 +270,12 @@ export default function QuickRecordPage() {
                 >
                   다음 고객 기록
                 </button>
-                <a
+                <Link
                   href="/treatments"
                   className="px-6 py-3 border border-[#333333] rounded-xl font-medium text-[#a1a1a1] active:scale-95 transition-transform"
                 >
                   시술 목록
-                </a>
+                </Link>
               </div>
             </div>
           </div>

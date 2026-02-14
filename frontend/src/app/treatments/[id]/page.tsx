@@ -138,7 +138,7 @@ export default function TreatmentDetailPage() {
       pollingRef.current = setInterval(async () => {
         try {
           const status = await getFaceSwapStatus(job._id);
-          // AKOOL status: 1 = processing, 2 = completed, 3 = failed
+          // Replicate status (mapped): 1 = processing, 2 = succeeded, 3 = failed
           if (status.status === 2 && status.url) {
             clearInterval(pollingRef.current!);
             pollingRef.current = null;
@@ -176,10 +176,10 @@ export default function TreatmentDetailPage() {
       await createPortfolioItem({
         photo_id: photo.id,
         title: treatment
-          ? `${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${photo.photo_type}`
+          ? `${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`
           : undefined,
       });
-      alert("포트폴리오에 추가되었습니다.");
+      await loadData();
     } catch {
       alert("포트폴리오 추가에 실패했습니다.");
     }
@@ -345,12 +345,12 @@ export default function TreatmentDetailPage() {
               <p className="text-sm text-[#555555] mb-3">
                 아직 사진/영상이 없습니다
               </p>
-              <a
+              <Link
                 href={`/treatments/${id}/capture`}
                 className="inline-block px-4 py-2 bg-white text-black rounded-lg text-sm font-medium active:scale-95 transition-transform"
               >
                 촬영하기
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="space-y-4">
@@ -388,7 +388,12 @@ export default function TreatmentDetailPage() {
                       {/* 포트폴리오 추가 버튼 */}
                       <button
                         onClick={() => handleAddToPortfolio(photo)}
-                        className="text-xs px-2 py-1 bg-[#1a1a1a] text-[#ededed] rounded-md"
+                        disabled={photo.is_portfolio}
+                        className={`text-xs px-2 py-1 rounded-md ${
+                          photo.is_portfolio
+                            ? "bg-[#0a2a0a] text-green-500 cursor-default"
+                            : "bg-[#1a1a1a] text-[#ededed]"
+                        }`}
                       >
                         {photo.is_portfolio ? "포트폴리오 추가됨" : "포트폴리오 추가"}
                       </button>
@@ -442,12 +447,12 @@ export default function TreatmentDetailPage() {
         <div className="bg-[#111111] rounded-xl border border-[#262626] p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-[#ededed]">파일 업로드</h2>
-            <a
+            <Link
               href={`/treatments/${id}/capture`}
               className="text-xs text-blue-400"
             >
               촬영하기
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-2">
             <select
