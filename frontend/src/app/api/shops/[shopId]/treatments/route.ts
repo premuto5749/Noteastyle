@@ -66,7 +66,7 @@ export async function GET(
 
   let query = supabase
     .from("treatments")
-    .select("*, photos:treatment_photos(*)")
+    .select("*, photos:treatment_photos(*), customer:customers(name)")
     .eq("shop_id", shopId)
     .order("created_at", { ascending: false })
     .range(skip, skip + limit - 1);
