@@ -266,7 +266,7 @@ export function togglePortfolioPublish(id: string) {
   });
 }
 
-// Face Swap
+// Face Swap (legacy)
 export interface FaceSwapJob {
   _id: string;
   status: number;
@@ -289,5 +289,96 @@ export function completeFaceSwap(photoId: string, faceSwappedUrl: string) {
   return request<{ status: string; photo_id: string; face_swapped_url: string }>(
     `/face-swap/complete/${photoId}`,
     { method: "POST", body: JSON.stringify({ face_swapped_url: faceSwappedUrl }) }
+  );
+}
+
+// AI Face Models
+export interface FaceModel {
+  id: string;
+  shop_id: string;
+  name: string;
+  gender: string;
+  image_url: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export function getFaceModels() {
+  return request<FaceModel[]>(`/shops/${SHOP_ID}/face-models`);
+}
+
+export async function uploadFaceModel(name: string, gender: string, file: File): Promise<FaceModel> {
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("gender", gender);
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE}/shops/${SHOP_ID}/face-models`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ detail: "Upload failed" }));
+    throw new Error(error.detail || "Failed to upload face model");
+  }
+  return res.json();
+}
+
+export function deleteFaceModel(id: string) {
+  return request<{ status: string }>(`/shops/${SHOP_ID}/face-models/${id}`, {
+    method: "DELETE",
+  });
+}
+
+// Face Swap (new workflow)
+export interface FaceSwapGenerateResult {
+  jobs: { _id: string; status: number }[];
+}
+
+export function generateFaceSwap(
+  treatmentPhotoId: string,
+  faceModelId: string,
+  count: number = 2
+) {
+  return request<FaceSwapGenerateResult>(`/face-swap/generate`, {
+    method: "POST",
+    body: JSON.stringify({
+      treatment_photo_id: treatmentPhotoId,
+      face_model_id: faceModelId,
+      count,
+    }),
+  });
+}
+
+export interface FaceSwapResult {
+  id: string;
+  treatment_photo_id: string;
+  face_model_id: string;
+  result_url: string;
+  is_selected: boolean;
+  created_at: string;
+}
+
+export function saveFaceSwapResult(data: {
+  treatment_photo_id: string;
+  face_model_id: string;
+  result_url: string;
+}) {
+  return request<FaceSwapResult>(`/face-swap/results`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getFaceSwapResults(treatmentPhotoId: string) {
+  return request<FaceSwapResult[]>(
+    `/face-swap/results?treatment_photo_id=${encodeURIComponent(treatmentPhotoId)}`
+  );
+}
+
+export function selectFaceSwapResult(resultId: string) {
+  return request<{ portfolio_id: string; result_id: string }>(
+    `/face-swap/results/${resultId}/select`,
+    { method: "POST" }
   );
 }
