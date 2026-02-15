@@ -105,7 +105,7 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
         className={`w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-90 ${
           recording
             ? "bg-red-500 animate-pulse shadow-lg shadow-red-900/30"
-            : "bg-white"
+            : "bg-black"
         } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         {recording ? (
@@ -113,7 +113,7 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
             <rect x="6" y="6" width="12" height="12" rx="2" />
           </svg>
         ) : (
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
             <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
             <line x1="12" y1="19" x2="12" y2="23" />
@@ -121,7 +121,7 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
           </svg>
         )}
       </button>
-      <span className="text-sm text-[#666666]">
+      <span className="text-sm text-gray-500">
         {recording ? `녹음 중 ${formatTime(duration)}` : "음성으로 기록하기"}
       </span>
       {recording && (

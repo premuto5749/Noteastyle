@@ -14,8 +14,8 @@ export function ServiceButton({ label, icon, selected, onClick }: ServiceButtonP
       onClick={onClick}
       className={`flex flex-col items-center justify-center gap-1 p-3 rounded-2xl border-2 transition-all active:scale-95 min-w-[80px] ${
         selected
-          ? "border-white bg-[#1a1a1a] text-white"
-          : "border-[#333333] bg-[#111111] text-[#a1a1a1] hover:border-[#555555]"
+          ? "border-gray-900 bg-gray-100 text-gray-900"
+          : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
       }`}
     >
       <span className="text-2xl">{icon}</span>

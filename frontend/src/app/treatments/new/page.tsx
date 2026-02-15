@@ -13,12 +13,12 @@ import {
 } from "@/lib/api";
 
 const SERVICES = [
-  { type: "cut", label: "\uCEE4\uD2B8", icon: "\u2702\uFE0F" },
-  { type: "color", label: "\uC5FC\uC0C9", icon: "\uD83C\uDFA8" },
-  { type: "perm", label: "\uD3B8", icon: "\uD83D\uDCAB" },
-  { type: "treatment", label: "\uD2B8\uB9AC\uD2B8\uBA3C\uD2B8", icon: "\u2728" },
-  { type: "bleach", label: "\uBE14\uB9AC\uCE58", icon: "\u26A1" },
-  { type: "scalp", label: "\uB450\uD53C\uAD00\uB9AC", icon: "\uD83C\uDF3F" },
+  { type: "cut", label: "커트", icon: "\u2702\uFE0F" },
+  { type: "color", label: "염색", icon: "\uD83C\uDFA8" },
+  { type: "perm", label: "펌", icon: "\uD83D\uDCAB" },
+  { type: "treatment", label: "트리트먼트", icon: "\u2728" },
+  { type: "bleach", label: "블리치", icon: "\u26A1" },
+  { type: "scalp", label: "두피관리", icon: "\uD83C\uDF3F" },
 ];
 
 export default function NewTreatmentPage() {
@@ -87,7 +87,7 @@ export default function NewTreatmentPage() {
       });
       router.push(`/treatments/${result.id}/capture`);
     } catch {
-      alert("\uC800\uC7A5\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
+      alert("저장에 실패했습니다.");
     } finally {
       setSaving(false);
     }
@@ -95,49 +95,49 @@ export default function NewTreatmentPage() {
 
   return (
     <div>
-      <PageHeader title="\uC0C1\uC138 \uAE30\uB85D" subtitle="\uC2DC\uC220 \uC815\uBCF4\uB97C \uAF3C\uAF3C\uD558\uAC8C \uAE30\uB85D\uD569\uB2C8\uB2E4" />
+      <PageHeader title="상세 기록" subtitle="시술 정보를 꼼꼼하게 기록합니다" />
 
       <div className="p-4 space-y-4">
         {/* Voice shortcut */}
-        <div className="bg-[#1a1a1a] rounded-2xl p-4 border border-[#262626]">
-          <p className="text-sm text-[#ededed] font-medium mb-3 text-center">
+        <div className="bg-gray-100 rounded-2xl p-4 border border-gray-200">
+          <p className="text-sm text-gray-900 font-medium mb-3 text-center">
             음성으로 자동 입력
           </p>
           <VoiceMemo onResult={handleVoiceMemo} disabled={voiceProcessing} />
           {voiceProcessing && (
-            <p className="text-sm text-[var(--primary)] mt-2 animate-pulse text-center">
+            <p className="text-sm text-gray-900 mt-2 animate-pulse text-center">
               AI가 분석 중...
             </p>
           )}
         </div>
 
         {/* Customer */}
-        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626] space-y-3">
+        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 space-y-3">
           <div>
-            <label className="text-sm font-medium text-[#a1a1a1] block mb-2">고객 이름 *</label>
+            <label className="text-sm font-medium text-gray-500 block mb-2">고객 이름 *</label>
             <input
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="이름"
-              className="w-full px-3 py-2.5 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
             />
           </div>
           <div>
-            <label className="text-xs text-[#666666] block mb-1">네이버 예약번호 (선택)</label>
+            <label className="text-xs text-gray-500 block mb-1">네이버 예약번호 (선택)</label>
             <input
               type="text"
               value={naverBookingId}
               onChange={(e) => setNaverBookingId(e.target.value)}
               placeholder="예약번호 입력"
-              className="w-full px-3 py-2 border border-[#333333] rounded-xl text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
             />
           </div>
         </div>
 
         {/* Service */}
-        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
-          <label className="text-sm font-medium text-[#a1a1a1] block mb-3">시술 종류 *</label>
+        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+          <label className="text-sm font-medium text-gray-500 block mb-3">시술 종류 *</label>
           <div className="grid grid-cols-3 gap-2">
             {SERVICES.map((s) => (
               <ServiceButton
@@ -152,17 +152,17 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Products */}
-        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626]">
-          <label className="text-sm font-medium text-[#a1a1a1] block mb-2">사용 제품</label>
+        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+          <label className="text-sm font-medium text-gray-500 block mb-2">사용 제품</label>
           {products.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {products.map((p, i) => (
                 <span
                   key={i}
-                  className="flex items-center gap-1 text-xs bg-[#1a1a1a] text-[#ededed] px-2 py-1 rounded-full"
+                  className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
                 >
                   {p.brand} {p.code} {p.area && `(${p.area})`}
-                  <button onClick={() => removeProduct(i)} className="ml-1 text-[#555555] hover:text-[#ededed]">
+                  <button onClick={() => removeProduct(i)} className="ml-1 text-gray-400 hover:text-gray-700">
                     x
                   </button>
                 </span>
@@ -175,18 +175,18 @@ export default function NewTreatmentPage() {
               value={productBrand}
               onChange={(e) => setProductBrand(e.target.value)}
               placeholder="브랜드 (예: 로레알)"
-              className="flex-1 px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
             />
             <input
               type="text"
               value={productCode}
               onChange={(e) => setProductCode(e.target.value)}
               placeholder="코드 (예: 7.1)"
-              className="w-24 px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+              className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
             />
             <button
               onClick={addProduct}
-              className="px-3 py-2 bg-[#1a1a1a] rounded-lg text-sm font-medium text-[#a1a1a1]"
+              className="px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-500"
             >
               +
             </button>
@@ -194,48 +194,48 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Details */}
-        <div className="bg-[#111111] rounded-2xl p-4 border border-[#262626] space-y-3">
-          <label className="text-sm font-medium text-[#a1a1a1] block">상세 정보</label>
+        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 space-y-3">
+          <label className="text-sm font-medium text-gray-500 block">상세 정보</label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-[#666666] block mb-1">시술 부위</label>
+              <label className="text-xs text-gray-500 block mb-1">시술 부위</label>
               <input
                 type="text"
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 placeholder="예: 뿌리, 전체"
-                className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
               />
             </div>
             <div>
-              <label className="text-xs text-[#666666] block mb-1">소요 시간 (분)</label>
+              <label className="text-xs text-gray-500 block mb-1">소요 시간 (분)</label>
               <input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="30"
-                className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
               />
             </div>
           </div>
           <div>
-            <label className="text-xs text-[#666666] block mb-1">가격 (원)</label>
+            <label className="text-xs text-gray-500 block mb-1">가격 (원)</label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="50000"
-              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
             />
           </div>
           <div>
-            <label className="text-xs text-[#666666] block mb-1">메모</label>
+            <label className="text-xs text-gray-500 block mb-1">메모</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="시술 관련 메모..."
               rows={3}
-              className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white resize-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 resize-none"
             />
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function NewTreatmentPage() {
         <button
           onClick={handleSubmit}
           disabled={saving || !customerName.trim() || !selectedService}
-          className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {saving ? "저장 중..." : "기록 저장"}
         </button>
