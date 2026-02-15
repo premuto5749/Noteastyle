@@ -34,3 +34,15 @@ uploads/
 
 # Database
 *.db
+
+# Vercel
+.vercel
+
+# Claude Code
+.claude/
+
+# Supabase CLI cache
+supabase/.temp/
+
+# Windows artifacts
+nul
