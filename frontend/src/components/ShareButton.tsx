@@ -56,7 +56,7 @@ export function ShareButton({ imageUrl, title = "Note-a-Style", text = "", class
     <button
       onClick={handleShare}
       disabled={sharing}
-      className={className || "text-xs px-2 py-1 bg-[#1a1a1a] text-[#a1a1a1] rounded-md disabled:opacity-50"}
+      className={className || "text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-md disabled:opacity-50"}
       title="공유"
     >
       {sharing ? (

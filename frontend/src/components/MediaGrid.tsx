@@ -27,7 +27,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
         {items.map((item, index) => (
           <div
             key={index}
-            className="relative aspect-square bg-[#1a1a1a] rounded-lg overflow-hidden cursor-pointer"
+            className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
             onClick={() => setPreviewIndex(index)}
           >
             {item.type === "photo" ? (
@@ -47,10 +47,10 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-[#222] flex items-center justify-center">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.5">
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
                       <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <polygon points="10 9 16 12 10 15 10 9" fill="#666" stroke="none" />
+                      <polygon points="10 9 16 12 10 15 10 9" fill="#9ca3af" stroke="none" />
                     </svg>
                   </div>
                 )}

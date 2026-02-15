@@ -4,8 +4,8 @@
   "description": "뷰티샵 시술 기록 & 포트폴리오 플랫폼",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/icon-192.png",
