@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "replicate.delivery",
+        hostname: "**.replicate.delivery",
       },
     ],
   },
