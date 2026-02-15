@@ -121,9 +121,12 @@ export interface Treatment {
   customer?: { name: string; visit_count?: number };
 }
 
-export function getTreatments(customerId?: string) {
-  const params = customerId ? `?customer_id=${customerId}` : "";
-  return request<Treatment[]>(`/shops/${SHOP_ID}/treatments${params}`);
+export function getTreatments(customerId?: string, date?: string) {
+  const searchParams = new URLSearchParams();
+  if (customerId) searchParams.set("customer_id", customerId);
+  if (date) searchParams.set("date", date);
+  const qs = searchParams.toString();
+  return request<Treatment[]>(`/shops/${SHOP_ID}/treatments${qs ? `?${qs}` : ""}`);
 }
 
 export function getTreatment(id: string) {

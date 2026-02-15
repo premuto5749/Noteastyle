@@ -61,6 +61,7 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const customerId = searchParams.get("customer_id");
   const serviceType = searchParams.get("service_type");
+  const date = searchParams.get("date");
   const skip = parseInt(searchParams.get("skip") || "0");
   const limit = parseInt(searchParams.get("limit") || "50");
 
@@ -73,6 +74,11 @@ export async function GET(
 
   if (customerId) query = query.eq("customer_id", customerId);
   if (serviceType) query = query.eq("service_type", serviceType);
+  if (date) {
+    const startOfDay = `${date}T00:00:00.000Z`;
+    const endOfDay = `${date}T23:59:59.999Z`;
+    query = query.gte("created_at", startOfDay).lte("created_at", endOfDay);
+  }
 
   const { data, error } = await query;
 
