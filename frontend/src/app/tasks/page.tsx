@@ -77,16 +77,8 @@ export default function TasksPage() {
     }
   }
 
-  // Flatten all treatments into gallery items (one per representative photo)
-  const galleryItems = treatments
-    .map((t) => {
-      const photo = getRepresentativePhoto(t.photos || []);
-      return photo ? { treatment: t, photo } : null;
-    })
-    .filter(Boolean) as { treatment: Treatment; photo: TreatmentPhoto }[];
-
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24">
       {/* Date Navigation */}
       <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
         <div className="flex items-center justify-between max-w-[480px] mx-auto">
@@ -123,12 +115,12 @@ export default function TasksPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-[480px] mx-auto">
+      <div className="max-w-[480px] mx-auto px-4 pt-4">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-gray-400 text-sm">불러오는 중...</p>
           </div>
-        ) : galleryItems.length === 0 ? (
+        ) : treatments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" className="mb-3">
               <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -139,8 +131,9 @@ export default function TasksPage() {
             <p className="text-gray-400 text-sm">완료된 시술이 없습니다</p>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-px bg-gray-100">
-            {galleryItems.map(({ treatment: t, photo }) => {
+          <div className="space-y-3">
+            {treatments.map((t) => {
+              const photo = getRepresentativePhoto(t.photos || []);
               const customerName = t.customer?.name;
               const serviceLabel = SERVICE_LABELS[t.service_type] || t.service_type;
 
@@ -148,24 +141,34 @@ export default function TasksPage() {
                 <button
                   key={t.id}
                   onClick={() => router.push(`/treatments/${t.id}`)}
-                  className="relative aspect-square bg-gray-100 overflow-hidden active:opacity-80 transition-opacity group"
+                  className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 text-left active:scale-[0.98] transition-transform"
                 >
-                  <Image
-                    src={photo.photo_url}
-                    alt={serviceLabel}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 480px) 25vw, 120px"
-                  />
-                  {/* Overlay on hover/focus */}
-                  <div className="absolute inset-0 bg-black/0 group-active:bg-black/30 transition-colors" />
-                  {/* Bottom info */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5 pt-4">
-                    <div className="text-[10px] text-white/90 font-medium truncate">
-                      {customerName || serviceLabel}
+                  {photo && (
+                    <div className="relative aspect-[4/3] bg-gray-100">
+                      <Image
+                        src={photo.photo_url}
+                        alt={serviceLabel}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 480px) 100vw, 480px"
+                      />
                     </div>
-                    <div className="text-[9px] text-white/60 truncate">
+                  )}
+                  <div className="p-3">
+                    <div className="text-xs text-gray-400">
+                      {new Date(t.created_at).toLocaleTimeString("ko-KR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                    {customerName && (
+                      <div className="text-sm font-medium text-gray-900 mt-0.5">
+                        {customerName} 고객님
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500 mt-0.5">
                       {serviceLabel}
+                      {t.service_detail && ` · ${t.service_detail}`}
                     </div>
                   </div>
                 </button>
