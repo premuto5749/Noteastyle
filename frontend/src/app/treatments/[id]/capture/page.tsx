@@ -143,7 +143,7 @@ export default function CapturePage() {
         <button
           onClick={handleSave}
           disabled={uploading}
-          className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {uploading
             ? `업로드 중... (${uploadProgress.current}/${uploadProgress.total})`

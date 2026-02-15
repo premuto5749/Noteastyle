@@ -9,6 +9,18 @@ export async function POST(
   const supabase = createServerClient();
   const body = await request.json();
 
+  // Check for duplicate portfolio entry
+  const { data: existing } = await supabase
+    .from("portfolios")
+    .select("id")
+    .eq("photo_id", body.photo_id)
+    .eq("shop_id", shopId)
+    .maybeSingle();
+
+  if (existing) {
+    return NextResponse.json({ detail: "이미 포트폴리오에 추가된 사진입니다." }, { status: 409 });
+  }
+
   // Mark photo as portfolio
   await supabase
     .from("treatment_photos")

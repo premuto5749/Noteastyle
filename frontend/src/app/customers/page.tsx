@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { getCustomers, createCustomer, type Customer } from "@/lib/api";
+import { getCustomers, createCustomer, updateCustomer, deleteCustomer, type Customer } from "@/lib/api";
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -11,6 +11,10 @@ export default function CustomersPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editNotes, setEditNotes] = useState("");
 
   useEffect(() => {
     loadCustomers();
@@ -44,7 +48,39 @@ export default function CustomersPage() {
       setNewName("");
       setNewPhone("");
     } catch {
-      alert("\uACE0\uAC1D \uCD94\uAC00\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.");
+      alert("고객 추가에 실패했습니다.");
+    }
+  }
+
+  function startEdit(c: Customer) {
+    setEditingCustomer(c);
+    setEditName(c.name);
+    setEditPhone(c.phone || "");
+    setEditNotes(c.notes || "");
+  }
+
+  async function handleEditSave() {
+    if (!editingCustomer || !editName.trim()) return;
+    try {
+      const updated = await updateCustomer(editingCustomer.id, {
+        name: editName.trim(),
+        phone: editPhone.trim() || undefined,
+        notes: editNotes.trim() || undefined,
+      });
+      setCustomers((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      setEditingCustomer(null);
+    } catch {
+      alert("수정에 실패했습니다.");
+    }
+  }
+
+  async function handleDeleteCustomer(id: string, name: string) {
+    if (!confirm(`${name} 고객을 삭제하시겠습니까?`)) return;
+    try {
+      await deleteCustomer(id);
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+    } catch {
+      alert("삭제에 실패했습니다.");
     }
   }
 
@@ -132,7 +168,7 @@ export default function CustomersPage() {
             {customers.map((c) => (
               <div
                 key={c.id}
-                className="bg-[#111111] rounded-xl border border-[#262626] p-4 active:bg-[#1a1a1a]"
+                className="bg-[#111111] rounded-xl border border-[#262626] p-4"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -141,21 +177,83 @@ export default function CustomersPage() {
                       <div className="text-xs text-[#666666] mt-0.5">{c.phone}</div>
                     )}
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-white font-medium">
-                      방문 {c.visit_count}회
-                    </div>
-                    {c.last_visit && (
-                      <div className="text-xs text-[#555555] mt-0.5">
-                        마지막 {new Date(c.last_visit).toLocaleDateString("ko-KR")}
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <div className="text-xs text-white font-medium">
+                        방문 {c.visit_count}회
                       </div>
-                    )}
+                      {c.last_visit && (
+                        <div className="text-xs text-[#555555] mt-0.5">
+                          마지막 {new Date(c.last_visit).toLocaleDateString("ko-KR")}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => startEdit(c)}
+                        className="px-2 py-1 text-xs text-[#a1a1a1] bg-[#1a1a1a] rounded-md"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCustomer(c.id, c.name)}
+                        className="px-2 py-1 text-xs text-red-400 bg-[#1a1a1a] rounded-md"
+                      >
+                        삭제
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        {/* Edit Customer Modal */}
+        {editingCustomer && (
+            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setEditingCustomer(null)}>
+              <div className="bg-[#111111] rounded-2xl border border-[#333333] p-4 space-y-3 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+                <h3 className="font-bold text-sm">고객 정보 수정</h3>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="이름"
+                  className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+                  autoFocus
+                />
+                <input
+                  type="tel"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  placeholder="전화번호 (선택)"
+                  className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white"
+                />
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="메모 (선택)"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-[#333333] rounded-lg text-sm bg-[#111111] text-[#ededed] placeholder:text-[#555555] focus:outline-none focus:border-white resize-none"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleEditSave}
+                    disabled={!editName.trim()}
+                    className="flex-1 py-2 bg-white text-black rounded-lg text-sm font-medium disabled:opacity-40"
+                  >
+                    저장
+                  </button>
+                  <button
+                    onClick={() => setEditingCustomer(null)}
+                    className="flex-1 py-2 border border-[#333333] rounded-lg text-sm font-medium text-[#a1a1a1]"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
       </div>
     </div>
   );

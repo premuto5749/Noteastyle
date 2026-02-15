@@ -103,7 +103,6 @@ export default function QuickRecordPage() {
     } catch (err) {
       const message = err instanceof Error ? err.message : "음성 인식에 실패했습니다.";
       alert(message + " 다시 시도해주세요.");
-      console.error("[VoiceMemo] 에러:", err);
     } finally {
       setVoiceProcessing(false);
     }
@@ -236,7 +235,7 @@ export default function QuickRecordPage() {
             <button
               onClick={() => handleSave()}
               disabled={saving}
-              className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-[0.98] transition-transform disabled:opacity-50"
+              className="w-full py-4 bg-white text-black rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
             >
               {saving ? "저장 중..." : "기록 완료"}
             </button>

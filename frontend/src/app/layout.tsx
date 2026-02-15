@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
   title: "Note-a-Style",
@@ -29,7 +30,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="antialiased bg-background text-foreground pb-20">
-        <main className="min-h-screen">{children}</main>
+        <ErrorBoundary>
+          <main className="min-h-screen">{children}</main>
+        </ErrorBoundary>
         <BottomNav />
       </body>
     </html>

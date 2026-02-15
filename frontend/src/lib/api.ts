@@ -6,15 +6,28 @@ const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID || "00000000-0000-0000-0000-0000
 export { SHOP_ID };
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    ...options,
-  });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(error.detail || "API request failed");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      ...options,
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(error.detail || "API request failed");
+    }
+    return res.json();
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
   }
-  return res.json();
 }
 
 // Customers
@@ -38,6 +51,26 @@ export function getCustomers(search?: string) {
 
 export function getCustomer(id: string) {
   return request<Customer>(`/shops/${SHOP_ID}/customers/${id}`);
+}
+
+export function updateCustomer(id: string, data: Partial<{
+  name: string;
+  phone: string;
+  gender: string;
+  birth_date: string;
+  notes: string;
+  naver_booking_id: string;
+}>) {
+  return request<Customer>(`/shops/${SHOP_ID}/customers/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteCustomer(id: string) {
+  return request<{ status: string }>(`/shops/${SHOP_ID}/customers/${id}`, {
+    method: "DELETE",
+  });
 }
 
 export function createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string; naver_booking_id?: string }) {
@@ -94,6 +127,29 @@ export function getTreatments(customerId?: string) {
 
 export function getTreatment(id: string) {
   return request<Treatment>(`/shops/${SHOP_ID}/treatments/${id}`);
+}
+
+export function updateTreatment(id: string, data: Partial<{
+  service_type: string;
+  service_detail: string;
+  products_used: ProductUsed[];
+  area: string;
+  duration_minutes: number;
+  price: number;
+  satisfaction: string;
+  customer_notes: string;
+  next_visit_recommendation: string;
+}>) {
+  return request<Treatment>(`/shops/${SHOP_ID}/treatments/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteTreatment(id: string) {
+  return request<{ status: string }>(`/shops/${SHOP_ID}/treatments/${id}`, {
+    method: "DELETE",
+  });
 }
 
 export function createTreatment(data: {
