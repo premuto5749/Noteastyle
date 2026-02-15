@@ -183,30 +183,31 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
         </button>
       </div>
 
-      {/* Step 1: Select Photo */}
+      {/* Step 1: Select Photo - 4-column gallery grid */}
       {step === "select-photo" && (
-        <div className="flex-1 overflow-auto p-4">
-          <p className="text-sm text-gray-500 mb-4">페이스 스왑할 사진을 선택하세요</p>
-          <div className="grid grid-cols-2 gap-2">
-            {photos.map((photo) => (
-              <button
-                key={photo.id}
-                onClick={() => handlePhotoSelect(photo)}
-                className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 active:scale-95 transition-transform"
-              >
-                <Image
-                  src={photo.photo_url}
-                  alt="시술 사진"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 480px) 50vw, 240px"
-                />
-              </button>
-            ))}
-          </div>
-          {photos.length === 0 && (
+        <div className="flex-1 overflow-auto">
+          <p className="text-sm text-gray-500 px-4 py-3">페이스 스왑할 사진을 선택하세요</p>
+          {photos.length === 0 ? (
             <div className="text-center py-20 text-gray-400 text-sm">
               시술 사진이 없습니다
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-px bg-gray-200">
+              {photos.map((photo) => (
+                <button
+                  key={photo.id}
+                  onClick={() => handlePhotoSelect(photo)}
+                  className="relative aspect-square bg-gray-100 overflow-hidden active:opacity-70 transition-opacity"
+                >
+                  <Image
+                    src={photo.photo_url}
+                    alt="시술 사진"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 480px) 25vw, 120px"
+                  />
+                </button>
+              ))}
             </div>
           )}
         </div>
