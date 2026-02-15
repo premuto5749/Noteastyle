@@ -39,9 +39,12 @@ function toDateString(date: Date): string {
 
 export default function TasksPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const dateString = toDateString(currentDate);
 
@@ -75,6 +78,14 @@ export default function TasksPage() {
       const [y, m, d] = val.split("-").map(Number);
       setCurrentDate(new Date(y, m - 1, d));
     }
+  }
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-400 text-sm">불러오는 중...</p>
+      </div>
+    );
   }
 
   return (
