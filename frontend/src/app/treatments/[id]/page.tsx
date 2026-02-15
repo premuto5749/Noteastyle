@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   getTreatment,
   uploadTreatmentPhoto,
-  startFaceSwap,
-  getFaceSwapStatus,
-  completeFaceSwap,
   createPortfolioItem,
   deleteTreatment,
   type Treatment,
@@ -17,6 +14,7 @@ import {
 import { ShareButton } from "@/components/ShareButton";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { StyleNoteOverlay } from "@/components/StyleNoteOverlay";
+import { FaceSwapFlow } from "@/components/FaceSwapFlow";
 
 const SERVICE_LABELS: Record<string, string> = {
   cut: "커트",
@@ -49,17 +47,11 @@ export default function TreatmentDetailPage() {
   const [treatment, setTreatment] = useState<Treatment | null>(null);
   const [loading, setLoading] = useState(true);
   const [showDetails, setShowDetails] = useState(false);
+  const [showFaceSwap, setShowFaceSwap] = useState(false);
 
   // Photo upload state
   const [uploadType, setUploadType] = useState<string>("after");
   const [uploading, setUploading] = useState(false);
-
-  // Face swap state
-  const [swapTargetPhotoId, setSwapTargetPhotoId] = useState<string | null>(null);
-  const [swapUploading, setSwapUploading] = useState(false);
-  const [swapJobId, setSwapJobId] = useState<string | null>(null);
-  const [swapPolling, setSwapPolling] = useState(false);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -77,12 +69,6 @@ export default function TreatmentDetailPage() {
     loadData();
   }, [loadData]);
 
-  useEffect(() => {
-    return () => {
-      if (pollingRef.current) clearInterval(pollingRef.current);
-    };
-  }, []);
-
   const sortedPhotos = treatment?.photos
     ? [...treatment.photos]
         .filter((p) => p.photo_type !== "source")
@@ -92,6 +78,11 @@ export default function TreatmentDetailPage() {
             (PHOTO_TYPE_ORDER[b.photo_type] ?? 99)
         )
     : [];
+
+  // Only photo-type media for face swap
+  const swappablePhotos = sortedPhotos.filter(
+    (p) => (p.media_type || "photo") === "photo"
+  );
 
   // Collect tags for display
   const tags: string[] = [];
@@ -119,52 +110,6 @@ export default function TreatmentDetailPage() {
       alert("업로드에 실패했습니다.");
     } finally {
       setUploading(false);
-      e.target.value = "";
-    }
-  }
-
-  async function handleFaceSwapStart(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !treatment || !swapTargetPhotoId) return;
-    setSwapUploading(true);
-    try {
-      const sourcePhoto = await uploadTreatmentPhoto(treatment.id, file, "source");
-      const job = await startFaceSwap(sourcePhoto.id, swapTargetPhotoId);
-      setSwapJobId(job._id);
-      setSwapUploading(false);
-      setSwapPolling(true);
-      pollingRef.current = setInterval(async () => {
-        try {
-          const status = await getFaceSwapStatus(job._id);
-          if (status.status === 2 && status.url) {
-            clearInterval(pollingRef.current!);
-            pollingRef.current = null;
-            await completeFaceSwap(swapTargetPhotoId, status.url);
-            setSwapPolling(false);
-            setSwapJobId(null);
-            setSwapTargetPhotoId(null);
-            await loadData();
-          } else if (status.status === 3) {
-            clearInterval(pollingRef.current!);
-            pollingRef.current = null;
-            setSwapPolling(false);
-            setSwapJobId(null);
-            setSwapTargetPhotoId(null);
-            alert("페이스 스왑 처리에 실패했습니다.");
-          }
-        } catch {
-          clearInterval(pollingRef.current!);
-          pollingRef.current = null;
-          setSwapPolling(false);
-          setSwapJobId(null);
-          setSwapTargetPhotoId(null);
-          alert("페이스 스왑 상태 확인에 실패했습니다.");
-        }
-      }, 3000);
-    } catch {
-      setSwapUploading(false);
-      alert("페이스 스왑을 시작할 수 없습니다.");
-    } finally {
       e.target.value = "";
     }
   }
@@ -329,13 +274,22 @@ export default function TreatmentDetailPage() {
             </div>
           )}
 
-          {/* Show Details Button */}
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="w-full py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
-          >
-            {showDetails ? "상세 접기" : "상세 보기"}
-          </button>
+          {/* Action Buttons - Side by Side */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
+            >
+              {showDetails ? "상세 접기" : "상세 보기"}
+            </button>
+            <button
+              onClick={() => setShowFaceSwap(true)}
+              disabled={swappablePhotos.length === 0}
+              className="flex-1 py-3 bg-blue-500 text-white rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
+            >
+              AI Faceswap
+            </button>
+          </div>
 
           {/* Expanded Details */}
           {showDetails && (
@@ -420,15 +374,6 @@ export default function TreatmentDetailPage() {
                           title={`${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
                           className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded-md disabled:opacity-50"
                         />
-                        {!photo.face_swapped_url && (photo.media_type || "photo") === "photo" && (
-                          <button
-                            onClick={() => setSwapTargetPhotoId(photo.id)}
-                            disabled={swapPolling}
-                            className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-md disabled:opacity-50"
-                          >
-                            AI 스왑
-                          </button>
-                        )}
                         <button
                           onClick={() => handleAddToPortfolio(photo)}
                           disabled={photo.is_portfolio}
@@ -498,52 +443,13 @@ export default function TreatmentDetailPage() {
         </div>
       </div>
 
-      {/* Face Swap Modal */}
-      {swapTargetPhotoId && !swapPolling && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end justify-center" onClick={() => setSwapTargetPhotoId(null)}>
-          <div className="bg-white rounded-t-2xl p-4 w-full max-w-[480px] space-y-3" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-900">AI 페이스 스왑</h2>
-              <button
-                onClick={() => setSwapTargetPhotoId(null)}
-                className="text-xs text-gray-400"
-              >
-                취소
-              </button>
-            </div>
-            <p className="text-sm text-gray-500">
-              교체할 얼굴이 담긴 소스 이미지를 선택하세요.
-            </p>
-            <label
-              className={`block text-center text-sm py-3 rounded-xl cursor-pointer ${
-                swapUploading
-                  ? "bg-gray-100 text-gray-400"
-                  : "bg-blue-500 text-white active:opacity-80"
-              }`}
-            >
-              {swapUploading ? "업로드 및 처리 시작 중..." : "소스 얼굴 이미지 선택"}
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFaceSwapStart}
-                disabled={swapUploading}
-              />
-            </label>
-          </div>
-        </div>
-      )}
-
-      {/* Face Swap Processing */}
-      {swapPolling && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-blue-500 text-white px-4 py-3 rounded-xl shadow-lg max-w-[400px] w-[calc(100%-2rem)]">
-          <div className="text-sm font-medium text-center">
-            AI 페이스 스왑 처리 중...
-          </div>
-          <p className="text-xs text-blue-100 mt-1 text-center">
-            완료되면 자동으로 결과가 표시됩니다
-          </p>
-        </div>
+      {/* Face Swap Flow Modal */}
+      {showFaceSwap && (
+        <FaceSwapFlow
+          photos={swappablePhotos}
+          onClose={() => setShowFaceSwap(false)}
+          onComplete={() => loadData()}
+        />
       )}
     </div>
   );
