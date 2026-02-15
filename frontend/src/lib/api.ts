@@ -118,6 +118,7 @@ export interface Treatment {
   next_visit_recommendation: string | null;
   created_at: string;
   photos: TreatmentPhoto[];
+  customer?: { name: string };
 }
 
 export function getTreatments(customerId?: string) {
