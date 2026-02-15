@@ -3,7 +3,11 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
 function getOpenAI() {
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY 환경변수가 설정되지 않았습니다.");
+  }
+  return new OpenAI({ apiKey });
 }
 
 const ProductInfo = z.object({
@@ -27,15 +31,12 @@ export type TreatmentExtractionResult = z.infer<typeof TreatmentExtraction>;
 
 export async function transcribeAudio(audioBuffer: Buffer, filename: string): Promise<string> {
   const file = new File([new Uint8Array(audioBuffer)], filename, { type: "audio/webm" });
-  console.log(`[transcribeAudio] 파일 생성: ${filename}, size: ${audioBuffer.length} bytes`);
 
   const transcription = await getOpenAI().audio.transcriptions.create({
     model: "whisper-1",
     file,
     language: "ko",
   });
-
-  console.log(`[transcribeAudio] 변환 결과: "${transcription.text}"`);
 
   if (!transcription.text || transcription.text.trim().length === 0) {
     throw new Error("음성이 인식되지 않았습니다. 더 크게 말하거나 더 길게 녹음해주세요.");

@@ -1,8 +1,12 @@
 import Replicate from "replicate";
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
+function getReplicate() {
+  const auth = process.env.REPLICATE_API_TOKEN;
+  if (!auth) {
+    throw new Error("REPLICATE_API_TOKEN 환경변수가 설정되지 않았습니다.");
+  }
+  return new Replicate({ auth });
+}
 
 const VERSION = "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b34";
 
@@ -11,7 +15,7 @@ const VERSION = "278a81e7ebb22db98bcba54de985d22cc1abeead2754eb1f2af717247be69b3
  * Returns { _id, status, url } matching the FaceSwapJob interface.
  */
 export async function faceSwap(sourceImageUrl: string, targetImageUrl: string) {
-  const prediction = await replicate.predictions.create({
+  const prediction = await getReplicate().predictions.create({
     version: VERSION,
     input: {
       swap_image: sourceImageUrl,
@@ -31,7 +35,7 @@ export async function faceSwap(sourceImageUrl: string, targetImageUrl: string) {
  * Returns { _id, status, url } matching the FaceSwapJob interface.
  */
 export async function getFaceSwapStatus(jobId: string) {
-  const prediction = await replicate.predictions.get(jobId);
+  const prediction = await getReplicate().predictions.get(jobId);
 
   return {
     _id: prediction.id,

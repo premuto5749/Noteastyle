@@ -33,6 +33,18 @@ export async function POST(
     return NextResponse.json({ detail: "No file provided" }, { status: 400 });
   }
 
+  // Validate file size (max 10MB)
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json({ detail: "파일 크기가 10MB를 초과합니다." }, { status: 400 });
+  }
+
+  // Validate file type
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "video/webm", "video/mp4", "video/quicktime"];
+  if (!ALLOWED_TYPES.some((t) => file.type.startsWith(t.split("/")[0]))) {
+    return NextResponse.json({ detail: "지원하지 않는 파일 형식입니다." }, { status: 400 });
+  }
+
   // Upload main file to Supabase Storage
   const ext = file.name.split(".").pop() || (mediaType === "video" ? "webm" : "jpg");
   const prefix = mediaType === "video" ? "videos" : "photos";

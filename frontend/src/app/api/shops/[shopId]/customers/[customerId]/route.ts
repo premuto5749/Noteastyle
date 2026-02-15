@@ -45,3 +45,20 @@ export async function PUT(
   if (error) return NextResponse.json({ detail: "Customer not found" }, { status: 404 });
   return NextResponse.json(data);
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ shopId: string; customerId: string }> }
+) {
+  const { shopId, customerId } = await params;
+  const supabase = createServerClient();
+
+  const { error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("id", customerId)
+    .eq("shop_id", shopId);
+
+  if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
+  return NextResponse.json({ status: "deleted" });
+}

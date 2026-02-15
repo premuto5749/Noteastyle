@@ -77,6 +77,19 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
     if (timerRef.current) clearInterval(timerRef.current);
   }, []);
 
+  const cancelRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.ondataavailable = null;
+      mediaRecorderRef.current.onstop = null;
+      mediaRecorderRef.current.stop();
+    }
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    setRecording(false);
+    setDuration(0);
+    if (timerRef.current) clearInterval(timerRef.current);
+    chunksRef.current = [];
+  }, []);
+
   const formatTime = (s: number) => {
     const min = Math.floor(s / 60);
     const sec = s % 60;
@@ -111,6 +124,15 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
       <span className="text-sm text-[#666666]">
         {recording ? `녹음 중 ${formatTime(duration)}` : "음성으로 기록하기"}
       </span>
+      {recording && (
+        <button
+          type="button"
+          onClick={cancelRecording}
+          className="text-xs text-red-400 underline"
+        >
+          취소
+        </button>
+      )}
     </div>
   );
 }

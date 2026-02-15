@@ -12,6 +12,7 @@ import {
   getFaceSwapStatus,
   completeFaceSwap,
   createPortfolioItem,
+  deleteTreatment,
   type Treatment,
   type Customer,
   type TreatmentPhoto,
@@ -152,6 +153,7 @@ export default function TreatmentDetailPage() {
             pollingRef.current = null;
             setSwapPolling(false);
             setSwapJobId(null);
+            setSwapTargetPhotoId(null);
             alert("페이스 스왑 처리에 실패했습니다.");
           }
         } catch {
@@ -159,6 +161,7 @@ export default function TreatmentDetailPage() {
           pollingRef.current = null;
           setSwapPolling(false);
           setSwapJobId(null);
+          setSwapTargetPhotoId(null);
           alert("페이스 스왑 상태 확인에 실패했습니다.");
         }
       }, 3000);
@@ -194,6 +197,16 @@ export default function TreatmentDetailPage() {
     );
   }
 
+  async function handleDelete() {
+    if (!confirm("이 시술 기록을 삭제하시겠습니까? 관련 사진도 함께 삭제됩니다.")) return;
+    try {
+      await deleteTreatment(id);
+      router.push("/treatments");
+    } catch {
+      alert("삭제에 실패했습니다.");
+    }
+  }
+
   if (!treatment) return null;
 
   return (
@@ -202,12 +215,20 @@ export default function TreatmentDetailPage() {
         title="시술 상세"
         subtitle={customer ? customer.name : undefined}
         action={
-          <button
-            onClick={() => router.back()}
-            className="px-3 py-1.5 text-sm text-[#a1a1a1] bg-[#1a1a1a] rounded-lg"
-          >
-            뒤로
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDelete}
+              className="px-3 py-1.5 text-sm text-red-400 bg-[#1a1a1a] rounded-lg"
+            >
+              삭제
+            </button>
+            <button
+              onClick={() => router.back()}
+              className="px-3 py-1.5 text-sm text-[#a1a1a1] bg-[#1a1a1a] rounded-lg"
+            >
+              뒤로
+            </button>
+          </div>
         }
       />
 
