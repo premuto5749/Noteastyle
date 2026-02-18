@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 
+async function downloadToStorage(
+  supabase: ReturnType<typeof createServerClient>,
+  sourceUrl: string,
+  treatmentPhotoId: string
+): Promise<string> {
+  // Download image from Replicate
+  const res = await fetch(sourceUrl);
+  if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
+  const arrayBuffer = await res.arrayBuffer();
+  const contentType = res.headers.get("content-type") || "image/jpeg";
+  const ext = contentType.includes("png") ? "png" : "jpg";
+
+  // Upload to Supabase Storage
+  const filePath = `face-swap-results/${treatmentPhotoId}/${crypto.randomUUID()}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from("treatment-photos")
+    .upload(filePath, arrayBuffer, { contentType, upsert: false });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const { data: urlData } = supabase.storage
+    .from("treatment-photos")
+    .getPublicUrl(filePath);
+
+  return urlData.publicUrl;
+}
+
 export async function POST(request: NextRequest) {
   const supabase = createServerClient();
   const { treatment_photo_id, face_model_id, result_url } = await request.json();
@@ -12,9 +39,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Download from Replicate and persist to Supabase Storage
+  let permanentUrl: string;
+  try {
+    permanentUrl = await downloadToStorage(supabase, result_url, treatment_photo_id);
+  } catch {
+    // Fallback: save original URL if download fails
+    permanentUrl = result_url;
+  }
+
   const { data, error } = await supabase
     .from("face_swap_results")
-    .insert({ treatment_photo_id, face_model_id, result_url })
+    .insert({
+      treatment_photo_id,
+      face_model_id,
+      result_url: permanentUrl,
+    })
     .select()
     .single();
 
