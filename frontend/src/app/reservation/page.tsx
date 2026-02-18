@@ -22,10 +22,6 @@ function currentTimeRounded(): string {
   const now = new Date();
   const minutes = Math.ceil(now.getMinutes() / 30) * 30;
   now.setMinutes(minutes, 0, 0);
-  if (minutes >= 60) {
-    now.setHours(now.getHours() + 1);
-    now.setMinutes(0);
-  }
   return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
