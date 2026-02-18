@@ -93,19 +93,30 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
     try {
       const { jobs } = await generateFaceSwap(selectedPhoto.id, model.id, 2);
 
-      // Poll each job
+      // Poll each job (5s interval, 2min timeout)
       let completed = 0;
       const totalJobs = jobs.length;
+      const POLL_INTERVAL = 5000;
+      const POLL_TIMEOUT = 120000;
 
       for (const job of jobs) {
+        const startTime = Date.now();
         const interval = setInterval(async () => {
+          // Timeout: stop polling after 2 minutes
+          if (Date.now() - startTime > POLL_TIMEOUT) {
+            clearInterval(interval);
+            pollingRef.current = pollingRef.current.filter((i) => i !== interval);
+            completed++;
+            if (completed >= totalJobs) setStep("results");
+            return;
+          }
+
           try {
             const status = await getFaceSwapStatus(job._id);
             if (status.status === 2 && status.url) {
               clearInterval(interval);
               pollingRef.current = pollingRef.current.filter((i) => i !== interval);
 
-              // Save result to DB
               const saved = await saveFaceSwapResult({
                 treatment_photo_id: selectedPhoto.id,
                 face_model_id: model.id,
@@ -114,26 +125,20 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
 
               setResults((prev) => [...prev, saved]);
               completed++;
-              if (completed >= totalJobs) {
-                setStep("results");
-              }
+              if (completed >= totalJobs) setStep("results");
             } else if (status.status === 3) {
               clearInterval(interval);
               pollingRef.current = pollingRef.current.filter((i) => i !== interval);
               completed++;
-              if (completed >= totalJobs) {
-                setStep("results");
-              }
+              if (completed >= totalJobs) setStep("results");
             }
           } catch {
             clearInterval(interval);
             pollingRef.current = pollingRef.current.filter((i) => i !== interval);
             completed++;
-            if (completed >= totalJobs) {
-              setStep("results");
-            }
+            if (completed >= totalJobs) setStep("results");
           }
-        }, 3000);
+        }, POLL_INTERVAL);
         pollingRef.current.push(interval);
       }
     } catch {
