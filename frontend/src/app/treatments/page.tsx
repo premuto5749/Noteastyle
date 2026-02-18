@@ -134,7 +134,7 @@ export default function TreatmentsPage() {
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-            className="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none"
+            className="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 focus:outline-none"
           >
             <option value="newest">최신순</option>
             <option value="oldest">오래된순</option>
