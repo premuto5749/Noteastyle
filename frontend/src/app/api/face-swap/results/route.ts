@@ -41,10 +41,11 @@ export async function POST(request: NextRequest) {
 
   // Download from Replicate and persist to Supabase Storage
   let permanentUrl: string;
+  let storageError: string | null = null;
   try {
     permanentUrl = await downloadToStorage(supabase, result_url, treatment_photo_id);
-  } catch {
-    // Fallback: save original URL if download fails
+  } catch (err) {
+    storageError = err instanceof Error ? err.message : "Unknown storage error";
     permanentUrl = result_url;
   }
 
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json({ ...data, _storage_error: storageError }, { status: 201 });
 }
 
 export async function GET(request: NextRequest) {
