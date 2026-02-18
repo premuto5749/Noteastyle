@@ -35,6 +35,7 @@ export async function GET(
   const supabase = createServerClient();
   const { searchParams } = new URL(request.url);
   const search = searchParams.get("search");
+  const phone = searchParams.get("phone");
   const skip = parseInt(searchParams.get("skip") || "0");
   const limit = parseInt(searchParams.get("limit") || "50");
 
@@ -47,6 +48,9 @@ export async function GET(
 
   if (search) {
     query = query.ilike("name", `%${search}%`);
+  }
+  if (phone) {
+    query = query.ilike("phone", `%${phone}%`);
   }
 
   const { data, error } = await query;
