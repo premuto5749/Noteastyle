@@ -52,11 +52,11 @@ export function DayCalendarStrip({
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-2 py-2">
+    <div className="bg-card border-b border-border px-2 py-2">
       <div className="flex items-center gap-1">
         <button
           onClick={handlePrev}
-          className="p-1.5 text-gray-400 hover:text-gray-600 shrink-0"
+          className="p-1.5 text-subtle hover:text-muted-foreground shrink-0"
           aria-label="이전 주"
         >
           <svg
@@ -94,7 +94,7 @@ export function DayCalendarStrip({
                       ? "text-red-400"
                       : isSaturday
                         ? "text-blue-400"
-                        : "text-gray-400"
+                        : "text-subtle"
                   }`}
                 >
                   {DAY_LABELS[day.dayOfWeek]}
@@ -102,16 +102,16 @@ export function DayCalendarStrip({
                 <span
                   className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-semibold transition-colors ${
                     isSelected
-                      ? "bg-gray-900 text-white"
+                      ? "bg-primary text-primary-foreground"
                       : isToday
-                        ? "bg-gray-200 text-gray-900"
-                        : "text-gray-700"
+                        ? "bg-muted text-foreground"
+                        : "text-foreground"
                   }`}
                 >
                   {day.dayNum}
                 </span>
                 {hasReservations && !isSelected && (
-                  <span className="w-1 h-1 rounded-full bg-gray-900" />
+                  <span className="w-1 h-1 rounded-full bg-primary" />
                 )}
                 {isSelected && <span className="w-1 h-1" />}
                 {!hasReservations && !isSelected && (
@@ -124,7 +124,7 @@ export function DayCalendarStrip({
 
         <button
           onClick={handleNext}
-          className="p-1.5 text-gray-400 hover:text-gray-600 shrink-0"
+          className="p-1.5 text-subtle hover:text-muted-foreground shrink-0"
           aria-label="다음 주"
         >
           <svg

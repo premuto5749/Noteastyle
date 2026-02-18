@@ -18,7 +18,7 @@ export function BottomNav() {
   if (/^\/treatments\/[^/]+$/.test(pathname)) return null;
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-200 z-50">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-card border-t border-border z-50">
       <div className="flex justify-around items-center h-16">
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -30,13 +30,11 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-0.5 px-2 py-1 text-xs transition-colors ${
-                item.isCenter
-                  ? isActive
-                    ? "text-gray-900"
-                    : "text-gray-500"
-                  : isActive
-                    ? "text-gray-900"
-                    : "text-gray-400"
+                isActive
+                  ? "text-foreground"
+                  : item.isCenter
+                    ? "text-muted-foreground"
+                    : "text-subtle"
               }`}
             >
               <item.icon active={isActive} />
@@ -58,8 +56,8 @@ function HomeLogoIcon({ active }: { active: boolean }) {
       height="26"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#111827" : "currentColor"}
-      strokeWidth="2"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -76,8 +74,8 @@ function CalendarPlusIcon({ active }: { active: boolean }) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#111827" : "currentColor"}
-      strokeWidth="2"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -98,8 +96,8 @@ function CustomerIcon({ active }: { active: boolean }) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#111827" : "currentColor"}
-      strokeWidth="2"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -116,8 +114,8 @@ function TaskIcon({ active }: { active: boolean }) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#111827" : "currentColor"}
-      strokeWidth="2"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -135,8 +133,8 @@ function PortfolioIcon({ active }: { active: boolean }) {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? "#111827" : "currentColor"}
-      strokeWidth="2"
+      stroke="currentColor"
+      strokeWidth={active ? 2.5 : 2}
       strokeLinecap="round"
       strokeLinejoin="round"
     >

@@ -140,8 +140,8 @@ export default function TreatmentDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-gray-400">불러오는 중...</p>
+      <div className="min-h-screen bg-card flex items-center justify-center">
+        <p className="text-subtle">불러오는 중...</p>
       </div>
     );
   }
@@ -152,12 +152,12 @@ export default function TreatmentDetailPage() {
   const visitCount = treatment.customer?.visit_count;
 
   return (
-    <div className="min-h-screen bg-gray-100 pb-8">
+    <div className="min-h-screen bg-muted pb-8">
       {/* Custom Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-header-bg backdrop-blur-sm px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-gray-500"
+          className="flex items-center gap-1 text-muted-foreground"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6" />
@@ -165,11 +165,11 @@ export default function TreatmentDetailPage() {
           <span className="text-sm">뒤로</span>
         </button>
         <div className="text-center">
-          <div className="text-sm font-bold text-gray-900">
+          <div className="text-sm font-bold text-foreground">
             {SERVICE_LABELS[treatment.service_type] || treatment.service_type}
           </div>
           {customerName && (
-            <div className="text-xs text-gray-500">{customerName} 고객님</div>
+            <div className="text-xs text-muted-foreground">{customerName} 고객님</div>
           )}
         </div>
         <div className="w-12" /> {/* Spacer for centering */}
@@ -181,48 +181,48 @@ export default function TreatmentDetailPage() {
       </PhotoCarousel>
 
       {/* Bottom Sheet */}
-      <div className="bg-white rounded-t-3xl -mt-6 relative z-10 min-h-[40vh]">
+      <div className="bg-card rounded-t-3xl -mt-6 relative z-10 min-h-[40vh]">
         {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          <div className="w-10 h-1 bg-hint rounded-full" />
         </div>
 
         <div className="px-4 pb-6 space-y-4">
           {/* Title + Customer + Price */}
           <div>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-foreground">
                 {SERVICE_LABELS[treatment.service_type] || treatment.service_type}
                 {treatment.service_detail && (
-                  <span className="text-gray-500 font-normal ml-2 text-base">
+                  <span className="text-muted-foreground font-normal ml-2 text-base">
                     {treatment.service_detail}
                   </span>
                 )}
               </h2>
               {treatment.price != null && (
-                <span className="text-lg font-bold text-gray-900">
+                <span className="text-lg font-bold text-foreground">
                   {treatment.price.toLocaleString()}원
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2 mt-1">
               {customerName && (
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {customerName} 고객님
                 </span>
               )}
               {visitCount != null && visitCount >= 5 && (
-                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">
+                <span className="px-1.5 py-0.5 bg-warning-bg text-warning-foreground text-[10px] font-bold rounded">
                   VIP
                 </span>
               )}
               {visitCount != null && (
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-subtle">
                   방문 {visitCount}회
                 </span>
               )}
             </div>
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="text-xs text-subtle mt-1">
               {new Date(treatment.created_at).toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "long",
@@ -235,8 +235,8 @@ export default function TreatmentDetailPage() {
           {/* Notes */}
           {treatment.customer_notes && (
             <div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">노트</h3>
-              <p className="text-sm text-gray-600 bg-gray-50 rounded-xl p-3">
+              <h3 className="text-sm font-bold text-foreground mb-1">노트</h3>
+              <p className="text-sm text-muted-foreground bg-surface rounded-xl p-3">
                 {treatment.customer_notes}
               </p>
             </div>
@@ -245,8 +245,8 @@ export default function TreatmentDetailPage() {
           {/* AI Summary */}
           {treatment.ai_summary && (
             <div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">AI 요약</h3>
-              <p className="text-sm text-gray-600 bg-blue-50 rounded-xl p-3">
+              <h3 className="text-sm font-bold text-foreground mb-1">AI 요약</h3>
+              <p className="text-sm text-muted-foreground bg-info-bg rounded-xl p-3">
                 {treatment.ai_summary}
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function TreatmentDetailPage() {
               {tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                  className="px-3 py-1 bg-muted text-muted-foreground text-xs rounded-full"
                 >
                   {tag}
                 </span>
@@ -269,8 +269,8 @@ export default function TreatmentDetailPage() {
           {/* Next Visit */}
           {treatment.next_visit_recommendation && (
             <div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">다음 방문 추천</h3>
-              <p className="text-sm text-gray-600">{treatment.next_visit_recommendation}</p>
+              <h3 className="text-sm font-bold text-foreground mb-1">다음 방문 추천</h3>
+              <p className="text-sm text-muted-foreground">{treatment.next_visit_recommendation}</p>
             </div>
           )}
 
@@ -278,14 +278,14 @@ export default function TreatmentDetailPage() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
+              className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground active:bg-surface"
             >
               {showDetails ? "상세 접기" : "상세 보기"}
             </button>
             <button
               onClick={() => setShowFaceSwap(true)}
               disabled={swappablePhotos.length === 0}
-              className="flex-1 py-3 bg-blue-500 text-white rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
+              className="flex-1 py-3 bg-accent text-primary-foreground rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
             >
               AI Faceswap
             </button>
@@ -295,10 +295,10 @@ export default function TreatmentDetailPage() {
           {showDetails && (
             <div className="space-y-4">
               {/* Detail Info */}
-              <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+              <div className="bg-surface rounded-xl p-4 space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-gray-500">날짜</div>
-                  <div className="text-gray-900">
+                  <div className="text-muted-foreground">날짜</div>
+                  <div className="text-foreground">
                     {new Date(treatment.created_at).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
@@ -308,29 +308,29 @@ export default function TreatmentDetailPage() {
 
                   {treatment.duration_minutes && (
                     <>
-                      <div className="text-gray-500">소요 시간</div>
-                      <div className="text-gray-900">{treatment.duration_minutes}분</div>
+                      <div className="text-muted-foreground">소요 시간</div>
+                      <div className="text-foreground">{treatment.duration_minutes}분</div>
                     </>
                   )}
 
                   {treatment.price != null && (
                     <>
-                      <div className="text-gray-500">가격</div>
-                      <div className="text-gray-900">{treatment.price.toLocaleString()}원</div>
+                      <div className="text-muted-foreground">가격</div>
+                      <div className="text-foreground">{treatment.price.toLocaleString()}원</div>
                     </>
                   )}
 
                   {treatment.area && (
                     <>
-                      <div className="text-gray-500">시술 부위</div>
-                      <div className="text-gray-900">{treatment.area}</div>
+                      <div className="text-muted-foreground">시술 부위</div>
+                      <div className="text-foreground">{treatment.area}</div>
                     </>
                   )}
 
                   {treatment.satisfaction && (
                     <>
-                      <div className="text-gray-500">만족도</div>
-                      <div className="text-gray-900">
+                      <div className="text-muted-foreground">만족도</div>
+                      <div className="text-foreground">
                         {"★".repeat(Number(treatment.satisfaction))}{"☆".repeat(5 - Number(treatment.satisfaction))}
                       </div>
                     </>
@@ -341,12 +341,12 @@ export default function TreatmentDetailPage() {
               {/* Products */}
               {treatment.products_used && treatment.products_used.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">사용 제품</h3>
+                  <h3 className="text-sm font-bold text-foreground mb-2">사용 제품</h3>
                   <div className="flex gap-1 flex-wrap">
                     {treatment.products_used.map((p, i) => (
                       <span
                         key={i}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                        className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
                       >
                         {p.brand} {p.code} {p.area && `(${p.area})`}
                       </span>
@@ -357,30 +357,30 @@ export default function TreatmentDetailPage() {
 
               {/* Photo Actions */}
               <div className="space-y-3">
-                <h3 className="text-sm font-bold text-gray-900">사진 관리</h3>
+                <h3 className="text-sm font-bold text-foreground">사진 관리</h3>
 
                 {sortedPhotos.map((photo) => (
-                  <div key={photo.id} className="bg-gray-50 rounded-xl p-3 space-y-2">
+                  <div key={photo.id} className="bg-surface rounded-xl p-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-500 uppercase">
+                      <span className="text-xs font-medium text-muted-foreground uppercase">
                         {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
                         {photo.media_type === "video" && (
-                          <span className="ml-1 text-blue-500">영상</span>
+                          <span className="ml-1 text-accent">영상</span>
                         )}
                       </span>
                       <div className="flex gap-1.5">
                         <ShareButton
                           imageUrl={photo.face_swapped_url || photo.photo_url}
                           title={`${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
-                          className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded-md disabled:opacity-50"
+                          className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-50"
                         />
                         <button
                           onClick={() => handleAddToPortfolio(photo)}
                           disabled={photo.is_portfolio}
                           className={`text-xs px-2 py-1 rounded-md ${
                             photo.is_portfolio
-                              ? "bg-green-100 text-green-600"
-                              : "bg-gray-200 text-gray-600"
+                              ? "bg-success-bg text-success-foreground"
+                              : "bg-muted text-muted-foreground"
                           }`}
                         >
                           {photo.is_portfolio ? "추가됨" : "포트폴리오"}
@@ -392,12 +392,12 @@ export default function TreatmentDetailPage() {
               </div>
 
               {/* Upload */}
-              <div className="bg-gray-50 rounded-xl p-4">
+              <div className="bg-surface rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-gray-900">파일 업로드</h3>
+                  <h3 className="text-sm font-bold text-foreground">파일 업로드</h3>
                   <Link
                     href={`/treatments/${id}/capture`}
-                    className="text-xs text-blue-500"
+                    className="text-xs text-accent"
                   >
                     촬영하기
                   </Link>
@@ -406,7 +406,7 @@ export default function TreatmentDetailPage() {
                   <select
                     value={uploadType}
                     onChange={(e) => setUploadType(e.target.value)}
-                    className="text-sm border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 bg-white text-gray-900"
+                    className="text-sm border border-border rounded-lg pl-3 pr-8 py-1.5 bg-card text-foreground"
                   >
                     <option value="before">시술 전</option>
                     <option value="during">시술 중</option>
@@ -415,8 +415,8 @@ export default function TreatmentDetailPage() {
                   <label
                     className={`flex-1 text-center text-sm py-2 rounded-lg cursor-pointer ${
                       uploading
-                        ? "bg-gray-100 text-gray-400"
-                        : "bg-black text-white active:opacity-80"
+                        ? "bg-muted text-subtle"
+                        : "bg-primary text-primary-foreground active:opacity-80"
                     }`}
                   >
                     {uploading ? "업로드 중..." : "사진/영상 선택"}
@@ -434,7 +434,7 @@ export default function TreatmentDetailPage() {
               {/* Delete */}
               <button
                 onClick={handleDelete}
-                className="w-full py-3 border border-red-200 text-red-400 rounded-xl text-sm font-medium active:bg-red-50"
+                className="w-full py-3 border border-destructive text-destructive rounded-xl text-sm font-medium active:bg-red-50"
               >
                 시술 기록 삭제
               </button>

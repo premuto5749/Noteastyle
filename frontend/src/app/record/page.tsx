@@ -125,8 +125,8 @@ export default function QuickRecordPage() {
       <div className="p-4">
         {step === "customer" && (
           <div className="space-y-6">
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-              <label className="text-sm font-medium text-gray-500 block mb-2">
+            <div className="bg-surface rounded-2xl p-6 border border-border">
+              <label className="text-sm font-medium text-muted-foreground block mb-2">
                 고객 이름
               </label>
               <div className="flex gap-2">
@@ -136,19 +136,19 @@ export default function QuickRecordPage() {
                   onChange={(e) => setCustomerName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCustomerSubmit()}
                   placeholder="이름을 입력하세요"
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-200"
+                  className="flex-1 px-4 py-3 border border-border rounded-xl text-base bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring focus:ring-2 focus:ring-muted"
                   autoFocus
                 />
                 <button
                   onClick={handleCustomerSubmit}
                   disabled={!customerName.trim()}
-                  className="px-6 py-3 bg-black text-white rounded-xl font-medium disabled:opacity-40 active:scale-95 transition-transform"
+                  className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-40 active:scale-95 transition-transform"
                 >
                   다음
                 </button>
               </div>
               <div className="mt-3">
-                <label className="text-xs text-gray-500 block mb-1">
+                <label className="text-xs text-muted-foreground block mb-1">
                   네이버 예약번호 (선택)
                 </label>
                 <input
@@ -156,16 +156,16 @@ export default function QuickRecordPage() {
                   value={naverBookingId}
                   onChange={(e) => setNaverBookingId(e.target.value)}
                   placeholder="예약번호 입력"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+                  className="w-full px-4 py-2 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
                 />
               </div>
             </div>
 
             <div className="text-center">
-              <p className="text-xs text-gray-400 mb-3">또는 음성으로 한번에 기록</p>
+              <p className="text-xs text-subtle mb-3">또는 음성으로 한번에 기록</p>
               <VoiceMemo onResult={handleVoiceMemo} disabled={voiceProcessing} />
               {voiceProcessing && (
-                <p className="text-sm text-gray-900 mt-2 animate-pulse">
+                <p className="text-sm text-foreground mt-2 animate-pulse">
                   AI가 음성을 분석하고 있어요...
                 </p>
               )}
@@ -175,12 +175,12 @@ export default function QuickRecordPage() {
 
         {step === "service" && (
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-              <div className="text-sm text-gray-500 mb-1">고객</div>
-              <div className="font-bold text-lg text-gray-900">{customerName}</div>
+            <div className="bg-surface rounded-2xl p-4 border border-border">
+              <div className="text-sm text-muted-foreground mb-1">고객</div>
+              <div className="font-bold text-lg text-foreground">{customerName}</div>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-              <div className="text-sm font-medium text-gray-500 mb-3">
+            <div className="bg-surface rounded-2xl p-4 border border-border">
+              <div className="text-sm font-medium text-muted-foreground mb-3">
                 시술 종류를 선택하세요
               </div>
               <div className="grid grid-cols-3 gap-3">
@@ -200,21 +200,21 @@ export default function QuickRecordPage() {
 
         {step === "product" && (
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
+            <div className="bg-surface rounded-2xl p-4 border border-border">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm text-gray-500">{customerName}</div>
-                  <div className="font-bold text-gray-900">
+                  <div className="text-sm text-muted-foreground">{customerName}</div>
+                  <div className="font-bold text-foreground">
                     {SERVICES.find((s) => s.type === selectedService)?.label}
                   </div>
                 </div>
-                <button onClick={() => setStep("service")} className="text-sm text-gray-500">
+                <button onClick={() => setStep("service")} className="text-sm text-muted-foreground">
                   변경
                 </button>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-              <div className="text-sm font-medium text-gray-500 mb-3">
+            <div className="bg-surface rounded-2xl p-4 border border-border">
+              <div className="text-sm font-medium text-muted-foreground mb-3">
                 사용한 제품 (여러 개 선택 가능)
               </div>
               <div className="flex flex-wrap gap-2">
@@ -235,7 +235,7 @@ export default function QuickRecordPage() {
             <button
               onClick={() => handleSave()}
               disabled={saving}
-              className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
+              className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
             >
               {saving ? "저장 중..." : "기록 완료"}
             </button>
@@ -244,20 +244,20 @@ export default function QuickRecordPage() {
 
         {step === "done" && (
           <div className="text-center py-12">
-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-success-bg rounded-full flex items-center justify-center mx-auto mb-4">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">기록 완료!</h2>
-            <p className="text-gray-500 text-sm mb-6">
+            <h2 className="text-xl font-bold text-foreground mb-1">기록 완료!</h2>
+            <p className="text-muted-foreground text-sm mb-6">
               {customerName}님의 시술이 기록되었습니다
             </p>
             <div className="flex flex-col gap-3 items-center">
               {savedId && (
                 <Link
                   href={`/treatments/${savedId}/capture`}
-                  className="w-full max-w-xs py-3 bg-black text-white rounded-xl font-bold text-center active:scale-95 transition-transform"
+                  className="w-full max-w-xs py-3 bg-primary text-primary-foreground rounded-xl font-bold text-center active:scale-95 transition-transform"
                 >
                   사진/영상 촬영
                 </Link>
@@ -265,13 +265,13 @@ export default function QuickRecordPage() {
               <div className="flex gap-3">
                 <button
                   onClick={reset}
-                  className="px-6 py-3 border border-gray-200 rounded-xl font-medium text-gray-500 active:scale-95 transition-transform"
+                  className="px-6 py-3 border border-border rounded-xl font-medium text-muted-foreground active:scale-95 transition-transform"
                 >
                   다음 고객 기록
                 </button>
                 <Link
                   href="/treatments"
-                  className="px-6 py-3 border border-gray-200 rounded-xl font-medium text-gray-500 active:scale-95 transition-transform"
+                  className="px-6 py-3 border border-border rounded-xl font-medium text-muted-foreground active:scale-95 transition-transform"
                 >
                   시술 목록
                 </Link>

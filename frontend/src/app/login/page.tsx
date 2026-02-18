@@ -18,17 +18,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center px-6 py-12">
+    <div className="min-h-screen bg-card flex flex-col justify-center px-6 py-12">
       {/* Logo */}
       <div className="text-center mb-10">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           note-a-style
         </h1>
       </div>
 
       {/* Greeting */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-foreground">
           디자이너님, 반가워요!
         </h2>
       </div>
@@ -41,7 +41,7 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일"
-            className="w-full px-4 py-3.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+            className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
           />
         </div>
         <div className="relative">
@@ -50,12 +50,12 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="비밀번호"
-            className="w-full px-4 py-3.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 pr-12"
+            className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring pr-12"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-subtle"
           >
             {showPassword ? (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -78,7 +78,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => alert("준비 중입니다")}
-            className="text-xs text-gray-400"
+            className="text-xs text-subtle"
           >
             비밀번호를 잊으셨나요?
           </button>
@@ -87,7 +87,7 @@ export default function LoginPage() {
         {/* Login Button */}
         <button
           type="submit"
-          className="w-full py-3.5 bg-black text-white rounded-full font-bold text-sm active:scale-95 transition-transform"
+          className="w-full py-3.5 bg-primary text-primary-foreground rounded-full font-bold text-sm active:scale-95 transition-transform"
         >
           로그인
         </button>
@@ -95,9 +95,9 @@ export default function LoginPage() {
 
       {/* Sign Up Link */}
       <div className="text-center mt-6">
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-subtle">
           아직 회원이 아니시라면{" "}
-          <Link href="#" onClick={(e) => { e.preventDefault(); alert("준비 중입니다"); }} className="text-gray-900 font-bold underline">
+          <Link href="#" onClick={(e) => { e.preventDefault(); alert("준비 중입니다"); }} className="text-foreground font-bold underline">
             회원가입
           </Link>
         </span>
@@ -105,9 +105,9 @@ export default function LoginPage() {
 
       {/* Divider */}
       <div className="flex items-center gap-3 my-8">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400">혹은 SNS 로그인</span>
-        <div className="flex-1 h-px bg-gray-200" />
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-xs text-subtle">혹은 SNS 로그인</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
 
       {/* Social Login Buttons */}

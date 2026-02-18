@@ -173,13 +173,13 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+    <div className="fixed inset-0 z-50 bg-card flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-        <h2 className="text-base font-bold text-gray-900">AI Faceswap</h2>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <h2 className="text-base font-bold text-foreground">AI Faceswap</h2>
         <button
           onClick={onClose}
-          className="p-1 text-gray-400"
+          className="p-1 text-subtle"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -191,18 +191,18 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
       {/* Step 1: Select Photo - 4-column gallery grid */}
       {step === "select-photo" && (
         <div className="flex-1 overflow-auto">
-          <p className="text-sm text-gray-500 px-4 py-3">페이스 스왑할 사진을 선택하세요</p>
+          <p className="text-sm text-muted-foreground px-4 py-3">페이스 스왑할 사진을 선택하세요</p>
           {photos.length === 0 ? (
-            <div className="text-center py-20 text-gray-400 text-sm">
+            <div className="text-center py-20 text-subtle text-sm">
               시술 사진이 없습니다
             </div>
           ) : (
-            <div className="grid grid-cols-4 gap-px bg-gray-200">
+            <div className="grid grid-cols-4 gap-px bg-border">
               {photos.map((photo) => (
                 <button
                   key={photo.id}
                   onClick={() => handlePhotoSelect(photo)}
-                  className="relative aspect-square bg-gray-100 overflow-hidden active:opacity-70 transition-opacity"
+                  className="relative aspect-square bg-muted overflow-hidden active:opacity-70 transition-opacity"
                 >
                   <Image
                     src={photo.photo_url}
@@ -223,7 +223,7 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
         <>
           {/* Selected photo preview */}
           {selectedPhoto && (
-            <div className="relative aspect-[4/3] bg-gray-100">
+            <div className="relative aspect-[4/3] bg-muted">
               <Image
                 src={selectedPhoto.photo_url}
                 alt="선택한 사진"
@@ -235,8 +235,8 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
           )}
 
           {/* Model selection bottom sheet */}
-          <div className="bg-white rounded-t-2xl border-t border-gray-100 p-4 space-y-4">
-            <h3 className="text-sm font-bold text-gray-900">AI 얼굴 모델 선택</h3>
+          <div className="bg-card rounded-t-2xl border-t border-border p-4 space-y-4">
+            <h3 className="text-sm font-bold text-foreground">AI 얼굴 모델 선택</h3>
 
             {models.length > 0 ? (
               <div className="flex gap-3">
@@ -244,9 +244,9 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                   <button
                     key={model.id}
                     onClick={() => handleModelSelect(model)}
-                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-gray-200 active:border-blue-500 active:bg-blue-50 transition-colors flex-1"
+                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border active:border-accent active:bg-info-bg transition-colors flex-1"
                   >
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 relative">
+                    <div className="w-16 h-16 rounded-full overflow-hidden bg-muted relative">
                       <Image
                         src={model.image_url}
                         alt={model.name}
@@ -255,41 +255,41 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                         sizes="64px"
                       />
                     </div>
-                    <span className="text-xs font-medium text-gray-900">{model.name}</span>
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-xs font-medium text-foreground">{model.name}</span>
+                    <span className="text-[10px] text-subtle">
                       {model.gender === "male" ? "남성" : "여성"}
                     </span>
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400 text-center py-4">등록된 모델이 없습니다</p>
+              <p className="text-sm text-subtle text-center py-4">등록된 모델이 없습니다</p>
             )}
 
             {/* Add model button / form */}
             {!showModelAdd ? (
               <button
                 onClick={() => setShowModelAdd(true)}
-                className="w-full py-2.5 border border-dashed border-gray-300 rounded-xl text-sm text-gray-500 active:bg-gray-50"
+                className="w-full py-2.5 border border-dashed border-input rounded-xl text-sm text-muted-foreground active:bg-surface"
               >
                 + 모델 추가
               </button>
             ) : (
-              <div className="bg-gray-50 rounded-xl p-3 space-y-3">
+              <div className="bg-surface rounded-xl p-3 space-y-3">
                 <input
                   type="text"
                   placeholder="모델 이름"
                   value={modelName}
                   onChange={(e) => setModelName(e.target.value)}
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-900"
+                  className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-card text-foreground"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setModelGender("female")}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium ${
                       modelGender === "female"
-                        ? "bg-blue-500 text-white"
-                        : "bg-white border border-gray-200 text-gray-500"
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-card border border-border text-muted-foreground"
                     }`}
                   >
                     여성
@@ -298,14 +298,14 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                     onClick={() => setModelGender("male")}
                     className={`flex-1 py-2 rounded-lg text-sm font-medium ${
                       modelGender === "male"
-                        ? "bg-blue-500 text-white"
-                        : "bg-white border border-gray-200 text-gray-500"
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-card border border-border text-muted-foreground"
                     }`}
                   >
                     남성
                   </button>
                 </div>
-                <label className="block text-center text-sm py-2 rounded-lg cursor-pointer bg-white border border-gray-200 text-gray-600">
+                <label className="block text-center text-sm py-2 rounded-lg cursor-pointer bg-card border border-border text-muted-foreground">
                   {modelFile ? modelFile.name : "얼굴 사진 선택"}
                   <input
                     type="file"
@@ -321,14 +321,14 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                       setModelName("");
                       setModelFile(null);
                     }}
-                    className="flex-1 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg"
+                    className="flex-1 py-2 text-sm text-muted-foreground border border-border rounded-lg"
                   >
                     취소
                   </button>
                   <button
                     onClick={handleModelAdd}
                     disabled={!modelName || !modelFile || modelUploading}
-                    className="flex-1 py-2 text-sm text-white bg-blue-500 rounded-lg disabled:opacity-50"
+                    className="flex-1 py-2 text-sm text-accent-foreground bg-accent rounded-lg disabled:opacity-50"
                   >
                     {modelUploading ? "추가 중..." : "추가"}
                   </button>
@@ -345,7 +345,7 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
           {/* Selected photo + model info */}
           <div className="flex items-center gap-4 mb-8">
             {selectedPhoto && (
-              <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 relative">
+              <div className="w-20 h-20 rounded-xl overflow-hidden bg-muted relative">
                 <Image
                   src={selectedPhoto.photo_url}
                   alt="시술 사진"
@@ -355,12 +355,12 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                 />
               </div>
             )}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-subtle">
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
             {selectedModel && (
-              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100 relative">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-muted relative">
                 <Image
                   src={selectedModel.image_url}
                   alt={selectedModel.name}
@@ -373,9 +373,9 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
           </div>
 
           {/* Spinner */}
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mb-6" />
-          <p className="text-sm font-medium text-gray-900">AI가 얼굴을 합성하고 있습니다...</p>
-          <p className="text-xs text-gray-400 mt-1">잠시만 기다려주세요</p>
+          <div className="w-16 h-16 border-4 border-muted border-t-accent rounded-full animate-spin mb-6" />
+          <p className="text-sm font-medium text-foreground">AI가 얼굴을 합성하고 있습니다...</p>
+          <p className="text-xs text-subtle mt-1">잠시만 기다려주세요</p>
         </div>
       )}
 
@@ -383,10 +383,10 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
       {step === "results" && (
         <div className="flex-1 flex flex-col">
           <div className="flex-1 overflow-auto p-4">
-            <p className="text-sm text-gray-500 mb-4">결과를 선택하세요</p>
+            <p className="text-sm text-muted-foreground mb-4">결과를 선택하세요</p>
 
             {results.length === 0 ? (
-              <div className="text-center py-20 text-gray-400 text-sm">
+              <div className="text-center py-20 text-subtle text-sm">
                 생성된 결과가 없습니다. 다시 시도해주세요.
               </div>
             ) : (
@@ -395,9 +395,9 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                   <button
                     key={result.id}
                     onClick={() => setSelectedResultId(result.id)}
-                    className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 transition-all ${
+                    className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-muted transition-all ${
                       selectedResultId === result.id
-                        ? "ring-3 ring-blue-500 ring-offset-2"
+                        ? "ring-3 ring-accent ring-offset-2 ring-offset-background"
                         : ""
                     }`}
                   >
@@ -409,7 +409,7 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
                       sizes="(max-width: 480px) 50vw, 240px"
                     />
                     {selectedResultId === result.id && (
-                      <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
@@ -422,17 +422,17 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
           </div>
 
           {/* Bottom action buttons */}
-          <div className="p-4 border-t border-gray-100 flex gap-3">
+          <div className="p-4 border-t border-border flex gap-3">
             <button
               onClick={handleRegenerate}
-              className="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 active:bg-gray-50"
+              className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground active:bg-surface"
             >
               다시 만들기
             </button>
             <button
               onClick={handleSelectResult}
               disabled={!selectedResultId || submitting}
-              className="flex-1 py-3 bg-blue-500 text-white rounded-xl text-sm font-medium disabled:opacity-50 active:opacity-80"
+              className="flex-1 py-3 bg-accent text-accent-foreground rounded-xl text-sm font-medium disabled:opacity-50 active:opacity-80"
             >
               {submitting ? "처리 중..." : "선택 완료"}
             </button>
@@ -442,7 +442,7 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-60 bg-gray-900 text-white px-4 py-3 rounded-xl shadow-lg text-sm">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-60 bg-primary text-primary-foreground px-4 py-3 rounded-xl shadow-lg text-sm">
           {toast}
         </div>
       )}

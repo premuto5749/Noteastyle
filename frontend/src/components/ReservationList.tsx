@@ -47,7 +47,7 @@ export function ReservationList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-14 bg-gray-100 rounded-xl animate-pulse"
+            className="h-14 bg-muted rounded-xl animate-pulse"
           />
         ))}
       </div>
@@ -58,8 +58,8 @@ export function ReservationList({
     return (
       <div className="text-center py-16">
         <div className="text-4xl mb-3">📅</div>
-        <p className="text-gray-400 text-sm">오늘 예약이 없습니다</p>
-        <p className="text-gray-300 text-xs mt-1">예약을 등록하세요</p>
+        <p className="text-subtle text-sm">오늘 예약이 없습니다</p>
+        <p className="text-hint text-xs mt-1">예약을 등록하세요</p>
       </div>
     );
   }

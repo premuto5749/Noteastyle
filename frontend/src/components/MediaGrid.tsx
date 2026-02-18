@@ -27,7 +27,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
         {items.map((item, index) => (
           <div
             key={index}
-            className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
+            className="relative aspect-square bg-muted rounded-lg overflow-hidden cursor-pointer"
             onClick={() => setPreviewIndex(index)}
           >
             {item.type === "photo" ? (
@@ -47,14 +47,14 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+                  <div className="w-full h-full bg-muted flex items-center justify-center text-subtle">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                       <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <polygon points="10 9 16 12 10 15 10 9" fill="#9ca3af" stroke="none" />
+                      <polygon points="10 9 16 12 10 15 10 9" fill="currentColor" stroke="none" />
                     </svg>
                   </div>
                 )}
-                {/* Play icon overlay */}
+                {/* Play icon overlay - always dark */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 bg-black/60 rounded-full flex items-center justify-center">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
@@ -62,7 +62,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
                     </svg>
                   </div>
                 </div>
-                {/* Duration badge */}
+                {/* Duration badge - always dark */}
                 {item.durationSeconds != null && (
                   <span className="absolute bottom-1 right-1 text-[10px] bg-black/70 text-white px-1 py-0.5 rounded">
                     {formatDuration(item.durationSeconds)}
@@ -71,7 +71,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
               </>
             )}
 
-            {/* Delete button */}
+            {/* Delete button - always dark */}
             {editable && (
               <button
                 onClick={(e) => {
@@ -90,7 +90,7 @@ export function MediaGrid({ items, onRemove, editable = true }: MediaGridProps) 
         ))}
       </div>
 
-      {/* Fullscreen preview modal */}
+      {/* Fullscreen preview modal - always dark */}
       {previewIndex !== null && items[previewIndex] && (
         <div
           className="fixed inset-0 z-50 bg-black flex items-center justify-center"

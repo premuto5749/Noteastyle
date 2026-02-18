@@ -87,15 +87,15 @@ export default function CapturePage() {
 
       <div className="p-4 space-y-4">
         {/* Photo type selector */}
-        <div className="flex bg-gray-100 rounded-xl p-1">
+        <div className="flex bg-muted rounded-xl p-1">
           {PHOTO_TYPES.map((pt) => (
             <button
               key={pt.value}
               onClick={() => setPhotoType(pt.value)}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
                 photoType === pt.value
-                  ? "bg-gray-900 text-white shadow-sm"
-                  : "text-gray-500"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground"
               }`}
             >
               {pt.label}
@@ -114,32 +114,32 @@ export default function CapturePage() {
 
         {/* Mode selection buttons */}
         {!captureMode && (
-          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-            <p className="text-sm text-gray-500 text-center mb-4">
+          <div className="bg-surface rounded-2xl p-4 border border-border">
+            <p className="text-sm text-muted-foreground text-center mb-4">
               시술 완료 후 사진 또는 영상을 촬영하세요
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setCaptureMode("photo")}
                 disabled={uploading}
-                className="flex flex-col items-center gap-2 py-6 bg-white rounded-xl border border-gray-200 active:scale-95 transition-transform disabled:opacity-50"
+                className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-600">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
-                <span className="text-sm font-medium text-gray-900">사진 촬영</span>
+                <span className="text-sm font-medium text-foreground">사진 촬영</span>
               </button>
               <button
                 onClick={() => setCaptureMode("video")}
                 disabled={uploading}
-                className="flex flex-col items-center gap-2 py-6 bg-white rounded-xl border border-gray-200 active:scale-95 transition-transform disabled:opacity-50"
+                className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-600">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
                   <rect x="2" y="4" width="15" height="16" rx="2" />
                   <path d="M17 9l5-3v12l-5-3" />
                 </svg>
-                <span className="text-sm font-medium text-gray-900">영상 촬영</span>
+                <span className="text-sm font-medium text-foreground">영상 촬영</span>
               </button>
             </div>
           </div>
@@ -147,10 +147,10 @@ export default function CapturePage() {
 
         {/* Media grid */}
         {items.length > 0 && (
-          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-            <h3 className="text-sm font-medium text-gray-500 mb-3">
+          <div className="bg-surface rounded-2xl p-4 border border-border">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">
               촬영된 미디어{" "}
-              <span className="text-gray-400">{items.length}개</span>
+              <span className="text-subtle">{items.length}개</span>
             </h3>
             <MediaGrid items={items} onRemove={handleRemove} editable={!uploading} />
           </div>
@@ -160,7 +160,7 @@ export default function CapturePage() {
         <button
           onClick={handleSave}
           disabled={uploading}
-          className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {uploading
             ? `업로드 중... (${uploadProgress.current}/${uploadProgress.total})`
