@@ -41,11 +41,11 @@ export async function POST(
   // Upload to Supabase Storage
   const ext = file.name.split(".").pop() || "jpg";
   const filePath = `face-models/${shopId}/${crypto.randomUUID()}.${ext}`;
-  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(await file.arrayBuffer());
 
   const { error: uploadError } = await supabase.storage
     .from("treatment-photos")
-    .upload(filePath, arrayBuffer, {
+    .upload(filePath, buffer, {
       contentType: file.type,
       upsert: false,
     });

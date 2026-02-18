@@ -406,7 +406,7 @@ export default function TreatmentDetailPage() {
                   <select
                     value={uploadType}
                     onChange={(e) => setUploadType(e.target.value)}
-                    className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-900"
+                    className="text-sm border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 bg-white text-gray-900"
                   >
                     <option value="before">시술 전</option>
                     <option value="during">시술 중</option>
