@@ -1,26 +1,35 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { MediaCapture, type CapturedMedia } from "@/components/MediaCapture";
 import { MediaGrid } from "@/components/MediaGrid";
 import { uploadTreatmentPhoto } from "@/lib/api";
 
+const PHOTO_TYPES = [
+  { value: "before", label: "시술 전" },
+  { value: "during", label: "시술 중" },
+  { value: "after", label: "시술 후" },
+] as const;
+
 export default function CapturePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const treatmentId = params.id as string;
 
+  const initialType = searchParams.get("type") || "after";
+  const [photoType, setPhotoType] = useState(initialType);
   const [captureMode, setCaptureMode] = useState<"photo" | "video" | null>(null);
   const [items, setItems] = useState<CapturedMedia[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
   const handleCapture = useCallback((media: CapturedMedia) => {
-    setItems((prev) => [...prev, media]);
+    setItems((prev) => [...prev, { ...media, photoType } as CapturedMedia & { photoType: string }]);
     setCaptureMode(null);
-  }, []);
+  }, [photoType]);
 
   const handleRemove = useCallback((index: number) => {
     setItems((prev) => {
@@ -48,7 +57,7 @@ export default function CapturePage() {
         await uploadTreatmentPhoto(
           treatmentId,
           item.blob,
-          "after",
+          photoType,
           undefined,
           {
             mediaType: item.type,
@@ -62,7 +71,6 @@ export default function CapturePage() {
     } catch {
       alert("업로드에 실패했습니다. 다시 시도해주세요.");
     } finally {
-      // Cleanup preview URLs regardless of success/failure
       items.forEach((item) => {
         URL.revokeObjectURL(item.previewUrl);
         if (item.thumbnailUrl) URL.revokeObjectURL(item.thumbnailUrl);
@@ -86,6 +94,23 @@ export default function CapturePage() {
       />
 
       <div className="p-4 space-y-4">
+        {/* Photo type selector */}
+        <div className="flex bg-gray-100 rounded-xl p-1">
+          {PHOTO_TYPES.map((pt) => (
+            <button
+              key={pt.value}
+              onClick={() => setPhotoType(pt.value)}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+                photoType === pt.value
+                  ? "bg-gray-900 text-white shadow-sm"
+                  : "text-gray-500"
+              }`}
+            >
+              {pt.label}
+            </button>
+          ))}
+        </div>
+
         {/* Camera/Video viewfinder */}
         {captureMode && (
           <MediaCapture

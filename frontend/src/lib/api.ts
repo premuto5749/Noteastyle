@@ -44,9 +44,12 @@ export interface Customer {
   created_at: string;
 }
 
-export function getCustomers(search?: string) {
-  const params = search ? `?search=${encodeURIComponent(search)}` : "";
-  return request<Customer[]>(`/shops/${SHOP_ID}/customers${params}`);
+export function getCustomers(search?: string, phone?: string) {
+  const p = new URLSearchParams();
+  if (search) p.set("search", search);
+  if (phone) p.set("phone", phone);
+  const qs = p.toString();
+  return request<Customer[]>(`/shops/${SHOP_ID}/customers${qs ? `?${qs}` : ""}`);
 }
 
 export function getCustomer(id: string) {
@@ -383,5 +386,98 @@ export function selectFaceSwapResult(resultId: string) {
   return request<{ portfolio_id: string; result_id: string }>(
     `/face-swap/results/${resultId}/select`,
     { method: "POST" }
+  );
+}
+
+// Reservations
+export interface Reservation {
+  id: string;
+  shop_id: string;
+  customer_id: string;
+  designer_id: string | null;
+  treatment_id: string | null;
+  scheduled_date: string;
+  scheduled_time: string;
+  estimated_duration_minutes: number;
+  service_type: string | null;
+  service_detail: string | null;
+  notes: string | null;
+  source: string;
+  status: string;
+  created_at: string;
+  customer?: { name: string; phone: string | null };
+  designer?: { name: string } | null;
+  treatment?: { id: string } | null;
+}
+
+export function getReservations(date?: string, status?: string) {
+  const p = new URLSearchParams();
+  if (date) p.set("date", date);
+  if (status) p.set("status", status);
+  const qs = p.toString();
+  return request<Reservation[]>(
+    `/shops/${SHOP_ID}/reservations${qs ? `?${qs}` : ""}`
+  );
+}
+
+export function getReservation(id: string) {
+  return request<Reservation>(`/shops/${SHOP_ID}/reservations/${id}`);
+}
+
+export function createReservation(data: {
+  customer_id: string;
+  designer_id?: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  estimated_duration_minutes?: number;
+  service_type?: string;
+  service_detail?: string;
+  notes?: string;
+  source?: string;
+}) {
+  return request<Reservation>(`/shops/${SHOP_ID}/reservations`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateReservation(
+  id: string,
+  data: Partial<{
+    customer_id: string;
+    designer_id: string;
+    treatment_id: string;
+    scheduled_date: string;
+    scheduled_time: string;
+    estimated_duration_minutes: number;
+    service_type: string;
+    service_detail: string;
+    notes: string;
+    source: string;
+    status: string;
+  }>
+) {
+  return request<Reservation>(`/shops/${SHOP_ID}/reservations/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteReservation(id: string) {
+  return request<{ status: string }>(`/shops/${SHOP_ID}/reservations/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export function startTreatmentFromReservation(
+  reservationId: string,
+  data?: { service_type?: string; designer_id?: string }
+) {
+  return request<{ treatment: Treatment; reservation: Reservation }>(
+    `/shops/${SHOP_ID}/reservations/${reservationId}/start-treatment`,
+    {
+      method: "POST",
+      body: data ? JSON.stringify(data) : undefined,
+    }
   );
 }
