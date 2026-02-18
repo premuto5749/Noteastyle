@@ -9,7 +9,7 @@ async function downloadToStorage(
   // Download image from Replicate
   const res = await fetch(sourceUrl);
   if (!res.ok) throw new Error(`Failed to download image: ${res.status}`);
-  const arrayBuffer = await res.arrayBuffer();
+  const buffer = Buffer.from(await res.arrayBuffer());
   const contentType = res.headers.get("content-type") || "image/jpeg";
   const ext = contentType.includes("png") ? "png" : "jpg";
 
@@ -17,7 +17,7 @@ async function downloadToStorage(
   const filePath = `face-swap-results/${treatmentPhotoId}/${crypto.randomUUID()}.${ext}`;
   const { error: uploadError } = await supabase.storage
     .from("treatment-photos")
-    .upload(filePath, arrayBuffer, { contentType, upsert: false });
+    .upload(filePath, buffer, { contentType, upsert: false });
 
   if (uploadError) throw new Error(uploadError.message);
 
