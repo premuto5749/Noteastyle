@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeColorMeta } from "@/components/ThemeColorMeta";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "Note-a-Style",
@@ -35,10 +36,12 @@ export default function RootLayout({
       </head>
       <body className="antialiased bg-background text-foreground pb-20">
         <ThemeProvider>
-          <ErrorBoundary>
-            <main className="min-h-screen">{children}</main>
-          </ErrorBoundary>
-          <BottomNav />
+          <AuthProvider>
+            <ErrorBoundary>
+              <main className="min-h-screen">{children}</main>
+            </ErrorBoundary>
+            <BottomNav />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -15,6 +15,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   if (pathname === "/login") return null;
+  if (pathname === "/reset-password") return null;
+  if (pathname.startsWith("/admin")) return null;
   if (/^\/treatments\/[^/]+$/.test(pathname)) return null;
 
   return (
