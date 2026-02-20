@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { getPortfolio, togglePortfolioPublish, type PortfolioItem } from "@/lib/api";
+import { getPortfolio, togglePortfolioPublish, deletePortfolioItem, type PortfolioItem } from "@/lib/api";
 import { ShareButton } from "@/components/ShareButton";
 
 export default function PortfolioPage() {
@@ -24,6 +24,16 @@ export default function PortfolioPage() {
     }
     load();
   }, [showPublished]);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("이 포트폴리오 항목을 삭제하시겠습니까?")) return;
+    try {
+      await deletePortfolioItem(id);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      alert("삭제에 실패했습니다.");
+    }
+  };
 
   const handleTogglePublish = async (id: string) => {
     try {
@@ -122,6 +132,16 @@ export default function PortfolioPage() {
                       공개
                     </span>
                   )}
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="absolute top-2 right-2 w-7 h-7 bg-black/50 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-colors"
+                    title="삭제"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
                 </div>
                 <div className="p-3">
                   {item.title && (
