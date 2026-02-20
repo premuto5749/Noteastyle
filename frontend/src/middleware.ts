@@ -10,6 +10,7 @@ const PROTECTED_PATHS = [
   "/reservation",
   "/settings",
   "/tasks",
+  "/admin",
 ];
 
 function isProtectedPath(pathname: string): boolean {
