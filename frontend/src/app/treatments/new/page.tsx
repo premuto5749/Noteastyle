@@ -99,45 +99,45 @@ export default function NewTreatmentPage() {
 
       <div className="p-4 space-y-4">
         {/* Voice shortcut */}
-        <div className="bg-gray-100 rounded-2xl p-4 border border-gray-200">
-          <p className="text-sm text-gray-900 font-medium mb-3 text-center">
+        <div className="bg-muted rounded-2xl p-4 border border-border">
+          <p className="text-sm text-foreground font-medium mb-3 text-center">
             음성으로 자동 입력
           </p>
           <VoiceMemo onResult={handleVoiceMemo} disabled={voiceProcessing} />
           {voiceProcessing && (
-            <p className="text-sm text-gray-900 mt-2 animate-pulse text-center">
+            <p className="text-sm text-foreground mt-2 animate-pulse text-center">
               AI가 분석 중...
             </p>
           )}
         </div>
 
         {/* Customer */}
-        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 space-y-3">
+        <div className="bg-surface rounded-2xl p-4 border border-border space-y-3">
           <div>
-            <label className="text-sm font-medium text-gray-500 block mb-2">고객 이름 *</label>
+            <label className="text-sm font-medium text-muted-foreground block mb-2">고객 이름 *</label>
             <input
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="이름"
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+              className="w-full px-3 py-2.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">네이버 예약번호 (선택)</label>
+            <label className="text-xs text-muted-foreground block mb-1">네이버 예약번호 (선택)</label>
             <input
               type="text"
               value={naverBookingId}
               onChange={(e) => setNaverBookingId(e.target.value)}
               placeholder="예약번호 입력"
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+              className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
             />
           </div>
         </div>
 
         {/* Service */}
-        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-          <label className="text-sm font-medium text-gray-500 block mb-3">시술 종류 *</label>
+        <div className="bg-surface rounded-2xl p-4 border border-border">
+          <label className="text-sm font-medium text-muted-foreground block mb-3">시술 종류 *</label>
           <div className="grid grid-cols-3 gap-2">
             {SERVICES.map((s) => (
               <ServiceButton
@@ -152,17 +152,17 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Products */}
-        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-          <label className="text-sm font-medium text-gray-500 block mb-2">사용 제품</label>
+        <div className="bg-surface rounded-2xl p-4 border border-border">
+          <label className="text-sm font-medium text-muted-foreground block mb-2">사용 제품</label>
           {products.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {products.map((p, i) => (
                 <span
                   key={i}
-                  className="flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                  className="flex items-center gap-1 text-xs bg-muted text-foreground px-2 py-1 rounded-full"
                 >
                   {p.brand} {p.code} {p.area && `(${p.area})`}
-                  <button onClick={() => removeProduct(i)} className="ml-1 text-gray-400 hover:text-gray-700">
+                  <button onClick={() => removeProduct(i)} className="ml-1 text-subtle hover:text-foreground">
                     x
                   </button>
                 </span>
@@ -175,18 +175,18 @@ export default function NewTreatmentPage() {
               value={productBrand}
               onChange={(e) => setProductBrand(e.target.value)}
               placeholder="브랜드 (예: 로레알)"
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+              className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
             />
             <input
               type="text"
               value={productCode}
               onChange={(e) => setProductCode(e.target.value)}
               placeholder="코드 (예: 7.1)"
-              className="w-24 px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+              className="w-24 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
             />
             <button
               onClick={addProduct}
-              className="px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-500"
+              className="px-3 py-2 bg-muted rounded-lg text-sm font-medium text-muted-foreground"
             >
               +
             </button>
@@ -194,48 +194,48 @@ export default function NewTreatmentPage() {
         </div>
 
         {/* Details */}
-        <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200 space-y-3">
-          <label className="text-sm font-medium text-gray-500 block">상세 정보</label>
+        <div className="bg-surface rounded-2xl p-4 border border-border space-y-3">
+          <label className="text-sm font-medium text-muted-foreground block">상세 정보</label>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-500 block mb-1">시술 부위</label>
+              <label className="text-xs text-muted-foreground block mb-1">시술 부위</label>
               <input
                 type="text"
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 placeholder="예: 뿌리, 전체"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 block mb-1">소요 시간 (분)</label>
+              <label className="text-xs text-muted-foreground block mb-1">소요 시간 (분)</label>
               <input
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="30"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
               />
             </div>
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">가격 (원)</label>
+            <label className="text-xs text-muted-foreground block mb-1">가격 (원)</label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="50000"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
             />
           </div>
           <div>
-            <label className="text-xs text-gray-500 block mb-1">메모</label>
+            <label className="text-xs text-muted-foreground block mb-1">메모</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="시술 관련 메모..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900 resize-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring resize-none"
             />
           </div>
         </div>
@@ -244,7 +244,7 @@ export default function NewTreatmentPage() {
         <button
           onClick={handleSubmit}
           disabled={saving || !customerName.trim() || !selectedService}
-          className="w-full py-4 bg-black text-white rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {saving ? "저장 중..." : "기록 저장"}
         </button>

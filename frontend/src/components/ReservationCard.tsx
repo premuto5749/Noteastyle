@@ -16,33 +16,33 @@ const STATUS_STYLES: Record<
   { border: string; bg: string; text: string; label: string }
 > = {
   scheduled: {
-    border: "border-l-gray-300",
-    bg: "bg-white",
-    text: "text-gray-500",
+    border: "border-l-hint",
+    bg: "bg-card",
+    text: "text-muted-foreground",
     label: "예정",
   },
   in_progress: {
     border: "border-l-blue-500",
-    bg: "bg-blue-50/50",
-    text: "text-blue-600",
+    bg: "bg-info-bg",
+    text: "text-info-foreground",
     label: "진행중",
   },
   completed: {
     border: "border-l-green-500",
-    bg: "bg-green-50/30",
-    text: "text-green-600",
+    bg: "bg-success-bg",
+    text: "text-success-foreground",
     label: "완료",
   },
   cancelled: {
-    border: "border-l-gray-300",
-    bg: "bg-gray-50",
-    text: "text-gray-400",
+    border: "border-l-hint",
+    bg: "bg-surface",
+    text: "text-subtle",
     label: "취소",
   },
   no_show: {
-    border: "border-l-gray-300",
-    bg: "bg-gray-50",
-    text: "text-gray-400",
+    border: "border-l-hint",
+    bg: "bg-surface",
+    text: "text-subtle",
     label: "노쇼",
   },
 };
@@ -64,7 +64,7 @@ export function ReservationCard({
 
   return (
     <div
-      className={`border border-gray-200 rounded-xl overflow-hidden border-l-4 ${style.border} ${style.bg}`}
+      className={`border border-border rounded-xl overflow-hidden border-l-4 ${style.border} ${style.bg}`}
     >
       {/* Collapsed header */}
       <button
@@ -75,7 +75,7 @@ export function ReservationCard({
         {/* Time */}
         <span
           className={`text-sm font-mono font-semibold shrink-0 w-12 ${
-            isCancelledOrNoShow ? "text-gray-400 line-through" : "text-gray-900"
+            isCancelledOrNoShow ? "text-subtle line-through" : "text-foreground"
           }`}
         >
           {timeStr}
@@ -86,8 +86,8 @@ export function ReservationCard({
           <span
             className={`text-sm font-medium ${
               isCancelledOrNoShow
-                ? "text-gray-400 line-through"
-                : "text-gray-900"
+                ? "text-subtle line-through"
+                : "text-foreground"
             }`}
           >
             {r.customer?.name ?? "알 수 없음"}
@@ -95,7 +95,7 @@ export function ReservationCard({
           {r.service_type && (
             <span
               className={`text-sm ml-2 ${
-                isCancelledOrNoShow ? "text-gray-300" : "text-gray-500"
+                isCancelledOrNoShow ? "text-hint" : "text-muted-foreground"
               }`}
             >
               {r.service_type}
@@ -104,7 +104,7 @@ export function ReservationCard({
         </div>
 
         {/* Duration */}
-        <span className="text-xs text-gray-400 shrink-0">
+        <span className="text-xs text-subtle shrink-0">
           {r.estimated_duration_minutes}분
         </span>
 
@@ -127,7 +127,7 @@ export function ReservationCard({
         {r.status !== "completed" && !isCancelledOrNoShow && (
           <span
             className={`w-2 h-2 rounded-full shrink-0 ${
-              r.status === "in_progress" ? "bg-blue-500" : "bg-gray-300"
+              r.status === "in_progress" ? "bg-blue-500" : "bg-hint"
             }`}
           />
         )}
@@ -139,7 +139,7 @@ export function ReservationCard({
           <div className="flex gap-2">
             <button
               onClick={onVoiceMemo}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 active:scale-95 transition-transform"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-muted rounded-lg text-sm font-medium text-foreground active:scale-95 transition-transform"
             >
               <svg
                 width="16"
@@ -160,7 +160,7 @@ export function ReservationCard({
             </button>
             <button
               onClick={onCamera}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 active:scale-95 transition-transform"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-muted rounded-lg text-sm font-medium text-foreground active:scale-95 transition-transform"
             >
               <svg
                 width="16"
@@ -179,7 +179,7 @@ export function ReservationCard({
             </button>
             <button
               onClick={onDetail}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 active:scale-95 transition-transform"
+              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-muted rounded-lg text-sm font-medium text-foreground active:scale-95 transition-transform"
             >
               <svg
                 width="16"
@@ -193,13 +193,13 @@ export function ReservationCard({
               >
                 <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
                 <rect x="8" y="2" width="8" height="4" rx="1" />
-                <path d="M9 14l2 2 4-4" />
+                <path d="9 14l2 2 4-4" />
               </svg>
               상세
             </button>
           </div>
           {r.notes && (
-            <p className="text-xs text-gray-400 mt-2 px-1">{r.notes}</p>
+            <p className="text-xs text-subtle mt-2 px-1">{r.notes}</p>
           )}
         </div>
       )}

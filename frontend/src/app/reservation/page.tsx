@@ -168,32 +168,32 @@ export default function ReservationPage() {
       <div className="p-4 space-y-5">
         {/* Phone number */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            전화번호 <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-foreground mb-1.5">
+            전화번호 <span className="text-destructive">*</span>
           </label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="010-0000-0000"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             autoFocus
           />
 
           {/* Search results dropdown */}
           {showResults && searchResults.length > 0 && (
-            <div className="mt-1 border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden">
+            <div className="mt-1 border border-border rounded-xl bg-card shadow-sm overflow-hidden">
               {searchResults.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => selectCustomer(c)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 active:bg-gray-100 border-b border-gray-100 last:border-b-0"
+                  className="w-full text-left px-4 py-3 hover:bg-surface active:bg-muted border-b border-border last:border-b-0"
                 >
-                  <span className="font-medium text-gray-900">{c.name}</span>
-                  <span className="text-sm text-gray-500 ml-2">
+                  <span className="font-medium text-foreground">{c.name}</span>
+                  <span className="text-sm text-muted-foreground ml-2">
                     {c.phone}
                   </span>
-                  <span className="text-xs text-gray-400 ml-2">
+                  <span className="text-xs text-subtle ml-2">
                     방문 {c.visit_count}회
                   </span>
                 </button>
@@ -203,7 +203,7 @@ export default function ReservationPage() {
 
           {/* Matched customer badge */}
           {matchedCustomer && (
-            <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+            <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-success-bg rounded-lg border border-green-200">
               <svg
                 width="16"
                 height="16"
@@ -216,7 +216,7 @@ export default function ReservationPage() {
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              <span className="text-sm text-green-700 font-medium">
+              <span className="text-sm text-success-foreground font-medium">
                 {matchedCustomer.name}님 (방문 {matchedCustomer.visit_count}회)
               </span>
               <button
@@ -225,7 +225,7 @@ export default function ReservationPage() {
                   setCustomerName("");
                   setIsNewCustomer(true);
                 }}
-                className="ml-auto text-xs text-green-600"
+                className="ml-auto text-xs text-success-foreground"
               >
                 변경
               </button>
@@ -234,7 +234,7 @@ export default function ReservationPage() {
 
           {/* New customer indicator */}
           {isNewCustomer && !matchedCustomer && phone.replace(/\D/g, "").length >= 4 && (
-            <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="mt-2 px-3 py-2 bg-info-bg rounded-lg border border-blue-200">
               <span className="text-sm text-blue-700">
                 신규 고객 — 이름을 입력해주세요
               </span>
@@ -245,41 +245,41 @@ export default function ReservationPage() {
         {/* Customer name (for new customers) */}
         {!matchedCustomer && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              고객 이름 <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-foreground mb-1.5">
+              고객 이름 <span className="text-destructive">*</span>
             </label>
             <input
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="홍길동"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             />
           </div>
         )}
 
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-foreground mb-1.5">
             날짜
           </label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           />
         </div>
 
         {/* Time */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-foreground mb-1.5">
             시간
           </label>
           <select
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white"
+            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent bg-card"
           >
             {TIME_OPTIONS.map((t) => (
               <option key={t} value={t}>
@@ -291,7 +291,7 @@ export default function ReservationPage() {
 
         {/* Duration */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-foreground mb-1.5">
             예상 소요시간
           </label>
           <div className="flex gap-2">
@@ -302,8 +302,8 @@ export default function ReservationPage() {
                 onClick={() => setDuration(d)}
                 className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
                   duration === d
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white text-gray-600 border-gray-300"
+                    ? "bg-primary text-primary-foreground border-ring"
+                    : "bg-card text-muted-foreground border-input"
                 }`}
               >
                 {d}분
@@ -314,8 +314,8 @@ export default function ReservationPage() {
 
         {/* Service type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            시술 종류 <span className="text-xs text-gray-400">(선택)</span>
+          <label className="block text-sm font-medium text-foreground mb-1.5">
+            시술 종류 <span className="text-xs text-subtle">(선택)</span>
           </label>
           <div className="grid grid-cols-3 gap-2">
             {SERVICE_TYPES.map((s) => (
@@ -336,15 +336,15 @@ export default function ReservationPage() {
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            메모 <span className="text-xs text-gray-400">(선택)</span>
+          <label className="block text-sm font-medium text-foreground mb-1.5">
+            메모 <span className="text-xs text-subtle">(선택)</span>
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="요청사항, 특이사항 등"
             rows={2}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
+            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
           />
         </div>
 
@@ -352,7 +352,7 @@ export default function ReservationPage() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold text-base active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-base active:scale-95 transition-transform disabled:opacity-50"
         >
           {submitting ? "등록 중..." : "예약 등록"}
         </button>

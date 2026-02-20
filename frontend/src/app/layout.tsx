@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/BottomNav";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeColorMeta } from "@/components/ThemeColorMeta";
 
 export const metadata: Metadata = {
   title: "Note-a-Style",
@@ -19,7 +21,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -28,12 +29,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <ThemeColorMeta />
+      </head>
       <body className="antialiased bg-background text-foreground pb-20">
-        <ErrorBoundary>
-          <main className="min-h-screen">{children}</main>
-        </ErrorBoundary>
-        <BottomNav />
+        <ThemeProvider>
+          <ErrorBoundary>
+            <main className="min-h-screen">{children}</main>
+          </ErrorBoundary>
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   );

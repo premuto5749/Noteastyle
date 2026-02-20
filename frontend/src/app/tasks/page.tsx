@@ -82,20 +82,20 @@ export default function TasksPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-400 text-sm">불러오는 중...</p>
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <p className="text-subtle text-sm">불러오는 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-surface pb-24">
       {/* Date Navigation */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 py-3">
+      <div className="sticky top-0 z-40 bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between max-w-[480px] mx-auto">
           <button
             onClick={() => shiftDate(-1)}
-            className="p-2 text-gray-400 active:text-gray-900"
+            className="p-2 text-subtle active:text-foreground"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />
@@ -103,7 +103,7 @@ export default function TasksPage() {
           </button>
 
           <label className="relative cursor-pointer">
-            <span className="text-sm font-semibold text-gray-900">
+            <span className="text-sm font-semibold text-foreground">
               {formatDateKR(currentDate)}
             </span>
             <input
@@ -116,7 +116,7 @@ export default function TasksPage() {
 
           <button
             onClick={() => shiftDate(1)}
-            className="p-2 text-gray-400 active:text-gray-900"
+            className="p-2 text-subtle active:text-foreground"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />
@@ -129,17 +129,17 @@ export default function TasksPage() {
       <div className="max-w-[480px] mx-auto px-4 pt-4">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <p className="text-gray-400 text-sm">불러오는 중...</p>
+            <p className="text-subtle text-sm">불러오는 중...</p>
           </div>
         ) : treatments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" className="mb-3">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3 text-hint">
               <rect x="3" y="4" width="18" height="18" rx="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            <p className="text-gray-400 text-sm">완료된 시술이 없습니다</p>
+            <p className="text-subtle text-sm">완료된 시술이 없습니다</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -152,10 +152,10 @@ export default function TasksPage() {
                 <button
                   key={t.id}
                   onClick={() => router.push(`/treatments/${t.id}`)}
-                  className="w-full bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 text-left active:scale-[0.98] transition-transform"
+                  className="w-full bg-card rounded-2xl overflow-hidden shadow-sm border border-border text-left active:scale-[0.98] transition-transform"
                 >
                   {photo && (
-                    <div className="relative aspect-[4/3] bg-gray-100">
+                    <div className="relative aspect-[4/3] bg-muted">
                       <Image
                         src={photo.photo_url}
                         alt={serviceLabel}
@@ -166,18 +166,18 @@ export default function TasksPage() {
                     </div>
                   )}
                   <div className="p-3">
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-subtle">
                       {new Date(t.created_at).toLocaleTimeString("ko-KR", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
                     </div>
                     {customerName && (
-                      <div className="text-sm font-medium text-gray-900 mt-0.5">
+                      <div className="text-sm font-medium text-foreground mt-0.5">
                         {customerName} 고객님
                       </div>
                     )}
-                    <div className="text-xs text-gray-500 mt-0.5">
+                    <div className="text-xs text-muted-foreground mt-0.5">
                       {serviceLabel}
                       {t.service_detail && ` · ${t.service_detail}`}
                     </div>

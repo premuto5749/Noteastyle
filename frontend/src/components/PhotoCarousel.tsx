@@ -21,8 +21,8 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
 
   if (photos.length === 0) {
     return (
-      <div className="aspect-[4/3] bg-gray-100 flex items-center justify-center">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5">
+      <div className="aspect-[4/3] bg-muted flex items-center justify-center text-hint">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
           <polyline points="21 15 16 10 5 21" />
@@ -43,7 +43,7 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
         {photos.map((photo) => (
           <div
             key={photo.id}
-            className="w-full shrink-0 snap-center aspect-[4/3] relative bg-gray-100"
+            className="w-full shrink-0 snap-center aspect-[4/3] relative bg-muted"
           >
             {photo.media_type === "video" ? (
               <video
@@ -64,7 +64,7 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
 
             {/* AI badge */}
             {photo.face_swapped_url && (
-              <span className="absolute top-3 left-3 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
+              <span className="absolute top-3 left-3 px-2 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full">
                 AI
               </span>
             )}

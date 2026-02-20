@@ -40,7 +40,7 @@ export function StyleNoteOverlay({ treatment }: StyleNoteOverlayProps) {
       {tags.slice(0, POSITION_SLOTS.length).map((tag, i) => (
         <span
           key={i}
-          className={`absolute ${POSITION_SLOTS[i]} px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full shadow-sm`}
+          className={`absolute ${POSITION_SLOTS[i]} px-3 py-1 bg-accent text-accent-foreground text-xs font-medium rounded-full shadow-sm`}
         >
           {tag}
         </span>

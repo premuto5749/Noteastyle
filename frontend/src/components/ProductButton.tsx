@@ -15,18 +15,18 @@ export function ProductButton({ brand, code, color, selected, onClick }: Product
       onClick={onClick}
       className={`flex items-center gap-2 px-4 py-2.5 rounded-full border-2 transition-all active:scale-95 ${
         selected
-          ? "border-gray-900 bg-gray-100"
-          : "border-gray-200 bg-white hover:border-gray-300"
+          ? "border-ring bg-muted"
+          : "border-border bg-card hover:border-input"
       }`}
     >
       {color && (
         <span
-          className="w-4 h-4 rounded-full border border-gray-200"
+          className="w-4 h-4 rounded-full border border-border"
           style={{ backgroundColor: color }}
         />
       )}
       <span className="text-sm font-medium">{brand}</span>
-      {code && <span className="text-xs text-gray-500">{code}</span>}
+      {code && <span className="text-xs text-muted-foreground">{code}</span>}
     </button>
   );
 }

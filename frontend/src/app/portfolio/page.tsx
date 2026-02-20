@@ -55,8 +55,8 @@ export default function PortfolioPage() {
             onClick={() => setShowPublished(false)}
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               !showPublished
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-500"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             전체
@@ -65,8 +65,8 @@ export default function PortfolioPage() {
             onClick={() => setShowPublished(true)}
             className={`px-4 py-2 rounded-full text-sm font-medium ${
               showPublished
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-500"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground"
             }`}
           >
             공개됨
@@ -74,20 +74,20 @@ export default function PortfolioPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+          <div className="text-center py-8 text-subtle">불러오는 중...</div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
+          <div className="text-center py-12 bg-surface rounded-xl border border-border">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-subtle">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                 <circle cx="8.5" cy="8.5" r="1.5" />
                 <polyline points="21 15 16 10 5 21" />
               </svg>
             </div>
-            <p className="text-gray-500 text-sm font-medium mb-1">
+            <p className="text-muted-foreground text-sm font-medium mb-1">
               아직 포트폴리오가 없습니다
             </p>
-            <p className="text-gray-400 text-xs">
+            <p className="text-subtle text-xs">
               시술 사진에서 AI 페이스 스왑을 적용하면
               <br />
               자동으로 포트폴리오가 생성됩니다
@@ -98,9 +98,9 @@ export default function PortfolioPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+                className="bg-card rounded-xl border border-border overflow-hidden"
               >
-                <div className="aspect-square bg-gray-100 relative">
+                <div className="aspect-square bg-muted relative">
                   {item.photo.face_swapped_url ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
@@ -109,7 +109,7 @@ export default function PortfolioPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                    <div className="w-full h-full flex items-center justify-center text-hint">
                       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                         <rect x="3" y="3" width="18" height="18" rx="2" />
                         <circle cx="8.5" cy="8.5" r="1.5" />
@@ -125,14 +125,14 @@ export default function PortfolioPage() {
                 </div>
                 <div className="p-3">
                   {item.title && (
-                    <div className="text-sm font-medium truncate text-gray-900">{item.title}</div>
+                    <div className="text-sm font-medium truncate text-foreground">{item.title}</div>
                   )}
                   {item.tags && (
                     <div className="flex gap-1 mt-1 flex-wrap">
                       {item.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded"
+                          className="text-xs bg-muted text-muted-foreground px-1.5 py-0.5 rounded"
                         >
                           #{tag}
                         </span>
@@ -144,8 +144,8 @@ export default function PortfolioPage() {
                       onClick={() => handleTogglePublish(item.id)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-medium ${
                         item.is_published
-                          ? "bg-gray-100 text-gray-500"
-                          : "bg-black text-white"
+                          ? "bg-muted text-muted-foreground"
+                          : "bg-primary text-primary-foreground"
                       }`}
                     >
                       {item.is_published ? "비공개" : "공개하기"}
@@ -153,7 +153,7 @@ export default function PortfolioPage() {
                     <ShareButton
                       imageUrl={item.photo.face_swapped_url || item.photo.photo_url}
                       title={item.title || "포트폴리오"}
-                      className="py-1.5 px-3 rounded-lg text-xs font-medium bg-gray-100 text-gray-500"
+                      className="py-1.5 px-3 rounded-lg text-xs font-medium bg-muted text-muted-foreground"
                     />
                   </div>
                 </div>

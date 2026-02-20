@@ -93,12 +93,12 @@ export default function TreatmentsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3">
+      <div className="sticky top-0 z-40 bg-header-bg backdrop-blur-sm border-b border-border px-4 py-3">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-bold text-gray-900">시술 기록</h1>
+          <h1 className="text-lg font-bold text-foreground">시술 기록</h1>
           <Link
             href="/treatments/new"
-            className="px-3 py-1.5 bg-black text-white rounded-lg text-sm font-medium"
+            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
           >
             + 새 기록
           </Link>
@@ -111,9 +111,9 @@ export default function TreatmentsPage() {
             height="16"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#9ca3af"
+            stroke="currentColor"
             strokeWidth="2"
-            className="absolute left-3 top-1/2 -translate-y-1/2"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-subtle"
           >
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -123,7 +123,7 @@ export default function TreatmentsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="시술, 고객명 검색"
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900"
+            className="w-full pl-10 pr-4 py-2.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
           />
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function TreatmentsPage() {
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-            className="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 focus:outline-none"
+            className="text-sm text-muted-foreground bg-card border border-border rounded-lg pl-3 pr-8 py-1.5 focus:outline-none"
           >
             <option value="newest">최신순</option>
             <option value="oldest">오래된순</option>
@@ -145,8 +145,8 @@ export default function TreatmentsPage() {
               onClick={() => setShowFilterMenu(!showFilterMenu)}
               className={`flex items-center gap-1.5 text-sm px-3 py-1.5 border rounded-lg ${
                 activeFilters.length > 0
-                  ? "border-gray-900 text-gray-900"
-                  : "border-gray-200 text-gray-500"
+                  ? "border-ring text-foreground"
+                  : "border-border text-muted-foreground"
               }`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -154,22 +154,22 @@ export default function TreatmentsPage() {
               </svg>
               필터
               {activeFilters.length > 0 && (
-                <span className="w-5 h-5 bg-gray-900 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
                   {activeFilters.length}
                 </span>
               )}
             </button>
 
             {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg p-2 z-10 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg p-2 z-10 min-w-[140px]">
                 {Object.entries(SERVICE_LABELS).map(([key, label]) => (
                   <button
                     key={key}
                     onClick={() => toggleFilter(key)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
                       activeFilters.includes(key)
-                        ? "bg-gray-100 text-gray-900 font-medium"
-                        : "text-gray-500"
+                        ? "bg-muted text-foreground font-medium"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {activeFilters.includes(key) && "✓ "}{label}
@@ -177,10 +177,10 @@ export default function TreatmentsPage() {
                 ))}
                 {activeFilters.length > 0 && (
                   <>
-                    <div className="h-px bg-gray-100 my-1" />
+                    <div className="h-px bg-border my-1" />
                     <button
                       onClick={() => setActiveFilters([])}
-                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-red-400"
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-destructive"
                     >
                       필터 초기화
                     </button>
@@ -193,21 +193,21 @@ export default function TreatmentsPage() {
 
         {/* Treatment Grid */}
         {loading ? (
-          <div className="text-center py-8 text-gray-400">불러오는 중...</div>
+          <div className="text-center py-8 text-subtle">불러오는 중...</div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+          <div className="text-center py-12 bg-surface rounded-xl border border-border">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-subtle">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
                 <line x1="16" y1="13" x2="8" y2="13" />
                 <line x1="16" y1="17" x2="8" y2="17" />
               </svg>
             </div>
-            <p className="text-gray-400 text-sm">시술 기록이 없습니다</p>
+            <p className="text-subtle text-sm">시술 기록이 없습니다</p>
             <Link
               href="/record"
-              className="inline-block mt-3 px-4 py-2 bg-black text-white rounded-lg text-sm"
+              className="inline-block mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm"
             >
               기록 시작하기
             </Link>
@@ -222,10 +222,10 @@ export default function TreatmentsPage() {
                 <Link
                   key={t.id}
                   href={`/treatments/${t.id}`}
-                  className="block rounded-xl overflow-hidden border border-gray-200 active:scale-[0.98] transition-transform"
+                  className="block rounded-xl overflow-hidden border border-border active:scale-[0.98] transition-transform"
                 >
                   {/* Photo */}
-                  <div className="aspect-square bg-gray-100 relative">
+                  <div className="aspect-square bg-muted relative">
                     {photo ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -235,7 +235,7 @@ export default function TreatmentsPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-hint">
                           <rect x="3" y="3" width="18" height="18" rx="2" />
                           <circle cx="8.5" cy="8.5" r="1.5" />
                           <polyline points="21 15 16 10 5 21" />
@@ -245,7 +245,7 @@ export default function TreatmentsPage() {
 
                     {/* AI Badge */}
                     {hasAiFaceSwap && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
+                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-accent text-primary-foreground text-[10px] font-bold rounded-full">
                         AI
                       </span>
                     )}
@@ -253,10 +253,10 @@ export default function TreatmentsPage() {
 
                   {/* Info */}
                   <div className="p-2.5">
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-subtle">
                       {new Date(t.created_at).toLocaleDateString("ko-KR")}
                     </div>
-                    <div className="text-sm font-medium text-gray-900 mt-0.5 truncate">
+                    <div className="text-sm font-medium text-foreground mt-0.5 truncate">
                       {t.customer?.name
                         ? `${t.customer.name} 고객님`
                         : SERVICE_LABELS[t.service_type] || t.service_type}

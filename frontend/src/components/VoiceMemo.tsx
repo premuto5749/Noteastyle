@@ -105,7 +105,7 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
         className={`w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-90 ${
           recording
             ? "bg-red-500 animate-pulse shadow-lg shadow-red-900/30"
-            : "bg-black"
+            : "bg-primary"
         } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         {recording ? (
@@ -121,14 +121,14 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
           </svg>
         )}
       </button>
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-muted-foreground">
         {recording ? `녹음 중 ${formatTime(duration)}` : "음성으로 기록하기"}
       </span>
       {recording && (
         <button
           type="button"
           onClick={cancelRecording}
-          className="text-xs text-red-400 underline"
+          className="text-xs text-destructive underline"
         >
           취소
         </button>
