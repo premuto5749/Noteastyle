@@ -272,6 +272,12 @@ export function togglePortfolioPublish(id: string) {
   });
 }
 
+export function deletePortfolioItem(id: string) {
+  return request<{ status: string }>(`/shops/${SHOP_ID}/portfolio/${id}`, {
+    method: "DELETE",
+  });
+}
+
 // Face Swap (legacy)
 export interface FaceSwapJob {
   _id: string;
