@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import {
-  getFaceModels,
-  uploadFaceModel,
   generateFaceSwap,
   getFaceSwapStatus,
   saveFaceSwapResult,
@@ -13,6 +11,7 @@ import {
   type FaceModel,
   type FaceSwapResult,
 } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 
 type Step = "select-photo" | "select-model" | "generating" | "results";
 
@@ -23,6 +22,7 @@ interface FaceSwapFlowProps {
 }
 
 export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps) {
+  const api = useShopApi();
   const [step, setStep] = useState<Step>("select-photo");
   const [selectedPhoto, setSelectedPhoto] = useState<TreatmentPhoto | null>(null);
   const [models, setModels] = useState<FaceModel[]>([]);
@@ -49,12 +49,12 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
 
   const loadModels = useCallback(async () => {
     try {
-      const data = await getFaceModels();
+      const data = await api.getFaceModels();
       setModels(data);
     } catch {
       // silent fail
     }
-  }, []);
+  }, [api]);
 
   // Photo selection
   function handlePhotoSelect(photo: TreatmentPhoto) {
@@ -75,7 +75,7 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
     if (!modelName || !modelFile) return;
     setModelUploading(true);
     try {
-      await uploadFaceModel(modelName, modelGender, modelFile);
+      await api.uploadFaceModel(modelName, modelGender, modelFile);
       await loadModels();
       setShowModelAdd(false);
       setModelName("");

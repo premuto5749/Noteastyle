@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const body = await request.json();
+export const POST = withShopAuth(async (req, params, _member) => {
+  const supabase = createServiceClient();
+  const body = await req.json();
+  const shopId = params.shopId;
 
   // Check for duplicate portfolio entry
   const { data: existing } = await supabase
@@ -41,15 +39,12 @@ export async function POST(
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data, { status: 201 });
-}
+});
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const { searchParams } = new URL(request.url);
+export const GET = withShopAuth(async (req, params, _member) => {
+  const supabase = createServiceClient();
+  const shopId = params.shopId;
+  const { searchParams } = new URL(req.url);
   const publishedOnly = searchParams.get("published_only") === "true";
   const skip = parseInt(searchParams.get("skip") || "0");
   const limit = parseInt(searchParams.get("limit") || "50");
@@ -67,4 +62,4 @@ export async function GET(
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data);
-}
+});

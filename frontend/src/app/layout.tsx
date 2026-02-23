@@ -5,6 +5,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeColorMeta } from "@/components/ThemeColorMeta";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ShopProvider } from "@/contexts/ShopContext";
 
 export const metadata: Metadata = {
   title: "Note-a-Style",
@@ -37,10 +38,12 @@ export default function RootLayout({
       <body className="antialiased bg-background text-foreground pb-20">
         <ThemeProvider>
           <AuthProvider>
-            <ErrorBoundary>
-              <main className="min-h-screen">{children}</main>
-            </ErrorBoundary>
-            <BottomNav />
+            <ShopProvider>
+              <ErrorBoundary>
+                <main className="min-h-screen">{children}</main>
+              </ErrorBoundary>
+              <BottomNav />
+            </ShopProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

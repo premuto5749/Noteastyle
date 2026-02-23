@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { getTreatments, type Treatment, type TreatmentPhoto } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
+import { type Treatment, type TreatmentPhoto } from "@/lib/api";
 
 const SERVICE_LABELS: Record<string, string> = {
   cut: "커트",
@@ -39,6 +40,7 @@ function toDateString(date: Date): string {
 
 export default function TasksPage() {
   const router = useRouter();
+  const api = useShopApi();
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [treatments, setTreatments] = useState<Treatment[]>([]);
@@ -51,14 +53,14 @@ export default function TasksPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await getTreatments(undefined, dateString);
+      const data = await api.getTreatments(undefined, dateString);
       setTreatments(data);
     } catch {
       setTreatments([]);
     } finally {
       setLoading(false);
     }
-  }, [dateString]);
+  }, [api, dateString]);
 
   useEffect(() => {
     loadData();

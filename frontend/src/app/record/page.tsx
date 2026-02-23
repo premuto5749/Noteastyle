@@ -6,12 +6,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { ServiceButton } from "@/components/ServiceButton";
 import { ProductButton } from "@/components/ProductButton";
 import { VoiceMemo } from "@/components/VoiceMemo";
-import {
-  createTreatment,
-  createCustomer,
-  transcribeVoiceMemo,
-  type ProductUsed,
-} from "@/lib/api";
+import { transcribeVoiceMemo, type ProductUsed } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 
 const SERVICES = [
   { type: "cut", label: "커트", icon: "\u2702\uFE0F" },
@@ -32,6 +28,7 @@ const POPULAR_PRODUCTS = [
 ];
 
 export default function QuickRecordPage() {
+  const api = useShopApi();
   const [step, setStep] = useState<"customer" | "service" | "product" | "done">("customer");
   const [customerName, setCustomerName] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
@@ -45,7 +42,7 @@ export default function QuickRecordPage() {
   const handleCustomerSubmit = useCallback(async () => {
     if (!customerName.trim()) return;
     try {
-      const customer = await createCustomer({
+      const customer = await api.createCustomer({
         name: customerName.trim(),
         naver_booking_id: naverBookingId.trim() || undefined,
       });
@@ -54,7 +51,7 @@ export default function QuickRecordPage() {
     } catch {
       alert("고객 등록에 실패했습니다. 네트워크 연결을 확인해주세요.");
     }
-  }, [customerName, naverBookingId]);
+  }, [customerName, naverBookingId, api]);
 
   const handleServiceSelect = (type: string) => {
     setSelectedService(type);
@@ -76,7 +73,7 @@ export default function QuickRecordPage() {
   const handleSave = async (serviceType?: string, products?: ProductUsed[]) => {
     setSaving(true);
     try {
-      const result = await createTreatment({
+      const result = await api.createTreatment({
         customer_id: customerId!,
         service_type: serviceType || selectedService!,
         products_used: products || selectedProducts,

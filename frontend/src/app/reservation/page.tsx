@@ -4,12 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { ServiceButton } from "@/components/ServiceButton";
-import {
-  getCustomers,
-  createCustomer,
-  createReservation,
-  type Customer,
-} from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
+import { type Customer } from "@/lib/api";
 
 function formatDate(d: Date): string {
   const y = d.getFullYear();
@@ -45,6 +41,7 @@ for (let h = 9; h <= 21; h++) {
 
 export default function ReservationPage() {
   const router = useRouter();
+  const api = useShopApi();
 
   // Form state
   const [phone, setPhone] = useState("");
@@ -75,7 +72,7 @@ export default function ReservationPage() {
     }
 
     try {
-      const results = await getCustomers(undefined, digits);
+      const results = await api.getCustomers(undefined, digits);
       setSearchResults(results);
       setShowResults(true);
 
@@ -98,7 +95,7 @@ export default function ReservationPage() {
       setIsNewCustomer(true);
       setShowResults(false);
     }
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -134,7 +131,7 @@ export default function ReservationPage() {
 
       // Create new customer if needed
       if (!customerId) {
-        const newCustomer = await createCustomer({
+        const newCustomer = await api.createCustomer({
           name: customerName.trim(),
           phone: phone.trim(),
         });
@@ -142,7 +139,7 @@ export default function ReservationPage() {
       }
 
       // Create reservation
-      await createReservation({
+      await api.createReservation({
         customer_id: customerId,
         scheduled_date: date,
         scheduled_time: time,

@@ -1,34 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { getPortfolio, togglePortfolioPublish, deletePortfolioItem, type PortfolioItem } from "@/lib/api";
+import { type PortfolioItem } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 import { ShareButton } from "@/components/ShareButton";
 
 export default function PortfolioPage() {
+  const api = useShopApi();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPublished, setShowPublished] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      try {
-        const data = await getPortfolio(showPublished);
-        setItems(data);
-      } catch {
-        // API not available
-      } finally {
-        setLoading(false);
-      }
+  const loadPortfolio = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await api.getPortfolio(showPublished);
+      setItems(data);
+    } catch {
+      // API not available
+    } finally {
+      setLoading(false);
     }
-    load();
-  }, [showPublished]);
+  }, [api, showPublished]);
+
+  useEffect(() => {
+    loadPortfolio();
+  }, [loadPortfolio]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("이 포트폴리오 항목을 삭제하시겠습니까?")) return;
     try {
-      await deletePortfolioItem(id);
+      await api.deletePortfolioItem(id);
       setItems((prev) => prev.filter((item) => item.id !== id));
     } catch {
       alert("삭제에 실패했습니다.");
@@ -37,7 +40,7 @@ export default function PortfolioPage() {
 
   const handleTogglePublish = async (id: string) => {
     try {
-      const updated = await togglePortfolioPublish(id);
+      const updated = await api.togglePortfolioPublish(id);
       if (showPublished && !updated.is_published) {
         // Remove from list when unpublishing in "published only" view
         setItems((prev) => prev.filter((item) => item.id !== id));

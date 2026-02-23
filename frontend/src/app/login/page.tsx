@@ -29,6 +29,7 @@ export default function LoginPage() {
 function LoginContent() {
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
@@ -58,6 +59,15 @@ function LoginContent() {
       return;
     }
 
+    // Check for pending invite token from /invite page
+    const pendingToken = localStorage.getItem("pending_invite_token");
+    if (pendingToken) {
+      localStorage.removeItem("pending_invite_token");
+      router.push(`/invite/${pendingToken}`);
+      router.refresh();
+      return;
+    }
+
     router.push("/");
     router.refresh();
   };
@@ -67,17 +77,24 @@ function LoginContent() {
     setError("");
     setIsLoading(true);
 
+    if (!fullName.trim()) {
+      setError("이름을 입력해주세요.");
+      setIsLoading(false);
+      return;
+    }
+
     if (password.length < 6) {
       setError("비밀번호는 최소 6자 이상이어야 합니다.");
       setIsLoading(false);
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: { full_name: fullName.trim() },
       },
     });
 
@@ -85,6 +102,15 @@ function LoginContent() {
       setError(getErrorMessage(error.message));
       setIsLoading(false);
       return;
+    }
+
+    // Create user_profiles entry
+    if (data.user) {
+      await fetch("/api/me/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: fullName.trim() }),
+      });
     }
 
     setMessage("인증 메일이 발송되었습니다. 메일함을 확인해주세요.");
@@ -201,6 +227,19 @@ function LoginContent() {
       {/* Email Form */}
       {(showEmailForm || mode !== "login") && (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === "signup" && (
+            <div>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="이름"
+                required
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              />
+            </div>
+          )}
+
           <div>
             <input
               type="email"

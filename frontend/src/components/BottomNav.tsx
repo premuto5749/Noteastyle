@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useShop } from "@/contexts/ShopContext";
 
 const NAV_ITEMS = [
   { href: "/customers", label: "고객", icon: CustomerIcon },
@@ -13,11 +14,15 @@ const NAV_ITEMS = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { currentShop } = useShop();
 
   if (pathname === "/login") return null;
   if (pathname === "/reset-password") return null;
   if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/onboarding")) return null;
+  if (pathname.startsWith("/invite")) return null;
   if (/^\/treatments\/[^/]+$/.test(pathname)) return null;
+  if (!currentShop) return null;
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-card border-t border-border z-50">

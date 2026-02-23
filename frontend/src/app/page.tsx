@@ -5,11 +5,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { DayCalendarStrip } from "@/components/DayCalendarStrip";
 import { ReservationList } from "@/components/ReservationList";
-import {
-  getReservations,
-  startTreatmentFromReservation,
-  type Reservation,
-} from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
+import { useShop } from "@/contexts/ShopContext";
+import { type Reservation } from "@/lib/api";
 
 function formatDate(d: Date): string {
   const y = d.getFullYear();
@@ -26,6 +24,8 @@ function formatHeaderDate(dateStr: string): string {
 
 export default function HomePage() {
   const router = useRouter();
+  const api = useShopApi();
+  const { currentShop } = useShop();
   const [selectedDate, setSelectedDate] = useState(() => formatDate(new Date()));
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -37,14 +37,14 @@ export default function HomePage() {
     setLoading(true);
     setExpandedId(null);
     try {
-      const data = await getReservations(date);
+      const data = await api.getReservations(date);
       setReservations(data);
     } catch {
       setReservations([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [api]);
 
   useEffect(() => {
     loadReservations(selectedDate);
@@ -61,7 +61,7 @@ export default function HomePage() {
         return reservation.treatment_id;
       }
       try {
-        const result = await startTreatmentFromReservation(reservation.id);
+        const result = await api.startTreatmentFromReservation(reservation.id);
         // Refresh list to reflect status change
         loadReservations(selectedDate);
         return result.treatment.id;
@@ -70,7 +70,7 @@ export default function HomePage() {
         return null;
       }
     },
-    [selectedDate, loadReservations]
+    [selectedDate, loadReservations, api]
   );
 
   const handleVoiceMemo = useCallback(
@@ -107,7 +107,9 @@ export default function HomePage() {
     <div className="pb-4">
       {/* Header */}
       <div className="bg-card px-4 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-foreground">Note-a-Style</h1>
+        <h1 className="text-lg font-bold text-foreground">
+          {currentShop?.shop_name || "Note-a-Style"}
+        </h1>
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground font-medium">
             {formatHeaderDate(selectedDate)}

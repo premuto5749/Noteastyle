@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
+export const GET = withShopAuth(async (_req, params, _member) => {
+  const supabase = createServiceClient();
 
   const { count, error } = await supabase
     .from("customers")
     .select("*", { count: "exact", head: true })
-    .eq("shop_id", shopId);
+    .eq("shop_id", params.shopId);
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json({ count: count ?? 0 });
-}
+});

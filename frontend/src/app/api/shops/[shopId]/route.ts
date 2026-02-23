@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
+export const GET = withShopAuth(async (_req, params, _member) => {
+  const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from("shops")
     .select()
-    .eq("id", shopId)
+    .eq("id", params.shopId)
     .single();
 
   if (error) return NextResponse.json({ detail: "Shop not found" }, { status: 404 });
   return NextResponse.json(data);
-}
+});

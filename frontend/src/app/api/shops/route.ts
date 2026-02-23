@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
-  const supabase = createServerClient();
+  // Verify authentication
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
+  }
+
+  const serviceClient = createServiceClient();
   const body = await request.json();
 
-  const { data, error } = await supabase
+  // Create the shop
+  const { data: shop, error: shopError } = await serviceClient
     .from("shops")
     .insert({
       name: body.name,
@@ -16,6 +27,42 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
-  return NextResponse.json(data, { status: 201 });
+  if (shopError) {
+    return NextResponse.json({ detail: shopError.message }, { status: 400 });
+  }
+
+  // Get user profile for display_name default
+  const { data: profile } = await serviceClient
+    .from("user_profiles")
+    .select("full_name")
+    .eq("user_id", user.id)
+    .single();
+
+  const displayName = body.display_name || profile?.full_name || "관리자";
+
+  // Auto-register creator as owner
+  const { error: memberError } = await serviceClient
+    .from("shop_members")
+    .insert({
+      user_id: user.id,
+      shop_id: shop.id,
+      role: "owner",
+      display_name: displayName,
+    });
+
+  if (memberError) {
+    // Cleanup: delete the shop if member creation failed
+    await serviceClient.from("shops").delete().eq("id", shop.id);
+    return NextResponse.json({ detail: memberError.message }, { status: 400 });
+  }
+
+  // Audit log
+  await serviceClient.from("shop_audit_logs").insert({
+    shop_id: shop.id,
+    actor_id: user.id,
+    action: "shop.created",
+    details: { shop_name: shop.name, shop_type: shop.shop_type },
+  });
+
+  return NextResponse.json(shop, { status: 201 });
 }
