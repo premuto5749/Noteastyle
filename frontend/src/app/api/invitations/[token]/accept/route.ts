@@ -59,12 +59,12 @@ export async function POST(
   // 4. Check if user is already a member of the shop
   const { data: existingMember } = await serviceClient
     .from("shop_members")
-    .select("id")
+    .select("id, is_active")
     .eq("user_id", user.id)
     .eq("shop_id", invitation.shop_id)
     .single();
 
-  if (existingMember) {
+  if (existingMember?.is_active) {
     return NextResponse.json({ error: "이미 해당 매장의 멤버입니다." }, { status: 409 });
   }
 
@@ -80,20 +80,39 @@ export async function POST(
     displayName = profile.full_name;
   }
 
-  // 6. Create shop_members entry
-  const { data: newMember, error: memberError } = await serviceClient
-    .from("shop_members")
-    .insert({
-      user_id: user.id,
-      shop_id: invitation.shop_id,
-      role: invitation.role,
-      display_name: displayName,
-    })
-    .select()
-    .single();
-
-  if (memberError) {
-    return NextResponse.json({ error: memberError.message }, { status: 400 });
+  // 6. Create or reactivate shop_members entry
+  let newMember;
+  if (existingMember && !existingMember.is_active) {
+    // Reactivate deactivated member
+    const { data, error } = await serviceClient
+      .from("shop_members")
+      .update({
+        is_active: true,
+        role: invitation.role,
+        display_name: displayName,
+      })
+      .eq("id", existingMember.id)
+      .select()
+      .single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    newMember = data;
+  } else {
+    const { data, error } = await serviceClient
+      .from("shop_members")
+      .insert({
+        user_id: user.id,
+        shop_id: invitation.shop_id,
+        role: invitation.role,
+        display_name: displayName,
+      })
+      .select()
+      .single();
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    newMember = data;
   }
 
   // 7. Audit log
