@@ -426,13 +426,17 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 ```
 1. main 최신화           cd C:/Dev/Noteastyle && git pull
 2. worktree 생성         git worktree add ../Noteastyle-<브랜치명> -b feat/기능명
-3. worktree에서 작업     cd ../Noteastyle-<브랜치명>
-4. 커밋                  git add <파일들> && git commit -m "..."
-5. 푸시                  git push -u origin feat/기능명
-6. PR 생성               gh pr create ...
-7. 머지                  gh pr merge ... --squash --delete-branch
-8. worktree 정리         cd C:/Dev/Noteastyle && git worktree remove ../Noteastyle-<브랜치명>
+3. env 심링크            ln -s C:/Dev/Noteastyle/frontend/.env.local ../Noteastyle-<브랜치명>/frontend/.env.local
+4. 의존성 설치           cd ../Noteastyle-<브랜치명>/frontend && npm install
+5. worktree에서 작업     (파일 수정)
+6. 커밋                  git add <파일들> && git commit -m "..."
+7. 푸시                  git push -u origin feat/기능명
+8. PR 생성               gh pr create ...
+9. 머지                  gh pr merge ... --squash --delete-branch
+10. worktree 정리        cd C:/Dev/Noteastyle && git worktree remove ../Noteastyle-<브랜치명>
 ```
+
+> **참고**: 3번의 심링크는 원본 `.env.local`을 참조하므로, 키 변경 시 모든 worktree에 자동 반영됩니다.
 
 ### 절대 규칙
 
