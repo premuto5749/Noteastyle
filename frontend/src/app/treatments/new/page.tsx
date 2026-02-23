@@ -3,25 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
-import { ServiceButton } from "@/components/ServiceButton";
+import { ServiceSelector } from "@/components/ServiceSelector";
 import { VoiceMemo } from "@/components/VoiceMemo";
-import { transcribeVoiceMemo, type ProductUsed } from "@/lib/api";
+import { transcribeVoiceMemo, type ProductUsed, type ShopService } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
-
-const SERVICES = [
-  { type: "cut", label: "커트", icon: "\u2702\uFE0F" },
-  { type: "color", label: "염색", icon: "\uD83C\uDFA8" },
-  { type: "perm", label: "펌", icon: "\uD83D\uDCAB" },
-  { type: "treatment", label: "트리트먼트", icon: "\u2728" },
-  { type: "bleach", label: "블리치", icon: "\u26A1" },
-  { type: "scalp", label: "두피관리", icon: "\uD83C\uDF3F" },
-];
+import { useServiceMenu } from "@/hooks/useServiceMenu";
 
 export default function NewTreatmentPage() {
   const router = useRouter();
   const { api } = useShopApi();
+  const { categories } = useServiceMenu();
   const [customerName, setCustomerName] = useState("");
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedServiceName, setSelectedServiceName] = useState<string | null>(null);
   const [productBrand, setProductBrand] = useState("");
   const [productCode, setProductCode] = useState("");
   const [products, setProducts] = useState<ProductUsed[]>([]);
@@ -47,12 +41,24 @@ export default function NewTreatmentPage() {
     setProducts((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const handleServiceSelect = (categoryName: string, service?: ShopService) => {
+    setSelectedCategory(categoryName);
+    setSelectedServiceName(service?.name ?? null);
+    // Auto-fill duration and price from service definition
+    if (service?.estimated_duration_minutes && !duration) {
+      setDuration(String(service.estimated_duration_minutes));
+    }
+    if (service?.price != null && !price) {
+      setPrice(String(service.price));
+    }
+  };
+
   const handleVoiceMemo = async (blob: Blob) => {
     setVoiceProcessing(true);
     try {
       const result = await transcribeVoiceMemo(blob);
       if (result.customer_name) setCustomerName(result.customer_name);
-      if (result.service_type) setSelectedService(result.service_type);
+      if (result.service_type) setSelectedCategory(result.service_type);
       if (result.products_used) setProducts(result.products_used);
       if (result.area) setArea(result.area);
       if (result.duration_minutes) setDuration(String(result.duration_minutes));
@@ -66,7 +72,7 @@ export default function NewTreatmentPage() {
   };
 
   const handleSubmit = async () => {
-    if (!customerName.trim() || !selectedService) return;
+    if (!customerName.trim() || !selectedCategory) return;
     setSaving(true);
     try {
       const customer = await api.createCustomer({
@@ -75,7 +81,8 @@ export default function NewTreatmentPage() {
       });
       const result = await api.createTreatment({
         customer_id: customer.id,
-        service_type: selectedService,
+        service_type: selectedCategory,
+        service_detail: selectedServiceName || undefined,
         products_used: products.length > 0 ? products : undefined,
         area: area || undefined,
         duration_minutes: duration ? parseInt(duration) : undefined,
@@ -135,17 +142,12 @@ export default function NewTreatmentPage() {
         {/* Service */}
         <div className="bg-surface rounded-2xl p-4 border border-border">
           <label className="text-sm font-medium text-muted-foreground block mb-3">시술 종류 *</label>
-          <div className="grid grid-cols-3 gap-2">
-            {SERVICES.map((s) => (
-              <ServiceButton
-                key={s.type}
-                label={s.label}
-                icon={s.icon}
-                selected={selectedService === s.type}
-                onClick={() => setSelectedService(s.type)}
-              />
-            ))}
-          </div>
+          <ServiceSelector
+            categories={categories}
+            onSelect={handleServiceSelect}
+            selectedCategory={selectedCategory ?? undefined}
+            selectedService={selectedServiceName ?? undefined}
+          />
         </div>
 
         {/* Products */}
@@ -240,7 +242,7 @@ export default function NewTreatmentPage() {
         {/* Submit */}
         <button
           onClick={handleSubmit}
-          disabled={saving || !customerName.trim() || !selectedService}
+          disabled={saving || !customerName.trim() || !selectedCategory}
           className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {saving ? "저장 중..." : "기록 저장"}

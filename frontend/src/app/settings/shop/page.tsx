@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useShop } from "@/contexts/ShopContext";
 import { useShopApi } from "@/hooks/useShopApi";
@@ -333,6 +334,39 @@ export default function ShopSettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Service Menu Management Link (owner/admin only) */}
+      {isOwnerOrAdmin && (
+        <div className="px-4 mt-4">
+          <Link
+            href="/settings/services"
+            className="flex items-center justify-between w-full bg-card rounded-2xl border border-border p-4 active:scale-[0.98] transition-transform"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-lg">📋</span>
+              <div>
+                <span className="text-sm font-medium text-foreground">
+                  시술 메뉴 관리
+                </span>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  카테고리, 시술 종류, 가격, 소요시간 설정
+                </p>
+              </div>
+            </div>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-muted-foreground"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </Link>
+        </div>
+      )}
 
       {/* Section 2: Members List */}
       <div className="px-4 mt-8">

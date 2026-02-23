@@ -3,21 +3,14 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useShopApi } from "@/hooks/useShopApi";
+import { useServiceMenu } from "@/hooks/useServiceMenu";
 import { type Treatment } from "@/lib/api";
-
-const SERVICE_LABELS: Record<string, string> = {
-  cut: "커트",
-  color: "염색",
-  perm: "펌",
-  treatment: "트리트먼트",
-  bleach: "블리치",
-  scalp: "두피관리",
-};
 
 type SortOrder = "newest" | "oldest";
 
 export default function TreatmentsPage() {
   const { api, isReady } = useShopApi();
+  const { categories, getCategoryLabel } = useServiceMenu();
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -55,7 +48,7 @@ export default function TreatmentsPage() {
     if (search.trim()) {
       const q = search.trim().toLowerCase();
       result = result.filter((t) => {
-        const serviceLabel = SERVICE_LABELS[t.service_type] || t.service_type;
+        const serviceLabel = getCategoryLabel(t.service_type);
         const customerName = t.customer?.name || "";
         return (
           serviceLabel.toLowerCase().includes(q) ||
@@ -79,7 +72,7 @@ export default function TreatmentsPage() {
     });
 
     return result;
-  }, [treatments, search, activeFilters, sortOrder]);
+  }, [treatments, search, activeFilters, sortOrder, getCategoryLabel]);
 
   const getRepresentativePhoto = (t: Treatment) => {
     const validPhotos = t.photos.filter((p) => p.photo_type !== "source");
@@ -165,17 +158,17 @@ export default function TreatmentsPage() {
 
             {showFilterMenu && (
               <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg p-2 z-10 min-w-[140px]">
-                {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+                {categories.map((cat) => (
                   <button
-                    key={key}
-                    onClick={() => toggleFilter(key)}
+                    key={cat.id}
+                    onClick={() => toggleFilter(cat.name)}
                     className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
-                      activeFilters.includes(key)
+                      activeFilters.includes(cat.name)
                         ? "bg-muted text-foreground font-medium"
                         : "text-muted-foreground"
                     }`}
                   >
-                    {activeFilters.includes(key) && "✓ "}{label}
+                    {activeFilters.includes(cat.name) && "✓ "}{cat.name}
                   </button>
                 ))}
                 {activeFilters.length > 0 && (
@@ -233,7 +226,7 @@ export default function TreatmentsPage() {
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={photo.face_swapped_url || photo.photo_url}
-                        alt={SERVICE_LABELS[t.service_type] || t.service_type}
+                        alt={getCategoryLabel(t.service_type)}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -262,7 +255,7 @@ export default function TreatmentsPage() {
                     <div className="text-sm font-medium text-foreground mt-0.5 truncate">
                       {t.customer?.name
                         ? `${t.customer.name} 고객님`
-                        : SERVICE_LABELS[t.service_type] || t.service_type}
+                        : getCategoryLabel(t.service_type)}
                     </div>
                   </div>
                 </Link>

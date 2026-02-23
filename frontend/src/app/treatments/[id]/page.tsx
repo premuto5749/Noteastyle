@@ -16,15 +16,7 @@ import { AnnotationOverlay } from "@/components/AnnotationOverlay";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
 import { loadVideoMetadata, validateVideoDuration } from "@/lib/video-utils";
-
-const SERVICE_LABELS: Record<string, string> = {
-  cut: "커트",
-  color: "염색",
-  perm: "펌",
-  treatment: "트리트먼트",
-  bleach: "블리치",
-  scalp: "두피관리",
-};
+import { useServiceMenu } from "@/hooks/useServiceMenu";
 
 const PHOTO_TYPE_LABELS: Record<string, string> = {
   before: "시술 전",
@@ -44,6 +36,7 @@ export default function TreatmentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { api, isReady } = useShopApi();
+  const { getCategoryLabel } = useServiceMenu();
   const id = params.id as string;
 
   const [treatment, setTreatment] = useState<Treatment | null>(null);
@@ -91,7 +84,7 @@ export default function TreatmentDetailPage() {
   const tags: string[] = [];
   if (treatment) {
     if (treatment.service_detail) tags.push(treatment.service_detail);
-    const serviceLabel = SERVICE_LABELS[treatment.service_type] || treatment.service_type;
+    const serviceLabel = getCategoryLabel(treatment.service_type);
     tags.push(serviceLabel);
     if (treatment.area) tags.push(treatment.area);
     if (treatment.products_used) {
@@ -140,7 +133,7 @@ export default function TreatmentDetailPage() {
       await api.createPortfolioItem({
         photo_id: photo.id,
         title: treatment
-          ? `${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`
+          ? `${getCategoryLabel(treatment.service_type)} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`
           : undefined,
       });
       await loadData();
@@ -192,7 +185,7 @@ export default function TreatmentDetailPage() {
         </button>
         <div className="text-center">
           <div className="text-sm font-bold text-foreground">
-            {SERVICE_LABELS[treatment.service_type] || treatment.service_type}
+            {getCategoryLabel(treatment.service_type)}
           </div>
           {customerName && (
             <div className="text-xs text-muted-foreground">{customerName} 고객님</div>
@@ -231,7 +224,7 @@ export default function TreatmentDetailPage() {
           <div>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">
-                {SERVICE_LABELS[treatment.service_type] || treatment.service_type}
+                {getCategoryLabel(treatment.service_type)}
                 {treatment.service_detail && (
                   <span className="text-muted-foreground font-normal ml-2 text-base">
                     {treatment.service_detail}
@@ -408,7 +401,7 @@ export default function TreatmentDetailPage() {
                       </button>
                       <ShareButton
                         imageUrl={photo.face_swapped_url || photo.photo_url}
-                        title={`${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
+                        title={`${getCategoryLabel(treatment.service_type)} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
                         className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-50"
                       />
                       <button
