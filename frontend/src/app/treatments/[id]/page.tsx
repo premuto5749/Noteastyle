@@ -12,6 +12,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { StyleNoteOverlay } from "@/components/StyleNoteOverlay";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
+import { loadVideoMetadata, validateVideoDuration } from "@/lib/video-utils";
 
 const SERVICE_LABELS: Record<string, string> = {
   cut: "커트",
@@ -100,9 +101,27 @@ export default function TreatmentDetailPage() {
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !treatment) return;
+
+    // 영상 파일인 경우 15초 제한 검증
+    const isVideo = file.type.startsWith("video/");
+    if (isVideo) {
+      try {
+        const { duration } = await loadVideoMetadata(file);
+        const result = validateVideoDuration(duration);
+        if (!result.valid) {
+          alert(result.message);
+          e.target.value = "";
+          return;
+        }
+      } catch {
+        alert("영상 파일을 읽을 수 없습니다.");
+        e.target.value = "";
+        return;
+      }
+    }
+
     setUploading(true);
     try {
-      const isVideo = file.type.startsWith("video/");
       await api.uploadTreatmentPhoto(treatment.id, file, uploadType, undefined, isVideo ? { mediaType: "video" } : undefined);
       await loadData();
     } catch {

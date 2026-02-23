@@ -3,9 +3,10 @@
 import { useState, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
-import { MediaCapture, type CapturedMedia } from "@/components/MediaCapture";
+import { NativeCapture } from "@/components/NativeCapture";
 import { MediaGrid } from "@/components/MediaGrid";
 import { useShopApi } from "@/hooks/useShopApi";
+import type { CapturedMedia } from "@/types/media";
 
 const PHOTO_TYPES = [
   { value: "before", label: "시술 전" },
@@ -22,14 +23,12 @@ export default function CapturePage() {
 
   const initialType = searchParams.get("type") || "after";
   const [photoType, setPhotoType] = useState(initialType);
-  const [captureMode, setCaptureMode] = useState<"photo" | "video" | null>(null);
   const [items, setItems] = useState<CapturedMedia[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
 
   const handleCapture = useCallback((media: CapturedMedia) => {
     setItems((prev) => [...prev, { ...media, photoType } as CapturedMedia & { photoType: string }]);
-    setCaptureMode(null);
   }, [photoType]);
 
   const handleRemove = useCallback((index: number) => {
@@ -83,7 +82,7 @@ export default function CapturePage() {
   return (
     <div>
       <PageHeader
-        title="사진/영상 촬영"
+        title="사진/영상 추가"
       />
 
       <div className="p-4 space-y-4">
@@ -104,47 +103,8 @@ export default function CapturePage() {
           ))}
         </div>
 
-        {/* Camera/Video viewfinder */}
-        {captureMode && (
-          <MediaCapture
-            mode={captureMode}
-            onCapture={handleCapture}
-            onClose={() => setCaptureMode(null)}
-          />
-        )}
-
-        {/* Mode selection buttons */}
-        {!captureMode && (
-          <div className="bg-surface rounded-2xl p-4 border border-border">
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              시술 완료 후 사진 또는 영상을 촬영하세요
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setCaptureMode("photo")}
-                disabled={uploading}
-                className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
-              >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-                <span className="text-sm font-medium text-foreground">사진 촬영</span>
-              </button>
-              <button
-                onClick={() => setCaptureMode("video")}
-                disabled={uploading}
-                className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
-              >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground">
-                  <rect x="2" y="4" width="15" height="16" rx="2" />
-                  <path d="M17 9l5-3v12l-5-3" />
-                </svg>
-                <span className="text-sm font-medium text-foreground">영상 촬영</span>
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Native capture (photo + disabled video) */}
+        <NativeCapture onCapture={handleCapture} disabled={uploading} />
 
         {/* Media grid */}
         {items.length > 0 && (

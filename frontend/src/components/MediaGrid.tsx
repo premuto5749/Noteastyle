@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { CapturedMedia } from "./MediaCapture";
+import type { CapturedMedia } from "@/types/media";
 
 interface MediaGridProps {
   items: CapturedMedia[];
