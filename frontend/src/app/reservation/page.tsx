@@ -58,60 +58,123 @@ export default function ReservationPage() {
   const [notes, setNotes] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const phoneDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const nameDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Phone search with debounce
-  const searchByPhone = useCallback(async (phoneVal: string) => {
-    const digits = phoneVal.replace(/\D/g, "");
-    if (digits.length < 4) {
-      setSearchResults([]);
-      setMatchedCustomer(null);
-      setIsNewCustomer(false);
-      setShowResults(false);
-      return;
-    }
-
-    try {
-      const results = await api.getCustomers(undefined, digits);
-      setSearchResults(results);
-      setShowResults(true);
-
-      if (results.length === 1 && results[0].phone?.replace(/\D/g, "") === digits) {
-        setMatchedCustomer(results[0]);
-        setCustomerName(results[0].name);
+  // Unified search function
+  const searchCustomers = useCallback(async (field: "phone" | "name", value: string) => {
+    if (field === "phone") {
+      const digits = value.replace(/\D/g, "");
+      if (digits.length < 4) {
+        setSearchResults([]);
+        setMatchedCustomer(null);
         setIsNewCustomer(false);
         setShowResults(false);
-      } else if (results.length === 0) {
+        return;
+      }
+
+      try {
+        const results = await api.getCustomers(undefined, digits);
+        setSearchResults(results);
+        setShowResults(true);
+
+        if (results.length === 1 && results[0].phone?.replace(/\D/g, "") === digits) {
+          setMatchedCustomer(results[0]);
+          setCustomerName(results[0].name);
+          setIsNewCustomer(false);
+          setShowResults(false);
+        } else if (results.length === 0) {
+          setMatchedCustomer(null);
+          setIsNewCustomer(true);
+          setShowResults(false);
+        } else {
+          setMatchedCustomer(null);
+          setIsNewCustomer(false);
+        }
+      } catch {
+        setSearchResults([]);
         setMatchedCustomer(null);
         setIsNewCustomer(true);
         setShowResults(false);
-      } else {
-        setMatchedCustomer(null);
-        setIsNewCustomer(false);
       }
-    } catch {
-      setSearchResults([]);
-      setMatchedCustomer(null);
-      setIsNewCustomer(true);
-      setShowResults(false);
+    } else {
+      // Name search: 2+ characters
+      if (value.trim().length < 2) {
+        setSearchResults([]);
+        setShowResults(false);
+        return;
+      }
+
+      try {
+        const results = await api.getCustomers(value.trim());
+        setSearchResults(results);
+        setShowResults(results.length > 0);
+        if (results.length === 0) {
+          setIsNewCustomer(true);
+        }
+      } catch {
+        setSearchResults([]);
+        setShowResults(false);
+      }
     }
   }, [api]);
 
+  // Phone debounce
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      searchByPhone(phone);
+    if (matchedCustomer) return;
+    if (phoneDebounceRef.current) clearTimeout(phoneDebounceRef.current);
+    phoneDebounceRef.current = setTimeout(() => {
+      searchCustomers("phone", phone);
     }, 300);
     return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (phoneDebounceRef.current) clearTimeout(phoneDebounceRef.current);
     };
-  }, [phone, searchByPhone]);
+  }, [phone, matchedCustomer, searchCustomers]);
+
+  // Name debounce
+  useEffect(() => {
+    if (matchedCustomer) return;
+    // Only search by name if phone hasn't produced results
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length >= 4) return; // Phone search is active, skip name search
+
+    if (nameDebounceRef.current) clearTimeout(nameDebounceRef.current);
+    nameDebounceRef.current = setTimeout(() => {
+      searchCustomers("name", customerName);
+    }, 300);
+    return () => {
+      if (nameDebounceRef.current) clearTimeout(nameDebounceRef.current);
+    };
+  }, [customerName, phone, matchedCustomer, searchCustomers]);
+
+  // Click-outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    if (showResults) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showResults]);
 
   const selectCustomer = (customer: Customer) => {
     setMatchedCustomer(customer);
     setCustomerName(customer.name);
     setPhone(customer.phone ?? "");
     setIsNewCustomer(false);
+    setShowResults(false);
+  };
+
+  const clearCustomer = () => {
+    setMatchedCustomer(null);
+    setCustomerName("");
+    setPhone("");
+    setIsNewCustomer(false);
+    setSearchResults([]);
     setShowResults(false);
   };
 
@@ -163,21 +226,46 @@ export default function ReservationPage() {
       <PageHeader title="예약 등록" />
 
       <div className="p-4 space-y-5">
-        {/* Phone number */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">
-            전화번호 <span className="text-destructive">*</span>
-          </label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="010-0000-0000"
-            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-            autoFocus
-          />
+        {/* Customer search section */}
+        <div ref={dropdownRef}>
+          {/* Phone & Name side by side */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                전화번호 <span className="text-destructive">*</span>
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => {
+                  if (matchedCustomer) clearCustomer();
+                  setPhone(e.target.value);
+                }}
+                placeholder="010-0000-0000"
+                readOnly={!!matchedCustomer}
+                className={`w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent ${matchedCustomer ? "bg-muted text-muted-foreground" : ""}`}
+                autoFocus
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                고객 이름 <span className="text-destructive">*</span>
+              </label>
+              <input
+                type="text"
+                value={customerName}
+                onChange={(e) => {
+                  if (matchedCustomer) clearCustomer();
+                  setCustomerName(e.target.value);
+                }}
+                placeholder="홍길동"
+                readOnly={!!matchedCustomer}
+                className={`w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent ${matchedCustomer ? "bg-muted text-muted-foreground" : ""}`}
+              />
+            </div>
+          </div>
 
-          {/* Search results dropdown */}
+          {/* Search results dropdown (shared below both fields) */}
           {showResults && searchResults.length > 0 && (
             <div className="mt-1 border border-border rounded-xl bg-card shadow-sm overflow-hidden">
               {searchResults.map((c) => (
@@ -217,11 +305,7 @@ export default function ReservationPage() {
                 {matchedCustomer.name}님 (방문 {matchedCustomer.visit_count}회)
               </span>
               <button
-                onClick={() => {
-                  setMatchedCustomer(null);
-                  setCustomerName("");
-                  setIsNewCustomer(true);
-                }}
+                onClick={clearCustomer}
                 className="ml-auto text-xs text-success-foreground"
               >
                 변경
@@ -230,30 +314,14 @@ export default function ReservationPage() {
           )}
 
           {/* New customer indicator */}
-          {isNewCustomer && !matchedCustomer && phone.replace(/\D/g, "").length >= 4 && (
+          {isNewCustomer && !matchedCustomer && (phone.replace(/\D/g, "").length >= 4 || customerName.trim().length >= 2) && (
             <div className="mt-2 px-3 py-2 bg-info-bg rounded-lg border border-blue-200">
               <span className="text-sm text-blue-700">
-                신규 고객 — 이름을 입력해주세요
+                신규 고객 — 전화번호와 이름을 입력해주세요
               </span>
             </div>
           )}
         </div>
-
-        {/* Customer name (for new customers) */}
-        {!matchedCustomer && (
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
-              고객 이름 <span className="text-destructive">*</span>
-            </label>
-            <input
-              type="text"
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="홍길동"
-              className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-            />
-          </div>
-        )}
 
         {/* Date */}
         <div>
