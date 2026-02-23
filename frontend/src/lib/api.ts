@@ -46,6 +46,13 @@ export interface ProductUsed {
   area?: string;
 }
 
+export interface PhotoAnnotation {
+  id: string;
+  x: number;
+  y: number;
+  text: string;
+}
+
 export interface TreatmentPhoto {
   id: string;
   treatment_id: string;
@@ -58,6 +65,7 @@ export interface TreatmentPhoto {
   media_type: "photo" | "video";
   video_duration_seconds: number | null;
   thumbnail_url: string | null;
+  annotations: PhotoAnnotation[] | null;
 }
 
 export interface Treatment {
@@ -289,6 +297,16 @@ export function createShopApi(shopId: string) {
       );
       if (!res.ok) throw new Error("Failed to upload media");
       return res.json() as Promise<TreatmentPhoto>;
+    },
+    updatePhoto(
+      treatmentId: string,
+      photoId: string,
+      data: { annotations?: PhotoAnnotation[] }
+    ) {
+      return request<TreatmentPhoto>(
+        `/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}`,
+        { method: "PATCH", body: JSON.stringify(data) }
+      );
     },
 
     // Portfolio
