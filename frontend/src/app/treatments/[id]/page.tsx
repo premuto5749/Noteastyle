@@ -7,10 +7,13 @@ import { useShopApi } from "@/hooks/useShopApi";
 import {
   type Treatment,
   type TreatmentPhoto,
+  type PhotoAnnotation,
 } from "@/lib/api";
 import { ShareButton } from "@/components/ShareButton";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { StyleNoteOverlay } from "@/components/StyleNoteOverlay";
+import { AnnotationOverlay } from "@/components/AnnotationOverlay";
+import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
 import { loadVideoMetadata, validateVideoDuration } from "@/lib/video-utils";
 
@@ -45,8 +48,8 @@ export default function TreatmentDetailPage() {
 
   const [treatment, setTreatment] = useState<Treatment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showDetails, setShowDetails] = useState(false);
   const [showFaceSwap, setShowFaceSwap] = useState(false);
+  const [annotatingPhoto, setAnnotatingPhoto] = useState<TreatmentPhoto | null>(null);
 
   // Photo upload state
   const [uploadType, setUploadType] = useState<string>("after");
@@ -146,6 +149,11 @@ export default function TreatmentDetailPage() {
     }
   }
 
+  async function handleSaveAnnotations(photo: TreatmentPhoto, annotations: PhotoAnnotation[]) {
+    await api.updatePhoto(photo.treatment_id, photo.id, { annotations });
+    await loadData();
+  }
+
   async function handleDelete() {
     if (!confirm("이 시술 기록을 삭제하시겠습니까? 관련 사진도 함께 삭제됩니다.")) return;
     try {
@@ -195,7 +203,20 @@ export default function TreatmentDetailPage() {
 
       {/* Photo Carousel */}
       <PhotoCarousel photos={sortedPhotos}>
-        {() => <StyleNoteOverlay treatment={treatment} />}
+        {(activeIndex) => (
+          <>
+            <StyleNoteOverlay treatment={treatment} />
+            <AnnotationOverlay
+              annotations={sortedPhotos[activeIndex]?.annotations || []}
+              onPinTap={() => {
+                const photo = sortedPhotos[activeIndex];
+                if (photo && (photo.media_type || "photo") === "photo") {
+                  setAnnotatingPhoto(photo);
+                }
+              }}
+            />
+          </>
+        )}
       </PhotoCarousel>
 
       {/* Bottom Sheet */}
@@ -292,172 +313,169 @@ export default function TreatmentDetailPage() {
             </div>
           )}
 
-          {/* Action Buttons - Side by Side */}
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="flex-1 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground active:bg-surface"
-            >
-              {showDetails ? "상세 접기" : "상세 보기"}
-            </button>
-            <button
-              onClick={() => setShowFaceSwap(true)}
-              disabled={swappablePhotos.length === 0}
-              className="flex-1 py-3 bg-accent text-primary-foreground rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
-            >
-              AI Faceswap
-            </button>
-          </div>
+          {/* AI Faceswap Button - Full Width */}
+          <button
+            onClick={() => setShowFaceSwap(true)}
+            disabled={swappablePhotos.length === 0}
+            className="w-full py-3 bg-accent text-primary-foreground rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
+          >
+            AI Faceswap
+          </button>
 
-          {/* Expanded Details */}
-          {showDetails && (
-            <div className="space-y-4">
-              {/* Detail Info */}
-              <div className="bg-surface rounded-xl p-4 space-y-2">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-muted-foreground">날짜</div>
-                  <div className="text-foreground">
-                    {new Date(treatment.created_at).toLocaleDateString("ko-KR", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </div>
-
-                  {treatment.duration_minutes && (
-                    <>
-                      <div className="text-muted-foreground">소요 시간</div>
-                      <div className="text-foreground">{treatment.duration_minutes}분</div>
-                    </>
-                  )}
-
-                  {treatment.price != null && (
-                    <>
-                      <div className="text-muted-foreground">가격</div>
-                      <div className="text-foreground">{treatment.price.toLocaleString()}원</div>
-                    </>
-                  )}
-
-                  {treatment.area && (
-                    <>
-                      <div className="text-muted-foreground">시술 부위</div>
-                      <div className="text-foreground">{treatment.area}</div>
-                    </>
-                  )}
-
-                  {treatment.satisfaction && (
-                    <>
-                      <div className="text-muted-foreground">만족도</div>
-                      <div className="text-foreground">
-                        {"★".repeat(Number(treatment.satisfaction))}{"☆".repeat(5 - Number(treatment.satisfaction))}
-                      </div>
-                    </>
-                  )}
-                </div>
+          {/* Detail Info */}
+          <div className="bg-surface rounded-xl p-4 space-y-2">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="text-muted-foreground">날짜</div>
+              <div className="text-foreground">
+                {new Date(treatment.created_at).toLocaleDateString("ko-KR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </div>
 
-              {/* Products */}
-              {treatment.products_used && treatment.products_used.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-foreground mb-2">사용 제품</h3>
-                  <div className="flex gap-1 flex-wrap">
-                    {treatment.products_used.map((p, i) => (
-                      <span
-                        key={i}
-                        className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
-                      >
-                        {p.brand} {p.code} {p.area && `(${p.area})`}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              {treatment.duration_minutes && (
+                <>
+                  <div className="text-muted-foreground">소요 시간</div>
+                  <div className="text-foreground">{treatment.duration_minutes}분</div>
+                </>
               )}
 
-              {/* Photo Actions */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-bold text-foreground">사진 관리</h3>
+              {treatment.price != null && (
+                <>
+                  <div className="text-muted-foreground">가격</div>
+                  <div className="text-foreground">{treatment.price.toLocaleString()}원</div>
+                </>
+              )}
 
-                {sortedPhotos.map((photo) => (
-                  <div key={photo.id} className="bg-surface rounded-xl p-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-muted-foreground uppercase">
-                        {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
-                        {photo.media_type === "video" && (
-                          <span className="ml-1 text-accent">영상</span>
-                        )}
-                      </span>
-                      <div className="flex gap-1.5">
-                        <ShareButton
-                          imageUrl={photo.face_swapped_url || photo.photo_url}
-                          title={`${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
-                          className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-50"
-                        />
-                        <button
-                          onClick={() => handleAddToPortfolio(photo)}
-                          disabled={photo.is_portfolio}
-                          className={`text-xs px-2 py-1 rounded-md ${
-                            photo.is_portfolio
-                              ? "bg-success-bg text-success-foreground"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {photo.is_portfolio ? "추가됨" : "포트폴리오"}
-                        </button>
-                      </div>
-                    </div>
+              {treatment.area && (
+                <>
+                  <div className="text-muted-foreground">시술 부위</div>
+                  <div className="text-foreground">{treatment.area}</div>
+                </>
+              )}
+
+              {treatment.satisfaction && (
+                <>
+                  <div className="text-muted-foreground">만족도</div>
+                  <div className="text-foreground">
+                    {"★".repeat(Number(treatment.satisfaction))}{"☆".repeat(5 - Number(treatment.satisfaction))}
                   </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Products */}
+          {treatment.products_used && treatment.products_used.length > 0 && (
+            <div>
+              <h3 className="text-sm font-bold text-foreground mb-2">사용 제품</h3>
+              <div className="flex gap-1 flex-wrap">
+                {treatment.products_used.map((p, i) => (
+                  <span
+                    key={i}
+                    className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full"
+                  >
+                    {p.brand} {p.code} {p.area && `(${p.area})`}
+                  </span>
                 ))}
               </div>
-
-              {/* Upload */}
-              <div className="bg-surface rounded-xl p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-foreground">파일 업로드</h3>
-                  <Link
-                    href={`/treatments/${id}/capture`}
-                    className="text-xs text-accent"
-                  >
-                    촬영하기
-                  </Link>
-                </div>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={uploadType}
-                    onChange={(e) => setUploadType(e.target.value)}
-                    className="text-sm border border-border rounded-lg pl-3 pr-8 py-1.5 bg-card text-foreground"
-                  >
-                    <option value="before">시술 전</option>
-                    <option value="during">시술 중</option>
-                    <option value="after">시술 후</option>
-                  </select>
-                  <label
-                    className={`flex-1 text-center text-sm py-2 rounded-lg cursor-pointer ${
-                      uploading
-                        ? "bg-muted text-subtle"
-                        : "bg-primary text-primary-foreground active:opacity-80"
-                    }`}
-                  >
-                    {uploading ? "업로드 중..." : "사진/영상 선택"}
-                    <input
-                      type="file"
-                      accept="image/*,video/*"
-                      className="hidden"
-                      onChange={handlePhotoUpload}
-                      disabled={uploading}
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Delete */}
-              <button
-                onClick={handleDelete}
-                className="w-full py-3 border border-destructive text-destructive rounded-xl text-sm font-medium active:bg-red-50"
-              >
-                시술 기록 삭제
-              </button>
             </div>
           )}
+
+          {/* Photo Actions */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-bold text-foreground">사진 관리</h3>
+
+            {sortedPhotos.map((photo) => {
+              const isPhoto = (photo.media_type || "photo") === "photo";
+              return (
+                <div key={photo.id} className="bg-surface rounded-xl p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-muted-foreground uppercase">
+                      {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
+                      {photo.media_type === "video" && (
+                        <span className="ml-1 text-accent">영상</span>
+                      )}
+                    </span>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => setAnnotatingPhoto(photo)}
+                        disabled={!isPhoto}
+                        className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-30"
+                      >
+                        핀 노트{photo.annotations && photo.annotations.length > 0 ? ` (${photo.annotations.length})` : ""}
+                      </button>
+                      <ShareButton
+                        imageUrl={photo.face_swapped_url || photo.photo_url}
+                        title={`${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
+                        className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-50"
+                      />
+                      <button
+                        onClick={() => handleAddToPortfolio(photo)}
+                        disabled={photo.is_portfolio}
+                        className={`text-xs px-2 py-1 rounded-md ${
+                          photo.is_portfolio
+                            ? "bg-success-bg text-success-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {photo.is_portfolio ? "추가됨" : "포트폴리오"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Upload */}
+          <div className="bg-surface rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-foreground">파일 업로드</h3>
+              <Link
+                href={`/treatments/${id}/capture`}
+                className="text-xs text-accent"
+              >
+                촬영하기
+              </Link>
+            </div>
+            <div className="flex items-center gap-2">
+              <select
+                value={uploadType}
+                onChange={(e) => setUploadType(e.target.value)}
+                className="text-sm border border-border rounded-lg pl-3 pr-8 py-1.5 bg-card text-foreground"
+              >
+                <option value="before">시술 전</option>
+                <option value="during">시술 중</option>
+                <option value="after">시술 후</option>
+              </select>
+              <label
+                className={`flex-1 text-center text-sm py-2 rounded-lg cursor-pointer ${
+                  uploading
+                    ? "bg-muted text-subtle"
+                    : "bg-primary text-primary-foreground active:opacity-80"
+                }`}
+              >
+                {uploading ? "업로드 중..." : "사진/영상 선택"}
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  className="hidden"
+                  onChange={handlePhotoUpload}
+                  disabled={uploading}
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Delete */}
+          <button
+            onClick={handleDelete}
+            className="w-full py-3 border border-destructive text-destructive rounded-xl text-sm font-medium active:bg-red-50"
+          >
+            시술 기록 삭제
+          </button>
         </div>
       </div>
 
@@ -467,6 +485,15 @@ export default function TreatmentDetailPage() {
           photos={swappablePhotos}
           onClose={() => setShowFaceSwap(false)}
           onComplete={() => loadData()}
+        />
+      )}
+
+      {/* Photo Annotation Editor Modal */}
+      {annotatingPhoto && (
+        <PhotoAnnotationEditor
+          photo={annotatingPhoto}
+          onSave={(annotations) => handleSaveAnnotations(annotatingPhoto, annotations)}
+          onClose={() => setAnnotatingPhoto(null)}
         />
       )}
     </div>
