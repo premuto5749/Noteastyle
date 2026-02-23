@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { getCustomers, createCustomer, updateCustomer, deleteCustomer, type Customer } from "@/lib/api";
+import { type Customer } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 
 export default function CustomersPage() {
+  const api = useShopApi();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -16,21 +18,21 @@ export default function CustomersPage() {
   const [editPhone, setEditPhone] = useState("");
   const [editNotes, setEditNotes] = useState("");
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
-
-  async function loadCustomers(query?: string) {
+  const loadCustomers = useCallback(async (query?: string) => {
     setLoading(true);
     try {
-      const data = await getCustomers(query);
+      const data = await api.getCustomers(query);
       setCustomers(data);
     } catch {
       // API not available
     } finally {
       setLoading(false);
     }
-  }
+  }, [api]);
+
+  useEffect(() => {
+    loadCustomers();
+  }, [loadCustomers]);
 
   async function handleSearch() {
     await loadCustomers(search || undefined);
@@ -39,7 +41,7 @@ export default function CustomersPage() {
   async function handleAddCustomer() {
     if (!newName.trim()) return;
     try {
-      const customer = await createCustomer({
+      const customer = await api.createCustomer({
         name: newName.trim(),
         phone: newPhone.trim() || undefined,
       });
@@ -62,7 +64,7 @@ export default function CustomersPage() {
   async function handleEditSave() {
     if (!editingCustomer || !editName.trim()) return;
     try {
-      const updated = await updateCustomer(editingCustomer.id, {
+      const updated = await api.updateCustomer(editingCustomer.id, {
         name: editName.trim(),
         phone: editPhone.trim() || undefined,
         notes: editNotes.trim() || undefined,
@@ -77,7 +79,7 @@ export default function CustomersPage() {
   async function handleDeleteCustomer(id: string, name: string) {
     if (!confirm(`${name} 고객을 삭제하시겠습니까?`)) return;
     try {
-      await deleteCustomer(id);
+      await api.deleteCustomer(id);
       setCustomers((prev) => prev.filter((c) => c.id !== id));
     } catch {
       alert("삭제에 실패했습니다.");

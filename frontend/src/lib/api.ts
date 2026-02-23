@@ -1,10 +1,5 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
-// Default shop ID for MVP (single-shop mode)
-const SHOP_ID = process.env.NEXT_PUBLIC_SHOP_ID || "00000000-0000-0000-0000-000000000001";
-
-export { SHOP_ID };
-
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
@@ -17,7 +12,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     });
     if (!res.ok) {
       const error = await res.json().catch(() => ({ detail: res.statusText }));
-      throw new Error(error.detail || "API request failed");
+      throw new Error(error.detail || error.error || "API request failed");
     }
     return res.json();
   } catch (err) {
@@ -44,45 +39,6 @@ export interface Customer {
   created_at: string;
 }
 
-export function getCustomers(search?: string, phone?: string) {
-  const p = new URLSearchParams();
-  if (search) p.set("search", search);
-  if (phone) p.set("phone", phone);
-  const qs = p.toString();
-  return request<Customer[]>(`/shops/${SHOP_ID}/customers${qs ? `?${qs}` : ""}`);
-}
-
-export function getCustomer(id: string) {
-  return request<Customer>(`/shops/${SHOP_ID}/customers/${id}`);
-}
-
-export function updateCustomer(id: string, data: Partial<{
-  name: string;
-  phone: string;
-  gender: string;
-  birth_date: string;
-  notes: string;
-  naver_booking_id: string;
-}>) {
-  return request<Customer>(`/shops/${SHOP_ID}/customers/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export function deleteCustomer(id: string) {
-  return request<{ status: string }>(`/shops/${SHOP_ID}/customers/${id}`, {
-    method: "DELETE",
-  });
-}
-
-export function createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string; naver_booking_id?: string }) {
-  return request<Customer>(`/shops/${SHOP_ID}/customers`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
 // Treatments
 export interface ProductUsed {
   brand: string;
@@ -107,7 +63,7 @@ export interface TreatmentPhoto {
 export interface Treatment {
   id: string;
   customer_id: string;
-  designer_id: string | null;
+  member_id: string | null;
   shop_id: string;
   service_type: string;
   service_detail: string | null;
@@ -124,88 +80,62 @@ export interface Treatment {
   customer?: { name: string; visit_count?: number };
 }
 
-export function getTreatments(customerId?: string, date?: string) {
-  const searchParams = new URLSearchParams();
-  if (customerId) searchParams.set("customer_id", customerId);
-  if (date) searchParams.set("date", date);
-  const qs = searchParams.toString();
-  return request<Treatment[]>(`/shops/${SHOP_ID}/treatments${qs ? `?${qs}` : ""}`);
+// Portfolio
+export interface PortfolioItem {
+  id: string;
+  shop_id: string;
+  photo_id: string;
+  title: string | null;
+  description: string | null;
+  tags: string[] | null;
+  is_published: boolean;
+  created_at: string;
+  photo: TreatmentPhoto;
 }
 
-export function getTreatment(id: string) {
-  return request<Treatment>(`/shops/${SHOP_ID}/treatments/${id}`);
+// AI Face Models
+export interface FaceModel {
+  id: string;
+  shop_id: string;
+  name: string;
+  gender: string;
+  image_url: string;
+  is_active: boolean;
+  created_at: string;
 }
 
-export function updateTreatment(id: string, data: Partial<{
-  service_type: string;
-  service_detail: string;
-  products_used: ProductUsed[];
-  area: string;
-  duration_minutes: number;
-  price: number;
-  satisfaction: string;
-  customer_notes: string;
-  next_visit_recommendation: string;
-}>) {
-  return request<Treatment>(`/shops/${SHOP_ID}/treatments/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export function deleteTreatment(id: string) {
-  return request<{ status: string }>(`/shops/${SHOP_ID}/treatments/${id}`, {
-    method: "DELETE",
-  });
-}
-
-export function createTreatment(data: {
+// Reservations
+export interface Reservation {
+  id: string;
+  shop_id: string;
   customer_id: string;
-  service_type: string;
-  service_detail?: string;
-  products_used?: ProductUsed[];
-  area?: string;
-  duration_minutes?: number;
-  price?: number;
-  satisfaction?: string;
-  customer_notes?: string;
-  next_visit_recommendation?: string;
-}) {
-  return request<Treatment>(`/shops/${SHOP_ID}/treatments`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  member_id: string | null;
+  treatment_id: string | null;
+  scheduled_date: string;
+  scheduled_time: string;
+  estimated_duration_minutes: number;
+  service_type: string | null;
+  service_detail: string | null;
+  notes: string | null;
+  source: string;
+  status: string;
+  created_at: string;
+  customer?: { name: string; phone: string | null };
+  member?: { display_name: string } | null;
+  treatment?: { id: string } | null;
 }
 
-export async function uploadTreatmentPhoto(
-  treatmentId: string,
-  file: File | Blob,
-  photoType: string = "after",
-  caption?: string,
-  options?: {
-    mediaType?: "photo" | "video";
-    videoDuration?: number;
-    thumbnail?: Blob;
-  }
-) {
-  const formData = new FormData();
-  formData.append("file", file instanceof Blob && !(file instanceof File)
-    ? new File([file], `capture.${options?.mediaType === "video" ? "webm" : "jpg"}`, { type: file.type })
-    : file);
-  formData.append("photo_type", photoType);
-  if (caption) formData.append("caption", caption);
-  if (options?.mediaType) formData.append("media_type", options.mediaType);
-  if (options?.videoDuration != null) formData.append("video_duration_seconds", String(options.videoDuration));
-  if (options?.thumbnail) {
-    formData.append("thumbnail", new File([options.thumbnail], "thumbnail.jpg", { type: "image/jpeg" }));
-  }
-
-  const res = await fetch(
-    `${API_BASE}/shops/${SHOP_ID}/treatments/${treatmentId}/photos`,
-    { method: "POST", body: formData }
-  );
-  if (!res.ok) throw new Error("Failed to upload media");
-  return res.json() as Promise<TreatmentPhoto>;
+// Shop Members
+export interface ShopMember {
+  id: string;
+  user_id: string;
+  shop_id: string;
+  role: string;
+  display_name: string;
+  specialty: string | null;
+  phone: string | null;
+  is_active: boolean;
+  joined_at: string;
 }
 
 // Voice Memo
@@ -220,6 +150,278 @@ export interface VoiceMemoResult {
   summary: string | null;
 }
 
+// Face Swap types
+export interface FaceSwapJob {
+  _id: string;
+  status: number;
+  url?: string;
+  [key: string]: unknown;
+}
+
+export interface FaceSwapGenerateResult {
+  jobs: { _id: string; status: number }[];
+}
+
+export interface FaceSwapResult {
+  id: string;
+  treatment_photo_id: string;
+  face_model_id: string;
+  result_url: string;
+  is_selected: boolean;
+  created_at: string;
+}
+
+// ---------- Shop-scoped API factory ----------
+
+export function createShopApi(shopId: string) {
+  return {
+    // Customers
+    getCustomers(search?: string, phone?: string) {
+      const p = new URLSearchParams();
+      if (search) p.set("search", search);
+      if (phone) p.set("phone", phone);
+      const qs = p.toString();
+      return request<Customer[]>(`/shops/${shopId}/customers${qs ? `?${qs}` : ""}`);
+    },
+    getCustomer(id: string) {
+      return request<Customer>(`/shops/${shopId}/customers/${id}`);
+    },
+    updateCustomer(id: string, data: Partial<{
+      name: string;
+      phone: string;
+      gender: string;
+      birth_date: string;
+      notes: string;
+      naver_booking_id: string;
+    }>) {
+      return request<Customer>(`/shops/${shopId}/customers/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    deleteCustomer(id: string) {
+      return request<{ status: string }>(`/shops/${shopId}/customers/${id}`, {
+        method: "DELETE",
+      });
+    },
+    createCustomer(data: { name: string; phone?: string; gender?: string; notes?: string; naver_booking_id?: string }) {
+      return request<Customer>(`/shops/${shopId}/customers`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+
+    // Treatments
+    getTreatments(customerId?: string, date?: string) {
+      const searchParams = new URLSearchParams();
+      if (customerId) searchParams.set("customer_id", customerId);
+      if (date) searchParams.set("date", date);
+      const qs = searchParams.toString();
+      return request<Treatment[]>(`/shops/${shopId}/treatments${qs ? `?${qs}` : ""}`);
+    },
+    getTreatment(id: string) {
+      return request<Treatment>(`/shops/${shopId}/treatments/${id}`);
+    },
+    updateTreatment(id: string, data: Partial<{
+      service_type: string;
+      service_detail: string;
+      products_used: ProductUsed[];
+      area: string;
+      duration_minutes: number;
+      price: number;
+      satisfaction: string;
+      customer_notes: string;
+      next_visit_recommendation: string;
+    }>) {
+      return request<Treatment>(`/shops/${shopId}/treatments/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    deleteTreatment(id: string) {
+      return request<{ status: string }>(`/shops/${shopId}/treatments/${id}`, {
+        method: "DELETE",
+      });
+    },
+    createTreatment(data: {
+      customer_id: string;
+      service_type: string;
+      service_detail?: string;
+      products_used?: ProductUsed[];
+      area?: string;
+      duration_minutes?: number;
+      price?: number;
+      satisfaction?: string;
+      customer_notes?: string;
+      next_visit_recommendation?: string;
+    }) {
+      return request<Treatment>(`/shops/${shopId}/treatments`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    async uploadTreatmentPhoto(
+      treatmentId: string,
+      file: File | Blob,
+      photoType: string = "after",
+      caption?: string,
+      options?: {
+        mediaType?: "photo" | "video";
+        videoDuration?: number;
+        thumbnail?: Blob;
+      }
+    ) {
+      const formData = new FormData();
+      formData.append("file", file instanceof Blob && !(file instanceof File)
+        ? new File([file], `capture.${options?.mediaType === "video" ? "webm" : "jpg"}`, { type: file.type })
+        : file);
+      formData.append("photo_type", photoType);
+      if (caption) formData.append("caption", caption);
+      if (options?.mediaType) formData.append("media_type", options.mediaType);
+      if (options?.videoDuration != null) formData.append("video_duration_seconds", String(options.videoDuration));
+      if (options?.thumbnail) {
+        formData.append("thumbnail", new File([options.thumbnail], "thumbnail.jpg", { type: "image/jpeg" }));
+      }
+
+      const res = await fetch(
+        `${API_BASE}/shops/${shopId}/treatments/${treatmentId}/photos`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("Failed to upload media");
+      return res.json() as Promise<TreatmentPhoto>;
+    },
+
+    // Portfolio
+    getPortfolio(publishedOnly: boolean = false) {
+      return request<PortfolioItem[]>(
+        `/shops/${shopId}/portfolio?published_only=${publishedOnly}`
+      );
+    },
+    createPortfolioItem(data: {
+      photo_id: string;
+      title?: string;
+      description?: string;
+      tags?: string[];
+    }) {
+      return request<PortfolioItem>(`/shops/${shopId}/portfolio`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    togglePortfolioPublish(id: string) {
+      return request<PortfolioItem>(`/shops/${shopId}/portfolio/${id}/publish`, {
+        method: "PUT",
+      });
+    },
+    deletePortfolioItem(id: string) {
+      return request<{ status: string }>(`/shops/${shopId}/portfolio/${id}`, {
+        method: "DELETE",
+      });
+    },
+
+    // Face Models
+    getFaceModels() {
+      return request<FaceModel[]>(`/shops/${shopId}/face-models`);
+    },
+    async uploadFaceModel(name: string, gender: string, file: File): Promise<FaceModel> {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("gender", gender);
+      formData.append("file", file);
+
+      const res = await fetch(`${API_BASE}/shops/${shopId}/face-models`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ detail: "Upload failed" }));
+        throw new Error(error.detail || "Failed to upload face model");
+      }
+      return res.json();
+    },
+    deleteFaceModel(id: string) {
+      return request<{ status: string }>(`/shops/${shopId}/face-models/${id}`, {
+        method: "DELETE",
+      });
+    },
+
+    // Reservations
+    getReservations(date?: string, status?: string) {
+      const p = new URLSearchParams();
+      if (date) p.set("date", date);
+      if (status) p.set("status", status);
+      const qs = p.toString();
+      return request<Reservation[]>(
+        `/shops/${shopId}/reservations${qs ? `?${qs}` : ""}`
+      );
+    },
+    getReservation(id: string) {
+      return request<Reservation>(`/shops/${shopId}/reservations/${id}`);
+    },
+    createReservation(data: {
+      customer_id: string;
+      member_id?: string;
+      scheduled_date: string;
+      scheduled_time: string;
+      estimated_duration_minutes?: number;
+      service_type?: string;
+      service_detail?: string;
+      notes?: string;
+      source?: string;
+    }) {
+      return request<Reservation>(`/shops/${shopId}/reservations`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    updateReservation(
+      id: string,
+      data: Partial<{
+        customer_id: string;
+        member_id: string;
+        treatment_id: string;
+        scheduled_date: string;
+        scheduled_time: string;
+        estimated_duration_minutes: number;
+        service_type: string;
+        service_detail: string;
+        notes: string;
+        source: string;
+        status: string;
+      }>
+    ) {
+      return request<Reservation>(`/shops/${shopId}/reservations/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    deleteReservation(id: string) {
+      return request<{ status: string }>(`/shops/${shopId}/reservations/${id}`, {
+        method: "DELETE",
+      });
+    },
+    startTreatmentFromReservation(
+      reservationId: string,
+      data?: { service_type?: string; member_id?: string }
+    ) {
+      return request<{ treatment: Treatment; reservation: Reservation }>(
+        `/shops/${shopId}/reservations/${reservationId}/start-treatment`,
+        {
+          method: "POST",
+          body: data ? JSON.stringify(data) : undefined,
+        }
+      );
+    },
+
+    // Members
+    getMembers() {
+      return request<ShopMember[]>(`/shops/${shopId}/members`);
+    },
+  };
+}
+
+// ---------- Non-shop-scoped APIs ----------
+
 export async function transcribeVoiceMemo(audioBlob: Blob): Promise<VoiceMemoResult> {
   const formData = new FormData();
   formData.append("file", audioBlob, "voice-memo.webm");
@@ -233,57 +435,6 @@ export async function transcribeVoiceMemo(audioBlob: Blob): Promise<VoiceMemoRes
     throw new Error(errorData.detail || "음성 인식에 실패했습니다.");
   }
   return res.json();
-}
-
-// Portfolio
-export interface PortfolioItem {
-  id: string;
-  shop_id: string;
-  photo_id: string;
-  title: string | null;
-  description: string | null;
-  tags: string[] | null;
-  is_published: boolean;
-  created_at: string;
-  photo: TreatmentPhoto;
-}
-
-export function getPortfolio(publishedOnly: boolean = false) {
-  return request<PortfolioItem[]>(
-    `/shops/${SHOP_ID}/portfolio?published_only=${publishedOnly}`
-  );
-}
-
-export function createPortfolioItem(data: {
-  photo_id: string;
-  title?: string;
-  description?: string;
-  tags?: string[];
-}) {
-  return request<PortfolioItem>(`/shops/${SHOP_ID}/portfolio`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export function togglePortfolioPublish(id: string) {
-  return request<PortfolioItem>(`/shops/${SHOP_ID}/portfolio/${id}/publish`, {
-    method: "PUT",
-  });
-}
-
-export function deletePortfolioItem(id: string) {
-  return request<{ status: string }>(`/shops/${SHOP_ID}/portfolio/${id}`, {
-    method: "DELETE",
-  });
-}
-
-// Face Swap (legacy)
-export interface FaceSwapJob {
-  _id: string;
-  status: number;
-  url?: string;
-  [key: string]: unknown;
 }
 
 export function startFaceSwap(sourcePhotoId: string, targetPhotoId: string) {
@@ -304,49 +455,6 @@ export function completeFaceSwap(photoId: string, faceSwappedUrl: string) {
   );
 }
 
-// AI Face Models
-export interface FaceModel {
-  id: string;
-  shop_id: string;
-  name: string;
-  gender: string;
-  image_url: string;
-  is_active: boolean;
-  created_at: string;
-}
-
-export function getFaceModels() {
-  return request<FaceModel[]>(`/shops/${SHOP_ID}/face-models`);
-}
-
-export async function uploadFaceModel(name: string, gender: string, file: File): Promise<FaceModel> {
-  const formData = new FormData();
-  formData.append("name", name);
-  formData.append("gender", gender);
-  formData.append("file", file);
-
-  const res = await fetch(`${API_BASE}/shops/${SHOP_ID}/face-models`, {
-    method: "POST",
-    body: formData,
-  });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ detail: "Upload failed" }));
-    throw new Error(error.detail || "Failed to upload face model");
-  }
-  return res.json();
-}
-
-export function deleteFaceModel(id: string) {
-  return request<{ status: string }>(`/shops/${SHOP_ID}/face-models/${id}`, {
-    method: "DELETE",
-  });
-}
-
-// Face Swap (new workflow)
-export interface FaceSwapGenerateResult {
-  jobs: { _id: string; status: number }[];
-}
-
 export function generateFaceSwap(
   treatmentPhotoId: string,
   faceModelId: string,
@@ -360,15 +468,6 @@ export function generateFaceSwap(
       count,
     }),
   });
-}
-
-export interface FaceSwapResult {
-  id: string;
-  treatment_photo_id: string;
-  face_model_id: string;
-  result_url: string;
-  is_selected: boolean;
-  created_at: string;
 }
 
 export function saveFaceSwapResult(data: {
@@ -395,95 +494,16 @@ export function selectFaceSwapResult(resultId: string) {
   );
 }
 
-// Reservations
-export interface Reservation {
-  id: string;
-  shop_id: string;
-  customer_id: string;
-  designer_id: string | null;
-  treatment_id: string | null;
-  scheduled_date: string;
-  scheduled_time: string;
-  estimated_duration_minutes: number;
-  service_type: string | null;
-  service_detail: string | null;
-  notes: string | null;
-  source: string;
-  status: string;
-  created_at: string;
-  customer?: { name: string; phone: string | null };
-  designer?: { name: string } | null;
-  treatment?: { id: string } | null;
-}
-
-export function getReservations(date?: string, status?: string) {
-  const p = new URLSearchParams();
-  if (date) p.set("date", date);
-  if (status) p.set("status", status);
-  const qs = p.toString();
-  return request<Reservation[]>(
-    `/shops/${SHOP_ID}/reservations${qs ? `?${qs}` : ""}`
-  );
-}
-
-export function getReservation(id: string) {
-  return request<Reservation>(`/shops/${SHOP_ID}/reservations/${id}`);
-}
-
-export function createReservation(data: {
-  customer_id: string;
-  designer_id?: string;
-  scheduled_date: string;
-  scheduled_time: string;
-  estimated_duration_minutes?: number;
-  service_type?: string;
-  service_detail?: string;
-  notes?: string;
-  source?: string;
+// Shop creation (no shop context needed)
+export function createShop(data: {
+  name: string;
+  shop_type: string;
+  address?: string;
+  phone?: string;
+  display_name?: string;
 }) {
-  return request<Reservation>(`/shops/${SHOP_ID}/reservations`, {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export function updateReservation(
-  id: string,
-  data: Partial<{
-    customer_id: string;
-    designer_id: string;
-    treatment_id: string;
-    scheduled_date: string;
-    scheduled_time: string;
-    estimated_duration_minutes: number;
-    service_type: string;
-    service_detail: string;
-    notes: string;
-    source: string;
-    status: string;
-  }>
-) {
-  return request<Reservation>(`/shops/${SHOP_ID}/reservations/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(data),
-  });
-}
-
-export function deleteReservation(id: string) {
-  return request<{ status: string }>(`/shops/${SHOP_ID}/reservations/${id}`, {
-    method: "DELETE",
-  });
-}
-
-export function startTreatmentFromReservation(
-  reservationId: string,
-  data?: { service_type?: string; designer_id?: string }
-) {
-  return request<{ treatment: Treatment; reservation: Reservation }>(
-    `/shops/${SHOP_ID}/reservations/${reservationId}/start-treatment`,
-    {
-      method: "POST",
-      body: data ? JSON.stringify(data) : undefined,
-    }
+  return request<{ id: string; name: string; shop_type: string }>(
+    `/shops`,
+    { method: "POST", body: JSON.stringify(data) }
   );
 }

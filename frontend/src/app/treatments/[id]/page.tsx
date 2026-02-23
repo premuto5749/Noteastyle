@@ -3,11 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useShopApi } from "@/hooks/useShopApi";
 import {
-  getTreatment,
-  uploadTreatmentPhoto,
-  createPortfolioItem,
-  deleteTreatment,
   type Treatment,
   type TreatmentPhoto,
 } from "@/lib/api";
@@ -42,6 +39,7 @@ const PHOTO_TYPE_ORDER: Record<string, number> = {
 export default function TreatmentDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const api = useShopApi();
   const id = params.id as string;
 
   const [treatment, setTreatment] = useState<Treatment | null>(null);
@@ -55,7 +53,7 @@ export default function TreatmentDetailPage() {
 
   const loadData = useCallback(async () => {
     try {
-      const t = await getTreatment(id);
+      const t = await api.getTreatment(id);
       setTreatment(t);
     } catch {
       alert("시술 정보를 불러올 수 없습니다.");
@@ -63,7 +61,7 @@ export default function TreatmentDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id, router]);
+  }, [id, router, api]);
 
   useEffect(() => {
     loadData();
@@ -104,7 +102,7 @@ export default function TreatmentDetailPage() {
     setUploading(true);
     try {
       const isVideo = file.type.startsWith("video/");
-      await uploadTreatmentPhoto(treatment.id, file, uploadType, undefined, isVideo ? { mediaType: "video" } : undefined);
+      await api.uploadTreatmentPhoto(treatment.id, file, uploadType, undefined, isVideo ? { mediaType: "video" } : undefined);
       await loadData();
     } catch {
       alert("업로드에 실패했습니다.");
@@ -116,7 +114,7 @@ export default function TreatmentDetailPage() {
 
   async function handleAddToPortfolio(photo: TreatmentPhoto) {
     try {
-      await createPortfolioItem({
+      await api.createPortfolioItem({
         photo_id: photo.id,
         title: treatment
           ? `${SERVICE_LABELS[treatment.service_type] || treatment.service_type} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`
@@ -131,7 +129,7 @@ export default function TreatmentDetailPage() {
   async function handleDelete() {
     if (!confirm("이 시술 기록을 삭제하시겠습니까? 관련 사진도 함께 삭제됩니다.")) return;
     try {
-      await deleteTreatment(id);
+      await api.deleteTreatment(id);
       router.push("/treatments");
     } catch {
       alert("삭제에 실패했습니다.");

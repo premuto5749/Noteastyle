@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const { searchParams } = new URL(request.url);
+export const GET = withShopAuth(async (req, params, _member) => {
+  const supabase = createServiceClient();
+  const shopId = params.shopId;
+  const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
   const status = searchParams.get("status");
 
   let query = supabase
     .from("reservations")
     .select(
-      "*, customer:customers(name, phone), designer:designers(name), treatment:treatments(id)"
+      "*, customer:customers(name, phone), member:shop_members(display_name), treatment:treatments(id)"
     )
     .eq("shop_id", shopId)
     .order("scheduled_time", { ascending: true });
@@ -31,22 +29,19 @@ export async function GET(
   if (error)
     return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data);
-}
+});
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const body = await request.json();
+export const POST = withShopAuth(async (req, params, _member) => {
+  const supabase = createServiceClient();
+  const shopId = params.shopId;
+  const body = await req.json();
 
   const { data, error } = await supabase
     .from("reservations")
     .insert({
       shop_id: shopId,
       customer_id: body.customer_id,
-      designer_id: body.designer_id ?? null,
+      member_id: body.member_id ?? null,
       scheduled_date: body.scheduled_date,
       scheduled_time: body.scheduled_time,
       estimated_duration_minutes: body.estimated_duration_minutes ?? 60,
@@ -56,11 +51,11 @@ export async function POST(
       source: body.source ?? "manual",
     })
     .select(
-      "*, customer:customers(name, phone), designer:designers(name), treatment:treatments(id)"
+      "*, customer:customers(name, phone), member:shop_members(display_name), treatment:treatments(id)"
     )
     .single();
 
   if (error)
     return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data, { status: 201 });
-}
+});

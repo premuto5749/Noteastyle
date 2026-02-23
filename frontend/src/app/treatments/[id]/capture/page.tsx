@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { MediaCapture, type CapturedMedia } from "@/components/MediaCapture";
 import { MediaGrid } from "@/components/MediaGrid";
-import { uploadTreatmentPhoto } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 
 const PHOTO_TYPES = [
   { value: "before", label: "시술 전" },
@@ -17,6 +17,7 @@ export default function CapturePage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const api = useShopApi();
   const treatmentId = params.id as string;
 
   const initialType = searchParams.get("type") || "after";
@@ -54,7 +55,7 @@ export default function CapturePage() {
         const item = items[i];
         setUploadProgress({ current: i + 1, total: items.length });
 
-        await uploadTreatmentPhoto(
+        await api.uploadTreatmentPhoto(
           treatmentId,
           item.blob,
           photoType,

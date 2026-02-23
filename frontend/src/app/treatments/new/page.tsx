@@ -5,12 +5,8 @@ import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { ServiceButton } from "@/components/ServiceButton";
 import { VoiceMemo } from "@/components/VoiceMemo";
-import {
-  createTreatment,
-  createCustomer,
-  transcribeVoiceMemo,
-  type ProductUsed,
-} from "@/lib/api";
+import { transcribeVoiceMemo, type ProductUsed } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
 
 const SERVICES = [
   { type: "cut", label: "커트", icon: "\u2702\uFE0F" },
@@ -23,6 +19,7 @@ const SERVICES = [
 
 export default function NewTreatmentPage() {
   const router = useRouter();
+  const api = useShopApi();
   const [customerName, setCustomerName] = useState("");
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [productBrand, setProductBrand] = useState("");
@@ -72,11 +69,11 @@ export default function NewTreatmentPage() {
     if (!customerName.trim() || !selectedService) return;
     setSaving(true);
     try {
-      const customer = await createCustomer({
+      const customer = await api.createCustomer({
         name: customerName.trim(),
         naver_booking_id: naverBookingId.trim() || undefined,
       });
-      const result = await createTreatment({
+      const result = await api.createTreatment({
         customer_id: customer.id,
         service_type: selectedService,
         products_used: products.length > 0 ? products : undefined,

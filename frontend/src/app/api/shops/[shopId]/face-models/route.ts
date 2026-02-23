@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
+export const GET = withShopAuth(async (_req, params, _member) => {
+  const supabase = createServiceClient();
+  const shopId = params.shopId;
 
   const { data, error } = await supabase
     .from("ai_face_models")
@@ -17,16 +15,13 @@ export async function GET(
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data);
-}
+});
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
+export const POST = withShopAuth(async (req, params, _member) => {
+  const supabase = createServiceClient();
+  const shopId = params.shopId;
 
-  const formData = await request.formData();
+  const formData = await req.formData();
   const name = formData.get("name") as string;
   const gender = formData.get("gender") as string;
   const file = formData.get("file") as File;
@@ -71,4 +66,4 @@ export async function POST(
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data, { status: 201 });
-}
+});

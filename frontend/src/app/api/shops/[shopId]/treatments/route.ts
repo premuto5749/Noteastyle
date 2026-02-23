@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
+import { withShopAuth } from "@/lib/auth/shop";
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const body = await request.json();
+export const POST = withShopAuth(async (req, params, member) => {
+  const supabase = createServiceClient();
+  const body = await req.json();
 
   const productsData = body.products_used
     ? body.products_used.map((p: { brand: string; code?: string; area?: string }) => ({
@@ -21,9 +18,9 @@ export async function POST(
   const { data: treatment, error } = await supabase
     .from("treatments")
     .insert({
-      shop_id: shopId,
+      shop_id: params.shopId,
       customer_id: body.customer_id,
-      designer_id: body.designer_id ?? null,
+      member_id: body.member_id ?? null,
       service_type: body.service_type,
       service_detail: body.service_detail ?? null,
       products_used: productsData,
@@ -50,15 +47,11 @@ export async function POST(
     .single();
 
   return NextResponse.json(full, { status: 201 });
-}
+});
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ shopId: string }> }
-) {
-  const { shopId } = await params;
-  const supabase = createServerClient();
-  const { searchParams } = new URL(request.url);
+export const GET = withShopAuth(async (req, params, member) => {
+  const supabase = createServiceClient();
+  const { searchParams } = new URL(req.url);
   const customerId = searchParams.get("customer_id");
   const serviceType = searchParams.get("service_type");
   const date = searchParams.get("date");
@@ -68,7 +61,7 @@ export async function GET(
   let query = supabase
     .from("treatments")
     .select("*, photos:treatment_photos(*), customer:customers(name)")
-    .eq("shop_id", shopId)
+    .eq("shop_id", params.shopId)
     .order("created_at", { ascending: false })
     .range(skip, skip + limit - 1);
 
@@ -84,4 +77,4 @@ export async function GET(
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
   return NextResponse.json(data);
-}
+});

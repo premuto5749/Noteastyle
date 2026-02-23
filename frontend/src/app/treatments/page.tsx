@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { getTreatments, type Treatment } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
+import { type Treatment } from "@/lib/api";
 
 const SERVICE_LABELS: Record<string, string> = {
   cut: "커트",
@@ -16,6 +17,7 @@ const SERVICE_LABELS: Record<string, string> = {
 type SortOrder = "newest" | "oldest";
 
 export default function TreatmentsPage() {
+  const api = useShopApi();
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -26,7 +28,7 @@ export default function TreatmentsPage() {
   useEffect(() => {
     async function load() {
       try {
-        const data = await getTreatments();
+        const data = await api.getTreatments();
         setTreatments(data);
       } catch {
         // API not available
@@ -35,7 +37,7 @@ export default function TreatmentsPage() {
       }
     }
     load();
-  }, []);
+  }, [api]);
 
   const toggleFilter = (serviceType: string) => {
     setActiveFilters((prev) =>

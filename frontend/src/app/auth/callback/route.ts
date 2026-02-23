@@ -21,6 +21,12 @@ export async function GET(request: Request) {
         }
       }
 
+      // Check for pending invite token (stored by /invite page before login)
+      const pendingToken = searchParams.get("invite_token");
+      if (pendingToken) {
+        return NextResponse.redirect(`${origin}/invite/${pendingToken}`);
+      }
+
       return NextResponse.redirect(origin);
     }
   }

@@ -3,9 +3,18 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
+import { useShop } from "@/contexts/ShopContext";
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: "소유자",
+  admin: "관리자",
+  designer: "디자이너",
+  assistant: "어시스턴트",
+};
 
 export default function SettingsPage() {
   const { user, isAdmin } = useAuth();
+  const { currentShop, shops, switchShop } = useShop();
 
   return (
     <div className="pb-4">
@@ -32,6 +41,48 @@ export default function SettingsPage() {
           <h1 className="text-lg font-bold text-foreground">설정</h1>
         </div>
       </div>
+
+      {/* Shop section */}
+      {currentShop && (
+        <div className="px-4 mt-6">
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">
+            매장
+          </h2>
+          <div className="bg-card rounded-2xl border border-border divide-y divide-border">
+            <div className="px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-foreground">{currentShop.shop_name}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                {ROLE_LABELS[currentShop.role] || currentShop.role}
+              </span>
+            </div>
+            <Link
+              href="/settings/shop"
+              className="px-4 py-3 flex items-center justify-between"
+            >
+              <span className="text-sm text-foreground">매장 관리</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </Link>
+            {shops.length > 1 && (
+              <div className="px-4 py-3">
+                <label className="text-sm text-foreground block mb-2">매장 전환</label>
+                <select
+                  value={currentShop.shop_id}
+                  onChange={(e) => switchShop(e.target.value)}
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground"
+                >
+                  {shops.map((s) => (
+                    <option key={s.shop_id} value={s.shop_id}>
+                      {s.shop_name} ({ROLE_LABELS[s.role] || s.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Theme section */}
       <div className="px-4 mt-6">
