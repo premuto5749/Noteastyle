@@ -373,6 +373,10 @@ npx supabase db push                    # 마이그레이션 적용
 npx supabase db reset                   # DB 초기화 + 마이그레이션 재적용
 ```
 
+### 로컬 도구 경로
+
+- **gh CLI**: `"C:/Program Files/GitHub CLI/gh.exe"` (PATH에 없으므로 전체 경로 사용)
+
 ### 환경 변수 (frontend/.env.local)
 
 | 변수 | 설명 | 필수 |
@@ -410,31 +414,62 @@ npx supabase db reset                   # DB 초기화 + 마이그레이션 재�
 
 ## 11. Git 워크플로우
 
-### 작업 순서 (반드시 준수)
-
-```
-1. main 최신화        git checkout main && git pull
-2. 새 브랜치 생성      git checkout -b feat/기능명
-3. 코드 작업           (파일 수정)
-4. 커밋               git add <파일들> && git commit -m "..."
-5. 푸시               git push -u origin feat/기능명
-6. PR 생성            gh pr create ...
-7. 머지               gh pr merge ... --squash --delete-branch
-8. main 복귀          git checkout main && git pull
-```
-
-### 절대 규칙
-- **어떤 코드 수정이든 반드시 브랜치를 먼저 생성**한 후 진행. 예외 없음.
-- 단 한 줄의 수정이라도 main에서 직접 파일을 수정하지 않음.
-- 항상 **main에서 새 브랜치를 생성**. 다른 브랜치에서 분기하지 않음.
-- 어떤 작업이든 반드시 **PR을 생성**. main에 직접 커밋/푸시 금지.
-- 머지 시 `--squash`로 커밋 정리, `--delete-branch`로 원격 브랜치 삭제.
-
 ### 브랜치 네이밍
+
 - 기능 추가: `feat/기능명` (예: `feat/voice-memo`)
 - 버그 수정: `fix/이슈번호-설명` (예: `fix/12-photo-upload`)
 - 리팩토링: `refactor/대상` (예: `refactor/api-client`)
 - 문서: `docs/대상` (예: `docs/deployment-guide`)
+
+### 작업 순서 (반드시 준수 — Worktree 방식)
+
+```
+1. main 최신화           cd C:/Dev/Noteastyle && git pull
+2. worktree 생성         git worktree add ../Noteastyle-<브랜치명> -b feat/기능명
+3. worktree에서 작업     cd ../Noteastyle-<브랜치명>
+4. 커밋                  git add <파일들> && git commit -m "..."
+5. 푸시                  git push -u origin feat/기능명
+6. PR 생성               gh pr create ...
+7. 머지                  gh pr merge ... --squash --delete-branch
+8. worktree 정리         cd C:/Dev/Noteastyle && git worktree remove ../Noteastyle-<브랜치명>
+```
+
+### 절대 규칙
+
+- **⚠️ 어떤 코드 수정이든 반드시 worktree를 생성한 후 해당 디렉토리에서 진행**할 것. 이 규칙은 예외 없이 적용된다.
+  - 백그라운드 에이전트(Task tool)에게 작업을 위임할 때도 worktree 생성을 먼저 지시할 것
+  - 단 한 줄의 수정이라도 main worktree(`C:/Dev/Noteastyle`)에서 직접 파일을 수정하지 않는다
+  - worktree 생성 전에 파일을 수정하는 것은 금지 — 반드시 `git worktree add` 후 편집
+- **항상 main에서 새 브랜치를 생성**할 것. 다른 브랜치에서 분기하지 않는다.
+- **어떤 작업이든 반드시 PR을 생성**할 것. main에 직접 커밋/푸시하지 않는다. (docs, fix, feat 모두 포함)
+- 머지 시 `--squash`로 커밋을 정리하고 `--delete-branch`로 원격 브랜치를 삭제한다.
+- 머지 후 반드시 `git worktree remove`로 worktree를 정리한다.
+
+### 사용자 확인 규칙
+
+- **파일 생성/수정, 패키지 설치, 빌드, Vercel 설정 등** → 확인 없이 바로 진행
+- **git commit, push, PR 생성, merge** → 실행 전에 반드시 사용자 확인을 받을 것
+
+### 여러 기능 동시 작업
+
+```bash
+# Worktree는 각 브랜치가 별도 디렉토리이므로 stash 없이 동시 작업 가능
+# 기능1 worktree
+git worktree add ../Noteastyle-feat-기능1 -b feat/기능1
+# 기능2 worktree (동시에 생성 가능)
+git worktree add ../Noteastyle-feat-기능2 -b feat/기능2
+
+# 각 디렉토리에서 독립적으로 작업
+# cd ../Noteastyle-feat-기능1  → 기능1 작업
+# cd ../Noteastyle-feat-기능2  → 기능2 작업
+
+# 작업 완료 후 정리
+git worktree remove ../Noteastyle-feat-기능1
+git worktree remove ../Noteastyle-feat-기능2
+```
+
+- 각 worktree는 독립된 디렉토리이므로 `git stash` 없이 여러 작업 동시 진행 가능
+- worktree 간 전환은 단순히 디렉토리 이동 (`cd`)으로 처리
 
 ### 커밋 메시지
 - 한국어 또는 영어 모두 가능
