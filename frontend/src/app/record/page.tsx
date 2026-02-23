@@ -3,20 +3,12 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { ServiceButton } from "@/components/ServiceButton";
+import { ServiceSelector } from "@/components/ServiceSelector";
 import { ProductButton } from "@/components/ProductButton";
 import { VoiceMemo } from "@/components/VoiceMemo";
-import { transcribeVoiceMemo, type ProductUsed } from "@/lib/api";
+import { transcribeVoiceMemo, type ProductUsed, type ShopService } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
-
-const SERVICES = [
-  { type: "cut", label: "커트", icon: "\u2702\uFE0F" },
-  { type: "color", label: "염색", icon: "\uD83C\uDFA8" },
-  { type: "perm", label: "펌", icon: "\uD83D\uDCAB" },
-  { type: "treatment", label: "트리트먼트", icon: "\u2728" },
-  { type: "bleach", label: "블리치", icon: "\u26A1" },
-  { type: "scalp", label: "두피관리", icon: "\uD83C\uDF3F" },
-];
+import { useServiceMenu } from "@/hooks/useServiceMenu";
 
 const POPULAR_PRODUCTS = [
   { brand: "로레알", code: "7.1", color: "#8B6914" },
@@ -27,17 +19,24 @@ const POPULAR_PRODUCTS = [
   { brand: "슈워츠코프", code: "4-0", color: "#2F1B14" },
 ];
 
+// Categories that typically use color products
+const PRODUCT_CATEGORIES = ["염색", "블리치", "펌", "color", "bleach", "perm"];
+
 export default function QuickRecordPage() {
   const { api } = useShopApi();
+  const { categories } = useServiceMenu();
   const [step, setStep] = useState<"customer" | "service" | "product" | "done">("customer");
   const [customerName, setCustomerName] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedServiceName, setSelectedServiceName] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<ProductUsed[]>([]);
   const [saving, setSaving] = useState(false);
   const [voiceProcessing, setVoiceProcessing] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [naverBookingId, setNaverBookingId] = useState("");
+  const [autoDuration, setAutoDuration] = useState<number | undefined>(undefined);
+  const [autoPrice, setAutoPrice] = useState<number | undefined>(undefined);
 
   const handleCustomerSubmit = useCallback(async () => {
     if (!customerName.trim()) return;
@@ -53,12 +52,17 @@ export default function QuickRecordPage() {
     }
   }, [customerName, naverBookingId, api]);
 
-  const handleServiceSelect = (type: string) => {
-    setSelectedService(type);
-    if (type === "color" || type === "bleach" || type === "perm") {
+  const handleServiceSelect = (categoryName: string, service?: ShopService) => {
+    setSelectedCategory(categoryName);
+    setSelectedServiceName(service?.name ?? null);
+    setAutoDuration(service?.estimated_duration_minutes ?? undefined);
+    setAutoPrice(service?.price ?? undefined);
+
+    const serviceType = categoryName;
+    if (PRODUCT_CATEGORIES.includes(serviceType)) {
       setStep("product");
     } else {
-      handleSave(type, []);
+      handleSave(serviceType, [], service);
     }
   };
 
@@ -70,13 +74,16 @@ export default function QuickRecordPage() {
     });
   };
 
-  const handleSave = async (serviceType?: string, products?: ProductUsed[]) => {
+  const handleSave = async (serviceType?: string, products?: ProductUsed[], service?: ShopService) => {
     setSaving(true);
     try {
       const result = await api.createTreatment({
         customer_id: customerId!,
-        service_type: serviceType || selectedService!,
+        service_type: serviceType || selectedCategory!,
+        service_detail: selectedServiceName || service?.name || undefined,
         products_used: products || selectedProducts,
+        duration_minutes: autoDuration || service?.estimated_duration_minutes || undefined,
+        price: autoPrice || service?.price || undefined,
       });
       setSavedId(result.id);
       setStep("done");
@@ -91,7 +98,7 @@ export default function QuickRecordPage() {
     setVoiceProcessing(true);
     try {
       const result = await transcribeVoiceMemo(blob);
-      if (result.service_type) setSelectedService(result.service_type);
+      if (result.service_type) setSelectedCategory(result.service_type);
       if (result.products_used) setSelectedProducts(result.products_used);
       if (result.customer_name) setCustomerName(result.customer_name);
       if (result.service_type && customerId) {
@@ -109,10 +116,13 @@ export default function QuickRecordPage() {
     setStep("customer");
     setCustomerName("");
     setCustomerId(null);
-    setSelectedService(null);
+    setSelectedCategory(null);
+    setSelectedServiceName(null);
     setSelectedProducts([]);
     setSavedId(null);
     setNaverBookingId("");
+    setAutoDuration(undefined);
+    setAutoPrice(undefined);
   };
 
   return (
@@ -180,17 +190,12 @@ export default function QuickRecordPage() {
               <div className="text-sm font-medium text-muted-foreground mb-3">
                 시술 종류를 선택하세요
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                {SERVICES.map((s) => (
-                  <ServiceButton
-                    key={s.type}
-                    label={s.label}
-                    icon={s.icon}
-                    selected={selectedService === s.type}
-                    onClick={() => handleServiceSelect(s.type)}
-                  />
-                ))}
-              </div>
+              <ServiceSelector
+                categories={categories}
+                onSelect={handleServiceSelect}
+                selectedCategory={selectedCategory ?? undefined}
+                selectedService={selectedServiceName ?? undefined}
+              />
             </div>
           </div>
         )}
@@ -202,7 +207,12 @@ export default function QuickRecordPage() {
                 <div>
                   <div className="text-sm text-muted-foreground">{customerName}</div>
                   <div className="font-bold text-foreground">
-                    {SERVICES.find((s) => s.type === selectedService)?.label}
+                    {selectedCategory}
+                    {selectedServiceName && (
+                      <span className="text-muted-foreground font-normal ml-2 text-sm">
+                        {selectedServiceName}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <button onClick={() => setStep("service")} className="text-sm text-muted-foreground">

@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
-import { ServiceButton } from "@/components/ServiceButton";
+import { ServiceSelector } from "@/components/ServiceSelector";
 import { useShopApi } from "@/hooks/useShopApi";
-import { type Customer } from "@/lib/api";
+import { useServiceMenu } from "@/hooks/useServiceMenu";
+import { type Customer, type ShopService } from "@/lib/api";
 
 function formatDate(d: Date): string {
   const y = d.getFullYear();
@@ -21,15 +22,6 @@ function currentTimeRounded(): string {
   return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 }
 
-const SERVICE_TYPES = [
-  { label: "커트", icon: "✂️" },
-  { label: "염색", icon: "🎨" },
-  { label: "펌", icon: "🌀" },
-  { label: "클리닉", icon: "💆" },
-  { label: "네일", icon: "💅" },
-  { label: "기타", icon: "✨" },
-];
-
 const TIME_OPTIONS: string[] = [];
 for (let h = 9; h <= 21; h++) {
   for (let m = 0; m < 60; m += 30) {
@@ -42,6 +34,7 @@ for (let h = 9; h <= 21; h++) {
 export default function ReservationPage() {
   const router = useRouter();
   const { api } = useShopApi();
+  const { categories } = useServiceMenu();
 
   // Form state
   const [phone, setPhone] = useState("");
@@ -382,21 +375,16 @@ export default function ReservationPage() {
           <label className="block text-sm font-medium text-foreground mb-1.5">
             시술 종류 <span className="text-xs text-subtle">(선택)</span>
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {SERVICE_TYPES.map((s) => (
-              <ServiceButton
-                key={s.label}
-                label={s.label}
-                icon={s.icon}
-                selected={serviceType === s.label}
-                onClick={() =>
-                  setServiceType((prev) =>
-                    prev === s.label ? null : s.label
-                  )
-                }
-              />
-            ))}
-          </div>
+          <ServiceSelector
+            categories={categories}
+            onSelect={(categoryName: string, service?: ShopService) => {
+              setServiceType(categoryName);
+              if (service?.estimated_duration_minutes) {
+                setDuration(service.estimated_duration_minutes);
+              }
+            }}
+            selectedCategory={serviceType ?? undefined}
+          />
         </div>
 
         {/* Notes */}

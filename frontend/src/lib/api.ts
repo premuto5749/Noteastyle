@@ -133,6 +133,32 @@ export interface Reservation {
   treatment?: { id: string } | null;
 }
 
+// Shop Services
+export interface ShopService {
+  id: string;
+  category_id: string;
+  shop_id: string;
+  name: string;
+  estimated_duration_minutes: number | null;
+  price: number | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceCategory {
+  id: string;
+  shop_id: string;
+  name: string;
+  icon: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  services: ShopService[];
+}
+
 // Shop Members
 export interface ShopMember {
   id: string;
@@ -434,6 +460,45 @@ export function createShopApi(shopId: string) {
     // Members
     getMembers() {
       return request<ShopMember[]>(`/shops/${shopId}/members`);
+    },
+
+    // Service Categories & Services
+    getServiceCategories() {
+      return request<ServiceCategory[]>(`/shops/${shopId}/services/categories`);
+    },
+    createServiceCategory(data: { name: string; icon?: string; sort_order?: number }) {
+      return request<ServiceCategory>(`/shops/${shopId}/services/categories`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    updateServiceCategory(categoryId: string, data: Partial<{ name: string; icon: string; sort_order: number }>) {
+      return request<ServiceCategory>(`/shops/${shopId}/services/categories/${categoryId}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    deleteServiceCategory(categoryId: string) {
+      return request<{ status: string }>(`/shops/${shopId}/services/categories/${categoryId}`, {
+        method: "DELETE",
+      });
+    },
+    createService(data: { category_id: string; name: string; estimated_duration_minutes?: number; price?: number; sort_order?: number }) {
+      return request<ShopService>(`/shops/${shopId}/services`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    updateService(serviceId: string, data: Partial<{ name: string; estimated_duration_minutes: number | null; price: number | null; sort_order: number }>) {
+      return request<ShopService>(`/shops/${shopId}/services/${serviceId}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    deleteService(serviceId: string) {
+      return request<{ status: string }>(`/shops/${shopId}/services/${serviceId}`, {
+        method: "DELETE",
+      });
     },
   };
 }
