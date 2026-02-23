@@ -41,7 +41,7 @@ for (let h = 9; h <= 21; h++) {
 
 export default function ReservationPage() {
   const router = useRouter();
-  const api = useShopApi();
+  const { api } = useShopApi();
 
   // Form state
   const [phone, setPhone] = useState("");

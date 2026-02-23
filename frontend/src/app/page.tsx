@@ -24,7 +24,7 @@ function formatHeaderDate(dateStr: string): string {
 
 export default function HomePage() {
   const router = useRouter();
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const { currentShop } = useShop();
   const [selectedDate, setSelectedDate] = useState(() => formatDate(new Date()));
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -47,8 +47,9 @@ export default function HomePage() {
   }, [api]);
 
   useEffect(() => {
+    if (!isReady) return;
     loadReservations(selectedDate);
-  }, [selectedDate, loadReservations]);
+  }, [selectedDate, loadReservations, isReady]);
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));

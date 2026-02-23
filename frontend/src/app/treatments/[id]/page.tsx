@@ -39,7 +39,7 @@ const PHOTO_TYPE_ORDER: Record<string, number> = {
 export default function TreatmentDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const id = params.id as string;
 
   const [treatment, setTreatment] = useState<Treatment | null>(null);
@@ -64,8 +64,9 @@ export default function TreatmentDetailPage() {
   }, [id, router, api]);
 
   useEffect(() => {
+    if (!isReady) return;
     loadData();
-  }, [loadData]);
+  }, [loadData, isReady]);
 
   const sortedPhotos = treatment?.photos
     ? [...treatment.photos]

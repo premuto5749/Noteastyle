@@ -40,7 +40,7 @@ function toDateString(date: Date): string {
 
 export default function TasksPage() {
   const router = useRouter();
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const [mounted, setMounted] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [treatments, setTreatments] = useState<Treatment[]>([]);
@@ -63,8 +63,9 @@ export default function TasksPage() {
   }, [api, dateString]);
 
   useEffect(() => {
+    if (!isReady) return;
     loadData();
-  }, [loadData]);
+  }, [loadData, isReady]);
 
   function shiftDate(days: number) {
     setCurrentDate((prev) => {

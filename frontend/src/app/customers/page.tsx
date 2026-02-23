@@ -6,7 +6,7 @@ import { type Customer } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
 
 export default function CustomersPage() {
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -31,8 +31,9 @@ export default function CustomersPage() {
   }, [api]);
 
   useEffect(() => {
+    if (!isReady) return;
     loadCustomers();
-  }, [loadCustomers]);
+  }, [loadCustomers, isReady]);
 
   async function handleSearch() {
     await loadCustomers(search || undefined);
