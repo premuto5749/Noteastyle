@@ -32,7 +32,7 @@ interface Invitation {
 export default function ShopSettingsPage() {
   const router = useRouter();
   const { currentShop, refreshShops } = useShop();
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
 
   // Shop info editing
   const [shopName, setShopName] = useState("");
@@ -102,12 +102,14 @@ export default function ShopSettingsPage() {
   }, [shopId, isOwnerOrAdmin]);
 
   useEffect(() => {
+    if (!isReady) return;
     fetchMembers();
-  }, [fetchMembers]);
+  }, [fetchMembers, isReady]);
 
   useEffect(() => {
+    if (!isReady) return;
     fetchInvitations();
-  }, [fetchInvitations]);
+  }, [fetchInvitations, isReady]);
 
   // Save shop name
   const handleSaveName = async () => {

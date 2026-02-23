@@ -17,7 +17,7 @@ export default function CapturePage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const api = useShopApi();
+  const { api } = useShopApi();
   const treatmentId = params.id as string;
 
   const initialType = searchParams.get("type") || "after";

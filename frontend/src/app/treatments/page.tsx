@@ -17,7 +17,7 @@ const SERVICE_LABELS: Record<string, string> = {
 type SortOrder = "newest" | "oldest";
 
 export default function TreatmentsPage() {
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -26,6 +26,7 @@ export default function TreatmentsPage() {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   useEffect(() => {
+    if (!isReady) return;
     async function load() {
       try {
         const data = await api.getTreatments();
@@ -37,7 +38,7 @@ export default function TreatmentsPage() {
       }
     }
     load();
-  }, [api]);
+  }, [api, isReady]);
 
   const toggleFilter = (serviceType: string) => {
     setActiveFilters((prev) =>

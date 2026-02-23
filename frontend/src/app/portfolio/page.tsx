@@ -7,7 +7,7 @@ import { useShopApi } from "@/hooks/useShopApi";
 import { ShareButton } from "@/components/ShareButton";
 
 export default function PortfolioPage() {
-  const api = useShopApi();
+  const { api, isReady } = useShopApi();
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPublished, setShowPublished] = useState(false);
@@ -25,8 +25,9 @@ export default function PortfolioPage() {
   }, [api, showPublished]);
 
   useEffect(() => {
+    if (!isReady) return;
     loadPortfolio();
-  }, [loadPortfolio]);
+  }, [loadPortfolio, isReady]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm("이 포트폴리오 항목을 삭제하시겠습니까?")) return;

@@ -22,7 +22,7 @@ interface FaceSwapFlowProps {
 }
 
 export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps) {
-  const api = useShopApi();
+  const { api } = useShopApi();
   const [step, setStep] = useState<Step>("select-photo");
   const [selectedPhoto, setSelectedPhoto] = useState<TreatmentPhoto | null>(null);
   const [models, setModels] = useState<FaceModel[]>([]);

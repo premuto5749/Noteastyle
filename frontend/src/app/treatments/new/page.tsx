@@ -19,7 +19,7 @@ const SERVICES = [
 
 export default function NewTreatmentPage() {
   const router = useRouter();
-  const api = useShopApi();
+  const { api } = useShopApi();
   const [customerName, setCustomerName] = useState("");
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [productBrand, setProductBrand] = useState("");

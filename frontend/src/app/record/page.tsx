@@ -28,7 +28,7 @@ const POPULAR_PRODUCTS = [
 ];
 
 export default function QuickRecordPage() {
-  const api = useShopApi();
+  const { api } = useShopApi();
   const [step, setStep] = useState<"customer" | "service" | "product" | "done">("customer");
   const [customerName, setCustomerName] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
