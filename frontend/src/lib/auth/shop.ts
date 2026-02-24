@@ -145,6 +145,16 @@ export function withShopAuth<P extends RouteParams = { shopId: string }>(
 
     if ("error" in result) return result.error;
 
-    return handler(req, resolvedParams, result.member);
+    try {
+      return await handler(req, resolvedParams, result.member);
+    } catch (err) {
+      const message =
+        err instanceof SyntaxError
+          ? "잘못된 요청 형식입니다."
+          : "서버 오류가 발생했습니다.";
+      const status = err instanceof SyntaxError ? 400 : 500;
+      console.error(`[withShopAuth] ${req.method} ${req.nextUrl.pathname}:`, err);
+      return NextResponse.json({ error: message }, { status });
+    }
   };
 }
