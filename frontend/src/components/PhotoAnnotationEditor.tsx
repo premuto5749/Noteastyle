@@ -83,14 +83,25 @@ export function PhotoAnnotationEditor({
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      await onSave(annotations);
+      // Auto-confirm pending pin if it has text
+      let finalAnnotations = annotations;
+      if (pendingPin && pendingText.trim()) {
+        const newAnnotation: PhotoAnnotation = {
+          id: crypto.randomUUID(),
+          x: pendingPin.x,
+          y: pendingPin.y,
+          text: pendingText.trim().slice(0, MAX_TEXT_LENGTH),
+        };
+        finalAnnotations = [...annotations, newAnnotation];
+      }
+      await onSave(finalAnnotations);
       onClose();
     } catch {
       alert("저장에 실패했습니다.");
     } finally {
       setSaving(false);
     }
-  }, [annotations, onSave, onClose]);
+  }, [annotations, pendingPin, pendingText, onSave, onClose]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
