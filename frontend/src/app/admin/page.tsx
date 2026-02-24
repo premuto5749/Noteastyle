@@ -124,6 +124,44 @@ export default function AdminPage() {
       <PageHeader title="관리자 설정" />
 
       <div className="px-4 pb-24">
+        {/* 관리 메뉴 */}
+        <section className="mb-6">
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            관리 메뉴
+          </h3>
+          <div className="space-y-2">
+            <a
+              href="/admin/site-settings"
+              className="flex items-center justify-between p-4 bg-card border border-border rounded-xl hover:border-accent/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🎨</span>
+                <div>
+                  <div className="text-sm font-medium text-foreground">
+                    사이트 설정 관리
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    로고, 파비콘, 테마 색상, SEO 설정
+                  </div>
+                </div>
+              </div>
+              <svg
+                className="w-5 h-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </a>
+          </div>
+        </section>
+
         {error && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
             {error}
