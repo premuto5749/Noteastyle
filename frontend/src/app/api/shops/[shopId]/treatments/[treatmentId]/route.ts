@@ -32,6 +32,7 @@ export const PUT = withShopAuth<{ shopId: string; treatmentId: string }>(
     if (body.price !== undefined) updateData.price = body.price;
     if (body.satisfaction !== undefined) updateData.satisfaction = body.satisfaction;
     if (body.customer_notes !== undefined) updateData.customer_notes = body.customer_notes;
+    if (body.ai_summary !== undefined) updateData.ai_summary = body.ai_summary;
     if (body.next_visit_recommendation !== undefined) updateData.next_visit_recommendation = body.next_visit_recommendation;
 
     const { data, error } = await supabase

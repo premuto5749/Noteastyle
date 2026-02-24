@@ -265,6 +265,7 @@ export function createShopApi(shopId: string) {
       price: number;
       satisfaction: string;
       customer_notes: string;
+      ai_summary: string;
       next_visit_recommendation: string;
     }>) {
       return request<Treatment>(`/shops/${shopId}/treatments/${id}`, {
