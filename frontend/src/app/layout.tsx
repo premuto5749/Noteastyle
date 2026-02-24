@@ -6,17 +6,36 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeColorMeta } from "@/components/ThemeColorMeta";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
+import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
+import { getSiteSettings } from "@/lib/site-settings.server";
 
-export const metadata: Metadata = {
-  title: "Note-a-Style",
-  description: "뷰티샵 시술 기록 & 포트폴리오 플랫폼",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Note-a-Style",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return {
+    title: settings.siteName,
+    description: settings.siteDescription,
+    manifest: "/manifest.webmanifest",
+    ...(settings.faviconUrl && {
+      icons: { icon: settings.faviconUrl },
+    }),
+    ...(settings.ogImageUrl && {
+      openGraph: {
+        title: settings.siteName,
+        description: settings.siteDescription,
+        images: [{ url: settings.ogImageUrl, width: 1200, height: 630 }],
+      },
+    }),
+    ...(settings.keywords.length > 0 && {
+      keywords: settings.keywords,
+    }),
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: settings.siteName,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -25,27 +44,31 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={settings.language} suppressHydrationWarning>
       <head>
         <ThemeColorMeta />
       </head>
       <body className="antialiased bg-background text-foreground pb-20">
-        <ThemeProvider>
-          <AuthProvider>
-            <ShopProvider>
-              <ErrorBoundary>
-                <main className="min-h-screen">{children}</main>
-              </ErrorBoundary>
-              <BottomNav />
-            </ShopProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <SiteSettingsProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <ShopProvider>
+                <ErrorBoundary>
+                  <main className="min-h-screen">{children}</main>
+                </ErrorBoundary>
+                <BottomNav />
+              </ShopProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </SiteSettingsProvider>
       </body>
     </html>
   );
