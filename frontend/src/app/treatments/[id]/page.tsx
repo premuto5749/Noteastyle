@@ -15,6 +15,7 @@ import { StyleNoteOverlay } from "@/components/StyleNoteOverlay";
 import { AnnotationOverlay } from "@/components/AnnotationOverlay";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
+import { VoiceNote } from "@/components/VoiceNote";
 import { loadVideoMetadata, validateVideoDuration } from "@/lib/video-utils";
 import { useServiceMenu } from "@/hooks/useServiceMenu";
 
@@ -42,6 +43,7 @@ export default function TreatmentDetailPage() {
   const [treatment, setTreatment] = useState<Treatment | null>(null);
   const [loading, setLoading] = useState(true);
   const [showFaceSwap, setShowFaceSwap] = useState(false);
+  const [showVoiceNote, setShowVoiceNote] = useState(false);
   const [annotatingPhoto, setAnnotatingPhoto] = useState<TreatmentPhoto | null>(null);
 
   // Photo upload state
@@ -265,14 +267,32 @@ export default function TreatmentDetailPage() {
           </div>
 
           {/* Notes */}
-          {treatment.customer_notes && (
-            <div>
-              <h3 className="text-sm font-bold text-foreground mb-1">노트</h3>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-bold text-foreground">노트</h3>
+              <button
+                onClick={() => setShowVoiceNote(true)}
+                className="flex items-center gap-1 text-xs text-accent font-medium active:opacity-70"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+                보이스 노트
+              </button>
+            </div>
+            {treatment.customer_notes ? (
               <p className="text-sm text-muted-foreground bg-surface rounded-xl p-3">
                 {treatment.customer_notes}
               </p>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-subtle bg-surface rounded-xl p-3">
+                메모가 없습니다. 보이스 노트로 추가해보세요.
+              </p>
+            )}
+          </div>
 
           {/* AI Summary */}
           {treatment.ai_summary && (
@@ -487,6 +507,18 @@ export default function TreatmentDetailPage() {
           photo={annotatingPhoto}
           onSave={(annotations) => handleSaveAnnotations(annotatingPhoto, annotations)}
           onClose={() => setAnnotatingPhoto(null)}
+        />
+      )}
+
+      {/* VoiceNote Modal */}
+      {showVoiceNote && (
+        <VoiceNote
+          treatmentId={id}
+          onComplete={() => {
+            setShowVoiceNote(false);
+            loadData();
+          }}
+          onClose={() => setShowVoiceNote(false)}
         />
       )}
     </div>
