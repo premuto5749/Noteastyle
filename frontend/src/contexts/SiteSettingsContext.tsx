@@ -48,6 +48,9 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (settings.accentColor && settings.accentColor !== DEFAULT_SETTINGS.accentColor) {
       document.documentElement.style.setProperty("--accent", settings.accentColor);
+    } else {
+      // 기본값으로 되돌릴 때 인라인 스타일 제거 → 스타일시트 규칙이 적용됨
+      document.documentElement.style.removeProperty("--accent");
     }
   }, [settings.accentColor]);
 
