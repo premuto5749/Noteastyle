@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/admin";
-import { isAdminByEnv } from "@/lib/auth/admin";
+import { isAdminByEnvId } from "@/lib/auth/admin";
 import { createServiceClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -30,7 +30,7 @@ export async function GET() {
 
   const userList = (users || []).map((u) => {
     const dbRole = roleMap.get(u.id);
-    const envAdmin = isAdminByEnv(u.id);
+    const envAdmin = isAdminByEnvId(u.id);
 
     let roleType: string | null = null;
     if (dbRole === "super_admin") roleType = "super_admin";
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
   }
 
   // 환경변수 관리자는 해제 불가
-  if (action === "revoke" && isAdminByEnv(user_id)) {
+  if (action === "revoke" && isAdminByEnvId(user_id)) {
     return NextResponse.json(
       { error: "환경변수로 지정된 관리자는 해제할 수 없습니다." },
       { status: 400 }
