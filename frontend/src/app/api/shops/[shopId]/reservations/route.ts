@@ -8,18 +8,32 @@ export const GET = withShopAuth(async (req, params, _member) => {
   const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
   const status = searchParams.get("status");
+  const skip = parseInt(searchParams.get("skip") ?? "0", 10) || 0;
+  const limit = parseInt(searchParams.get("limit") ?? "0", 10) || 0;
 
   let query = supabase
     .from("reservations")
     .select(
       "*, customer:customers(name, phone), member:shop_members(display_name), treatment:treatments(id)"
     )
-    .eq("shop_id", shopId)
-    .order("scheduled_time", { ascending: true });
+    .eq("shop_id", shopId);
 
   if (date) {
-    query = query.eq("scheduled_date", date);
+    // 특정 날짜 조회: 기존 동작 유지 (시간 오름차순, 페이지네이션 없음)
+    query = query
+      .eq("scheduled_date", date)
+      .order("scheduled_time", { ascending: true });
+  } else {
+    // 전체 조회: 날짜 내림차순 → 시간 오름차순 + 페이지네이션
+    query = query
+      .order("scheduled_date", { ascending: false })
+      .order("scheduled_time", { ascending: true });
+
+    if (limit > 0) {
+      query = query.range(skip, skip + limit - 1);
+    }
   }
+
   if (status) {
     query = query.eq("status", status);
   }
