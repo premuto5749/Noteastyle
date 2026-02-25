@@ -454,6 +454,11 @@ export function createShopApi(shopId: string) {
         `/shops/${shopId}/reservations${qs ? `?${qs}` : ""}`
       );
     },
+    getReservationCounts(month: string) {
+      return request<Record<string, number>>(
+        `/shops/${shopId}/reservations/counts?month=${encodeURIComponent(month)}`
+      );
+    },
     getReservation(id: string) {
       return request<Reservation>(`/shops/${shopId}/reservations/${id}`);
     },

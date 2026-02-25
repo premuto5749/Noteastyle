@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DayCalendarStrip } from "@/components/DayCalendarStrip";
+import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import { ReservationList } from "@/components/ReservationList";
 import { VoiceNote } from "@/components/VoiceNote";
 import { useShopApi } from "@/hooks/useShopApi";
@@ -31,6 +32,15 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true);
   const [voiceNoteReservation, setVoiceNoteReservation] = useState<Reservation | null>(null);
 
+  // Monthly calendar state
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [monthCounts, setMonthCounts] = useState<Record<string, number>>({});
+  const fetchingMonth = useRef<string>("");
+
   const isToday = selectedDate === formatDate(new Date());
 
   const loadReservations = useCallback(async (date: string) => {
@@ -50,6 +60,32 @@ export default function TasksPage() {
     if (!isReady) return;
     loadReservations(selectedDate);
   }, [selectedDate, loadReservations, isReady]);
+
+  // Fetch monthly counts when calendar month changes
+  const loadMonthCounts = useCallback(async (month: string) => {
+    if (fetchingMonth.current === month) return;
+    fetchingMonth.current = month;
+    try {
+      const data = await api.getReservationCounts(month);
+      setMonthCounts(data);
+    } catch {
+      setMonthCounts({});
+    }
+  }, [api]);
+
+  useEffect(() => {
+    if (!isReady || !calendarOpen) return;
+    loadMonthCounts(calendarMonth);
+  }, [calendarMonth, calendarOpen, loadMonthCounts, isReady]);
+
+  const handleCalendarOpen = useCallback(() => {
+    // Set month to match currently selected date
+    const d = new Date(selectedDate + "T00:00:00");
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    setCalendarMonth(month);
+    fetchingMonth.current = ""; // force re-fetch
+    setCalendarOpen(true);
+  }, [selectedDate]);
 
   const handleToggle = (id: string) => {
     setExpandedId((prev) => (prev === id ? null : id));
@@ -112,6 +148,7 @@ export default function TasksPage() {
         <DayCalendarStrip
           selectedDate={selectedDate}
           onDateSelect={setSelectedDate}
+          onCalendarOpen={handleCalendarOpen}
         />
       </div>
 
@@ -149,6 +186,17 @@ export default function TasksPage() {
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
       </Link>
+
+      {/* Monthly Calendar */}
+      <MonthlyCalendar
+        isOpen={calendarOpen}
+        onClose={() => setCalendarOpen(false)}
+        selectedDate={selectedDate}
+        onDateSelect={setSelectedDate}
+        currentMonth={calendarMonth}
+        onMonthChange={setCalendarMonth}
+        counts={monthCounts}
+      />
 
       {/* VoiceNote Modal */}
       {voiceNoteReservation && (

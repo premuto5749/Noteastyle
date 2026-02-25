@@ -6,6 +6,7 @@ interface DayCalendarStripProps {
   selectedDate: string; // YYYY-MM-DD
   onDateSelect: (date: string) => void;
   reservationCounts?: Record<string, number>;
+  onCalendarOpen?: () => void;
 }
 
 function formatDate(d: Date): string {
@@ -21,6 +22,7 @@ export function DayCalendarStrip({
   selectedDate,
   onDateSelect,
   reservationCounts,
+  onCalendarOpen,
 }: DayCalendarStripProps) {
   const today = formatDate(new Date());
 
@@ -140,6 +142,30 @@ export function DayCalendarStrip({
             <polyline points="9 18 15 12 9 6" />
           </svg>
         </button>
+
+        {onCalendarOpen && (
+          <button
+            onClick={onCalendarOpen}
+            className="p-1.5 ml-0.5 text-subtle hover:text-muted-foreground shrink-0"
+            aria-label="월간 캘린더"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
