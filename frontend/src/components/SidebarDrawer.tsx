@@ -21,6 +21,11 @@ export function SidebarDrawer() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
+  const showAdminMenu =
+    isAdmin ||
+    currentShop?.role === "owner" ||
+    currentShop?.role === "admin";
+
   // Close on route change
   useEffect(() => {
     close();
@@ -140,7 +145,7 @@ export function SidebarDrawer() {
                   ))}
                 </div>
               </div>
-              {isAdmin && <MenuItem href="/admin" label="관리자 설정" />}
+              {showAdminMenu && <MenuItem href="/admin" label="관리자 설정" />}
             </MenuSection>
           </nav>
 
