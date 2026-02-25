@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { withShopAuth } from "@/lib/auth/shop";
 
-export const POST = withShopAuth(async (req, params, _member) => {
+export const POST = withShopAuth(async (req, params, member) => {
   const supabase = createServiceClient();
   const body = await req.json();
   const shopId = params.shopId;
@@ -30,6 +30,7 @@ export const POST = withShopAuth(async (req, params, _member) => {
     .insert({
       shop_id: shopId,
       photo_id: body.photo_id,
+      member_id: member.id,
       title: body.title ?? null,
       description: body.description ?? null,
       tags: body.tags ?? null,

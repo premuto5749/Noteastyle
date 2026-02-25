@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { getExplorePortfolio, type ExplorePortfolioItem } from "@/lib/api";
+import { DesignerBadge } from "@/components/DesignerBadge";
 
 const SHOP_TYPE_FILTERS = [
   { value: "", label: "전체" },
@@ -179,6 +180,9 @@ export default function ExplorePage() {
                           </span>
                         ))}
                       </div>
+                    )}
+                    {item.designer?.is_public && (
+                      <DesignerBadge designer={item.designer} />
                     )}
                   </div>
                 </div>
