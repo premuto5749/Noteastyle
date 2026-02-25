@@ -4,6 +4,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
 
+  // Propagate external abort signal to our controller
+  if (options?.signal) {
+    if (options.signal.aborted) {
+      controller.abort();
+    } else {
+      options.signal.addEventListener("abort", () => controller.abort(), { once: true });
+    }
+  }
+
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: { "Content-Type": "application/json", ...options?.headers },
@@ -251,12 +260,13 @@ export interface DesignerBadge {
 export function createShopApi(shopId: string) {
   return {
     // Customers
-    getCustomers(search?: string, phone?: string) {
+    getCustomers(search?: string, phone?: string, opts?: { limit?: number; signal?: AbortSignal }) {
       const p = new URLSearchParams();
       if (search) p.set("search", search);
       if (phone) p.set("phone", phone);
+      if (opts?.limit) p.set("limit", String(opts.limit));
       const qs = p.toString();
-      return request<Customer[]>(`/shops/${shopId}/customers${qs ? `?${qs}` : ""}`);
+      return request<Customer[]>(`/shops/${shopId}/customers${qs ? `?${qs}` : ""}`, opts?.signal ? { signal: opts.signal } : undefined);
     },
     getCustomer(id: string) {
       return request<Customer>(`/shops/${shopId}/customers/${id}`);
