@@ -30,14 +30,13 @@ export const GET = withShopAuth(async (req, params, _member) => {
   const search = searchParams.get("search");
   const phone = searchParams.get("phone");
   const skip = parseInt(searchParams.get("skip") || "0");
-  const limit = parseInt(searchParams.get("limit") || "50");
+  const isSearch = !!(search || phone);
+  const limit = parseInt(searchParams.get("limit") || (isSearch ? "10" : "50"));
 
   let query = supabase
     .from("customers")
     .select("id, name, phone, visit_count, last_visit")
-    .eq("shop_id", params.shopId)
-    .order("last_visit", { ascending: false, nullsFirst: false })
-    .range(skip, skip + limit - 1);
+    .eq("shop_id", params.shopId);
 
   if (search) {
     query = query.ilike("name", `%${search}%`);
@@ -45,6 +44,10 @@ export const GET = withShopAuth(async (req, params, _member) => {
   if (phone) {
     query = query.ilike("phone", `%${phone}%`);
   }
+
+  query = query
+    .order("last_visit", { ascending: false, nullsFirst: false })
+    .range(skip, skip + limit - 1);
 
   const { data, error } = await query;
 

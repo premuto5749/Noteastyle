@@ -65,8 +65,10 @@ function ReservationForm() {
   const [notes, setNotes] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const phoneDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const nameDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const searchAbortRef = useRef<AbortController | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Load prefilled customer from query params
@@ -88,6 +90,9 @@ function ReservationForm() {
 
   // Unified search function
   const searchCustomers = useCallback(async (field: "phone" | "name", value: string) => {
+    // Cancel any in-flight search request
+    searchAbortRef.current?.abort();
+
     if (field === "phone") {
       const digits = value.replace(/\D/g, "");
       if (digits.length < 4) {
@@ -95,11 +100,16 @@ function ReservationForm() {
         setMatchedCustomer(null);
         setIsNewCustomer(false);
         setShowResults(false);
+        setSearchLoading(false);
         return;
       }
 
+      const abortController = new AbortController();
+      searchAbortRef.current = abortController;
+      setSearchLoading(true);
+
       try {
-        const results = await api.getCustomers(undefined, digits);
+        const results = await api.getCustomers(undefined, digits, { limit: 10, signal: abortController.signal });
         setSearchResults(results);
         setShowResults(true);
 
@@ -116,30 +126,41 @@ function ReservationForm() {
           setMatchedCustomer(null);
           setIsNewCustomer(false);
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof Error && err.message.includes("abort")) return;
         setSearchResults([]);
         setMatchedCustomer(null);
         setIsNewCustomer(true);
         setShowResults(false);
+      } finally {
+        setSearchLoading(false);
       }
     } else {
       // Name search: 2+ characters
       if (value.trim().length < 2) {
         setSearchResults([]);
         setShowResults(false);
+        setSearchLoading(false);
         return;
       }
 
+      const abortController = new AbortController();
+      searchAbortRef.current = abortController;
+      setSearchLoading(true);
+
       try {
-        const results = await api.getCustomers(value.trim());
+        const results = await api.getCustomers(value.trim(), undefined, { limit: 10, signal: abortController.signal });
         setSearchResults(results);
         setShowResults(results.length > 0);
         if (results.length === 0) {
           setIsNewCustomer(true);
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof Error && err.message.includes("abort")) return;
         setSearchResults([]);
         setShowResults(false);
+      } finally {
+        setSearchLoading(false);
       }
     }
   }, [api]);
@@ -289,8 +310,16 @@ function ReservationForm() {
             </div>
           </div>
 
+          {/* Search loading indicator */}
+          {searchLoading && (
+            <div className="mt-1 px-4 py-2 text-sm text-muted-foreground flex items-center gap-2">
+              <span className="inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              검색 중...
+            </div>
+          )}
+
           {/* Search results dropdown (shared below both fields) */}
-          {showResults && searchResults.length > 0 && (
+          {!searchLoading && showResults && searchResults.length > 0 && (
             <div className="mt-1 border border-border rounded-xl bg-card shadow-sm overflow-hidden">
               {searchResults.map((c) => (
                 <button
