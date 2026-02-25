@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { PageHeader } from "@/components/PageHeader";
+import Link from "next/link";
 import { type Customer } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
 
@@ -89,20 +89,20 @@ export default function CustomersPage() {
 
   return (
     <div>
-      <PageHeader
-        title="고객 관리"
-        subtitle={`${customers.length}명의 고객`}
-        action={
-          <button
-            onClick={() => setShowAdd(true)}
-            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
-          >
-            + 추가
-          </button>
-        }
-      />
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-bold text-foreground">고객 관리</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">{customers.length}명의 고객</p>
+        </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+        >
+          + 추가
+        </button>
+      </div>
 
-      <div className="p-4 space-y-4">
+      <div className="px-4 pb-4 space-y-4">
         {/* Search */}
         <div className="flex gap-2">
           <input
@@ -192,6 +192,12 @@ export default function CustomersPage() {
                       )}
                     </div>
                     <div className="flex gap-1">
+                      <Link
+                        href={`/reservation?customerId=${c.id}&name=${encodeURIComponent(c.name)}&phone=${encodeURIComponent(c.phone || "")}`}
+                        className="px-2 py-1 text-xs text-accent bg-accent/10 rounded-md"
+                      >
+                        예약
+                      </Link>
                       <button
                         onClick={() => startEdit(c)}
                         className="px-2 py-1 text-xs text-muted-foreground bg-muted rounded-md"

@@ -6,7 +6,7 @@ import { useShop } from "@/contexts/ShopContext";
 
 const NAV_ITEMS = [
   { href: "/customers", label: "고객", icon: CustomerIcon },
-  { href: "/reservation", label: "예약등록", icon: CalendarPlusIcon },
+  { href: "/explore", label: "탐색", icon: ExploreIcon },
   { href: "/", label: "홈", icon: HomeLogoIcon, isCenter: true },
   { href: "/tasks", label: "작업", icon: TaskIcon },
   { href: "/portfolio", label: "포트폴리오", icon: PortfolioIcon },
@@ -74,7 +74,7 @@ function HomeLogoIcon({ active }: { active: boolean }) {
   );
 }
 
-function CalendarPlusIcon({ active }: { active: boolean }) {
+function ExploreIcon({ active }: { active: boolean }) {
   return (
     <svg
       width="24"
@@ -86,12 +86,8 @@ function CalendarPlusIcon({ active }: { active: boolean }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-      <line x1="12" y1="14" x2="12" y2="20" />
-      <line x1="9" y1="17" x2="15" y2="17" />
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
     </svg>
   );
 }

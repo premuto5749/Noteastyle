@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { PageHeader } from "@/components/PageHeader";
 import { type PortfolioItem } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
 import { ShareButton } from "@/components/ShareButton";
@@ -57,12 +56,12 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <PageHeader
-        title="포트폴리오"
-        subtitle="AI 페이스 스왑 포트폴리오"
-      />
+      <div className="px-4 pt-4 pb-2">
+        <h2 className="text-base font-bold text-foreground">내 포트폴리오</h2>
+        <p className="text-xs text-muted-foreground mt-0.5">AI 페이스 스왑 포트폴리오</p>
+      </div>
 
-      <div className="p-4 space-y-4">
+      <div className="px-4 pb-4 space-y-4">
         {/* Filter */}
         <div className="flex gap-2">
           <button

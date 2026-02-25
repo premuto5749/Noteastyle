@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { ServiceSelector } from "@/components/ServiceSelector";
 import { useShopApi } from "@/hooks/useShopApi";
@@ -32,13 +32,27 @@ for (let h = 9; h <= 21; h++) {
 }
 
 export default function ReservationPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-center text-subtle">불러오는 중...</div>}>
+      <ReservationForm />
+    </Suspense>
+  );
+}
+
+function ReservationForm() {
   const router = useRouter();
+  const searchParamsHook = useSearchParams();
   const { api } = useShopApi();
   const { categories } = useServiceMenu();
 
+  // Query param prefill
+  const prefillCustomerId = searchParamsHook.get("customerId");
+  const prefillName = searchParamsHook.get("name");
+  const prefillPhone = searchParamsHook.get("phone");
+
   // Form state
-  const [phone, setPhone] = useState("");
-  const [customerName, setCustomerName] = useState("");
+  const [phone, setPhone] = useState(prefillPhone || "");
+  const [customerName, setCustomerName] = useState(prefillName || "");
   const [matchedCustomer, setMatchedCustomer] = useState<Customer | null>(null);
   const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [searchResults, setSearchResults] = useState<Customer[]>([]);
@@ -54,6 +68,23 @@ export default function ReservationPage() {
   const phoneDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const nameDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load prefilled customer from query params
+  useEffect(() => {
+    if (!prefillCustomerId || !prefillName) return;
+    setMatchedCustomer({
+      id: prefillCustomerId,
+      shop_id: "",
+      name: prefillName,
+      phone: prefillPhone,
+      gender: null,
+      birth_date: null,
+      notes: null,
+      visit_count: 0,
+      last_visit: null,
+      created_at: "",
+    });
+  }, [prefillCustomerId, prefillName, prefillPhone]);
 
   // Unified search function
   const searchCustomers = useCallback(async (field: "phone" | "name", value: string) => {
