@@ -391,10 +391,12 @@ export function createShopApi(shopId: string) {
     },
 
     // Reservations
-    getReservations(date?: string, status?: string) {
+    getReservations(date?: string, status?: string, skip?: number, limit?: number) {
       const p = new URLSearchParams();
       if (date) p.set("date", date);
       if (status) p.set("status", status);
+      if (skip != null && skip > 0) p.set("skip", String(skip));
+      if (limit != null && limit > 0) p.set("limit", String(limit));
       const qs = p.toString();
       return request<Reservation[]>(
         `/shops/${shopId}/reservations${qs ? `?${qs}` : ""}`
