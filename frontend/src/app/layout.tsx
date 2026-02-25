@@ -60,7 +60,7 @@ export default async function RootLayout({
         <ThemeColorMeta />
       </head>
       <body className="antialiased bg-background text-foreground pb-20">
-        <SiteSettingsProvider>
+        <SiteSettingsProvider initialSettings={settings}>
           <ThemeProvider>
             <AuthProvider>
               <ShopProvider>

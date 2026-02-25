@@ -246,10 +246,11 @@ export function createShopApi(shopId: string) {
     },
 
     // Treatments
-    getTreatments(customerId?: string, date?: string) {
+    getTreatments(customerId?: string, date?: string, options?: { compact?: boolean }) {
       const searchParams = new URLSearchParams();
       if (customerId) searchParams.set("customer_id", customerId);
       if (date) searchParams.set("date", date);
+      if (options?.compact) searchParams.set("compact", "true");
       const qs = searchParams.toString();
       return request<Treatment[]>(`/shops/${shopId}/treatments${qs ? `?${qs}` : ""}`);
     },

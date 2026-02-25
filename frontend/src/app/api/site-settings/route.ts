@@ -8,7 +8,9 @@ import { getSiteSettings } from "@/lib/site-settings.server";
 export async function GET() {
   try {
     const settings = await getSiteSettings();
-    return NextResponse.json(settings);
+    return NextResponse.json(settings, {
+      headers: { "Cache-Control": "public, max-age=300, s-maxage=600" },
+    });
   } catch {
     // 에러 시에도 기본값 반환
     const { DEFAULT_SETTINGS } = await import("@/lib/site-settings");

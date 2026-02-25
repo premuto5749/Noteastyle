@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
+import Image from "next/image";
 import type { TreatmentPhoto } from "@/lib/api";
 
 interface PhotoCarouselProps {
@@ -40,7 +41,7 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
         className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide"
         style={{ scrollBehavior: "smooth" }}
       >
-        {photos.map((photo) => (
+        {photos.map((photo, index) => (
           <div
             key={photo.id}
             className="w-full shrink-0 snap-center aspect-[4/3] relative bg-muted"
@@ -54,11 +55,13 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
+              <Image
                 src={photo.face_swapped_url || photo.photo_url}
                 alt={photo.photo_type}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority={index === 0}
               />
             )}
 

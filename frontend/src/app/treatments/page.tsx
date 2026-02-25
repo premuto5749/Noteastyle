@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useShopApi } from "@/hooks/useShopApi";
 import { useServiceMenu } from "@/hooks/useServiceMenu";
 import { type Treatment } from "@/lib/api";
@@ -22,7 +23,7 @@ export default function TreatmentsPage() {
     if (!isReady) return;
     async function load() {
       try {
-        const data = await api.getTreatments();
+        const data = await api.getTreatments(undefined, undefined, { compact: true });
         setTreatments(data);
       } catch {
         // API not available
@@ -223,11 +224,12 @@ export default function TreatmentsPage() {
                   {/* Photo */}
                   <div className="aspect-square bg-muted relative">
                     {photo ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
+                      <Image
                         src={photo.face_swapped_url || photo.photo_url}
                         alt={getCategoryLabel(t.service_type)}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 480px) 50vw, 240px"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
