@@ -4,8 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useShopApi } from "@/hooks/useShopApi";
-import { VoiceNote } from "@/components/VoiceNote";
+
+const VoiceNote = dynamic(
+  () => import("@/components/VoiceNote").then((m) => ({ default: m.VoiceNote })),
+  { ssr: false }
+);
 import {
   type Reservation,
   type Treatment,
@@ -53,14 +58,19 @@ export default function HomePage() {
     setLoading(true);
     try {
       const today = formatDate(new Date());
-      const allReservations = await api.getReservations(today);
+
+      // 병렬 fetch: reservations + treatments 동시 호출
+      const [allReservations, treatments] = await Promise.all([
+        api.getReservations(today),
+        api.getTreatments(undefined, undefined, { compact: true }),
+      ]);
+
       setTodayCount(allReservations.length);
 
       const active = allReservations.filter((r) => r.status === "in_progress");
       setInProgress(active);
 
       if (active.length === 0) {
-        const treatments = await api.getTreatments();
         setRecentTreatments(treatments.slice(0, 5));
       } else {
         setRecentTreatments([]);

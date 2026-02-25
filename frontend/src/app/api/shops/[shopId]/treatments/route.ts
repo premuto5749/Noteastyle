@@ -57,10 +57,16 @@ export const GET = withShopAuth(async (req, params, member) => {
   const date = searchParams.get("date");
   const skip = parseInt(searchParams.get("skip") || "0");
   const limit = parseInt(searchParams.get("limit") || "50");
+  const compact = searchParams.get("compact") === "true";
+
+  // compact 모드: 목록용 경량 응답 (사진 필드 최소화)
+  const photoSelect = compact
+    ? "photos:treatment_photos(id, photo_url, face_swapped_url, photo_type, media_type)"
+    : "photos:treatment_photos(*)";
 
   let query = supabase
     .from("treatments")
-    .select("*, photos:treatment_photos(*), customer:customers(name)")
+    .select(`*, ${photoSelect}, customer:customers(name)`)
     .eq("shop_id", params.shopId)
     .order("created_at", { ascending: false })
     .range(skip, skip + limit - 1);

@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useCallback,
   type ReactNode,
 } from "react";
 import type { SiteSettings } from "@/lib/site-settings";
@@ -22,11 +23,22 @@ const SiteSettingsContext = createContext<SiteSettingsContextType>({
   refresh: async () => {},
 });
 
-export function SiteSettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
-  const [isLoading, setIsLoading] = useState(true);
+interface SiteSettingsProviderProps {
+  children: ReactNode;
+  initialSettings?: SiteSettings;
+}
 
-  const fetchSettings = async () => {
+export function SiteSettingsProvider({
+  children,
+  initialSettings,
+}: SiteSettingsProviderProps) {
+  const [settings, setSettings] = useState<SiteSettings>(
+    initialSettings ?? DEFAULT_SETTINGS
+  );
+  // initialSettings가 있으면 이미 로딩 완료 상태
+  const [isLoading, setIsLoading] = useState(!initialSettings);
+
+  const fetchSettings = useCallback(async () => {
     try {
       const res = await fetch("/api/site-settings");
       if (res.ok) {
@@ -38,11 +50,14 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchSettings();
   }, []);
+
+  // initialSettings가 없을 때만 클라이언트에서 fetch
+  useEffect(() => {
+    if (!initialSettings) {
+      fetchSettings();
+    }
+  }, [initialSettings, fetchSettings]);
 
   // accent 색상 변경 시 CSS 변수 동적 적용
   useEffect(() => {

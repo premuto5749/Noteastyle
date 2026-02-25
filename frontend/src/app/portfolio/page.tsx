@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import { type PortfolioItem } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
 import { ShareButton } from "@/components/ShareButton";
@@ -115,11 +116,12 @@ export default function PortfolioPage() {
               >
                 <div className="aspect-square bg-muted relative">
                   {item.photo.face_swapped_url ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
+                    <Image
                       src={item.photo.face_swapped_url}
                       alt={item.title || "포트폴리오"}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 480px) 50vw, 240px"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-hint">
