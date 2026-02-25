@@ -5,13 +5,26 @@ import { createClient } from "@/lib/supabase/server";
  * 환경변수 기반 관리자 확인 (즉시 판별, DB 불필요)
  * ADMIN_USER_IDS에 쉼표 구분으로 등록된 UUID 확인
  */
-export function isAdminByEnv(userId: string): boolean {
+export function isAdminByEnvId(userId: string): boolean {
   const adminIds = process.env.ADMIN_USER_IDS || "";
   return adminIds
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean)
     .includes(userId);
+}
+
+/**
+ * 환경변수 기반 관리자 확인 (이메일)
+ * ADMIN_EMAILS에 쉼표 구분으로 등록된 이메일 확인
+ */
+export function isAdminByEnvEmail(email: string): boolean {
+  const adminEmails = process.env.ADMIN_EMAILS || "";
+  return adminEmails
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(email.toLowerCase());
 }
 
 /**
@@ -30,10 +43,11 @@ export async function isAdminByDb(userId: string): Promise<boolean> {
 }
 
 /**
- * 관리자 확인 (환경변수 우선, 없으면 DB 확인)
+ * 관리자 확인 (환경변수 ID → 환경변수 이메일 → DB 순서)
  */
-export async function isAdmin(userId: string): Promise<boolean> {
-  if (isAdminByEnv(userId)) return true;
+export async function isAdmin(userId: string, email?: string): Promise<boolean> {
+  if (isAdminByEnvId(userId)) return true;
+  if (email && isAdminByEnvEmail(email)) return true;
   return isAdminByDb(userId);
 }
 
@@ -51,7 +65,7 @@ export async function checkCurrentUserIsAdmin(): Promise<{
 
   if (!user) return { isAdmin: false, userId: null };
 
-  const adminStatus = await isAdmin(user.id);
+  const adminStatus = await isAdmin(user.id, user.email ?? undefined);
   return { isAdmin: adminStatus, userId: user.id };
 }
 
