@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { type PortfolioItem } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
 import { ShareButton } from "@/components/ShareButton";
@@ -85,6 +86,12 @@ export default function PortfolioPage() {
           >
             공개됨
           </button>
+          <Link
+            href="/profile"
+            className="px-4 py-2 rounded-full text-sm font-medium bg-muted text-muted-foreground ml-auto"
+          >
+            내 프로필
+          </Link>
         </div>
 
         {loading ? (

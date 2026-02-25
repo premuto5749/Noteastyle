@@ -205,6 +205,47 @@ export interface FaceSwapResult {
   created_at: string;
 }
 
+// Member Profile
+export interface CareerEntry {
+  company: string;
+  role: string;
+  start_year: number;
+  end_year: number | null;
+}
+
+export interface CertificationEntry {
+  name: string;
+  issuer: string;
+  year: number;
+}
+
+export interface SnsLinks {
+  instagram?: string;
+  kakao?: string;
+  youtube?: string;
+  blog?: string;
+}
+
+export interface MemberProfile {
+  profile_photo_url: string | null;
+  bio: string | null;
+  career_history: CareerEntry[];
+  certifications: CertificationEntry[];
+  sns_links: SnsLinks;
+  show_contact: boolean;
+  is_public: boolean;
+  display_name: string;
+  specialty: string | null;
+  phone: string | null;
+}
+
+export interface DesignerBadge {
+  id: string;
+  display_name: string;
+  profile_photo_url: string | null;
+  is_public: boolean;
+}
+
 // ---------- Shop-scoped API factory ----------
 
 export function createShopApi(shopId: string) {
@@ -466,6 +507,31 @@ export function createShopApi(shopId: string) {
       return request<ShopMember[]>(`/shops/${shopId}/members`);
     },
 
+    // Member Profile
+    getMemberProfile(memberId: string) {
+      return request<MemberProfile>(`/shops/${shopId}/members/${memberId}/profile`);
+    },
+    updateMemberProfile(memberId: string, data: Partial<Omit<MemberProfile, "display_name" | "phone">>) {
+      return request<MemberProfile>(`/shops/${shopId}/members/${memberId}/profile`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    async uploadProfilePhoto(memberId: string, file: File): Promise<{ profile_photo_url: string }> {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch(`${API_BASE}/shops/${shopId}/members/${memberId}/profile/photo`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ detail: "Upload failed" }));
+        throw new Error(error.detail || "프로필 사진 업로드에 실패했습니다.");
+      }
+      return res.json();
+    },
+
     // Service Categories & Services
     getServiceCategories() {
       return request<ServiceCategory[]>(`/shops/${shopId}/services/categories`);
@@ -595,6 +661,7 @@ export interface ExplorePortfolioItem {
     name: string;
     shop_type: string;
   };
+  designer?: DesignerBadge | null;
 }
 
 export function getExplorePortfolio(params?: {
@@ -610,6 +677,26 @@ export function getExplorePortfolio(params?: {
   if (params?.limit != null) p.set("limit", String(params.limit));
   const qs = p.toString();
   return request<ExplorePortfolioItem[]>(`/explore/portfolio${qs ? `?${qs}` : ""}`);
+}
+
+// Designer public profile
+export interface DesignerPublicProfile {
+  member_id: string;
+  display_name: string;
+  specialty: string | null;
+  phone: string | null;
+  profile_photo_url: string | null;
+  bio: string | null;
+  career_history: CareerEntry[];
+  certifications: CertificationEntry[];
+  sns_links: SnsLinks;
+  show_contact: boolean;
+  shop: { id: string; name: string; shop_type: string };
+  portfolios: ExplorePortfolioItem[];
+}
+
+export function getDesignerPublicProfile(memberId: string) {
+  return request<DesignerPublicProfile>(`/explore/designer/${memberId}`);
 }
 
 // Shop creation (no shop context needed)

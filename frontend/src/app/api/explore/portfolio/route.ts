@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
   let query = service
     .from("portfolios")
-    .select("id, title, description, tags, is_published, created_at, photo:treatment_photos(*), shop:shops(id, name, shop_type)")
+    .select("id, title, description, tags, is_published, created_at, photo:treatment_photos(*), shop:shops(id, name, shop_type), member:shop_members(id, display_name, profile:member_profiles(profile_photo_url, is_public))")
     .eq("is_published", true)
     .order("created_at", { ascending: false })
     .range(skip, skip + limit - 1);
@@ -49,5 +49,20 @@ export async function GET(req: NextRequest) {
     ? (data || []).filter((item: Record<string, unknown>) => item.shop !== null)
     : data || [];
 
-  return NextResponse.json(filtered);
+  // Transform member + profile into flat designer badge
+  const result = filtered.map((item: Record<string, unknown>) => {
+    const member = item.member as { id: string; display_name: string; profile: { profile_photo_url: string | null; is_public: boolean } | null } | null;
+    const designer = member?.profile?.is_public
+      ? {
+          id: member.id,
+          display_name: member.display_name,
+          profile_photo_url: member.profile.profile_photo_url,
+          is_public: true,
+        }
+      : null;
+    const { member: _member, ...rest } = item;
+    return { ...rest, designer };
+  });
+
+  return NextResponse.json(result);
 }
