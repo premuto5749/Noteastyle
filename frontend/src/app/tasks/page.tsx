@@ -7,7 +7,6 @@ import { DayCalendarStrip } from "@/components/DayCalendarStrip";
 import { ReservationList } from "@/components/ReservationList";
 import { VoiceNote } from "@/components/VoiceNote";
 import { useShopApi } from "@/hooks/useShopApi";
-import { useShop } from "@/contexts/ShopContext";
 import { type Reservation } from "@/lib/api";
 
 function formatDate(d: Date): string {
@@ -26,7 +25,6 @@ function formatHeaderDate(dateStr: string): string {
 export default function TasksPage() {
   const router = useRouter();
   const { api, isReady } = useShopApi();
-  const { currentShop } = useShop();
   const [selectedDate, setSelectedDate] = useState(() => formatDate(new Date()));
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -104,18 +102,13 @@ export default function TasksPage() {
 
   return (
     <div className="pb-4">
-      {/* Header */}
-      <div className="bg-card px-4 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-foreground">
-          {currentShop?.shop_name || "예약"}
-        </h1>
-        <span className="text-sm text-muted-foreground font-medium">
-          {formatHeaderDate(selectedDate)}
-        </span>
-      </div>
-
-      {/* Calendar strip */}
-      <div className="sticky top-0 z-10">
+      {/* Date indicator + Calendar strip */}
+      <div className="sticky top-12 z-10">
+        <div className="bg-card px-4 py-2 flex items-center justify-end">
+          <span className="text-sm text-muted-foreground font-medium">
+            {formatHeaderDate(selectedDate)}
+          </span>
+        </div>
         <DayCalendarStrip
           selectedDate={selectedDate}
           onDateSelect={setSelectedDate}

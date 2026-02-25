@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AppHeader } from "@/components/AppHeader";
 import { BottomNav } from "@/components/BottomNav";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SidebarDrawer } from "@/components/SidebarDrawer";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeColorMeta } from "@/components/ThemeColorMeta";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { getSiteSettings } from "@/lib/site-settings.server";
 
@@ -61,10 +64,14 @@ export default async function RootLayout({
           <ThemeProvider>
             <AuthProvider>
               <ShopProvider>
-                <ErrorBoundary>
-                  <main className="min-h-screen">{children}</main>
-                </ErrorBoundary>
-                <BottomNav />
+                <SidebarProvider>
+                  <AppHeader />
+                  <ErrorBoundary>
+                    <main className="min-h-screen">{children}</main>
+                  </ErrorBoundary>
+                  <BottomNav />
+                  <SidebarDrawer />
+                </SidebarProvider>
               </ShopProvider>
             </AuthProvider>
           </ThemeProvider>

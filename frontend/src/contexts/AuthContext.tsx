@@ -31,6 +31,7 @@ const PROTECTED_PATHS = [
   "/record",
   "/treatments",
   "/customers",
+  "/explore",
   "/portfolio",
   "/reservation",
   "/settings",
