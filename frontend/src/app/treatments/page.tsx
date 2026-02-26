@@ -203,7 +203,7 @@ export default function TreatmentsPage() {
             </div>
             <p className="text-subtle text-sm">시술 기록이 없습니다</p>
             <Link
-              href="/record"
+              href="/treatments/new"
               className="inline-block mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm"
             >
               기록 시작하기
