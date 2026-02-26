@@ -21,10 +21,7 @@ export function SidebarDrawer() {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
 
-  const showAdminMenu =
-    isAdmin ||
-    currentShop?.role === "owner" ||
-    currentShop?.role === "admin";
+  const showAdminMenu = isAdmin;
 
   // Close on route change
   useEffect(() => {
