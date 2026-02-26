@@ -5,4 +5,5 @@ export interface CapturedMedia {
   durationSeconds?: number;
   previewUrl: string;
   thumbnailUrl?: string;
+  photoType: string; // "before" | "during" | "after"
 }
