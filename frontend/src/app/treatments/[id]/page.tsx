@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useShopApi } from "@/hooks/useShopApi";
@@ -16,7 +16,6 @@ import { AnnotationOverlay } from "@/components/AnnotationOverlay";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
 import { VoiceNote } from "@/components/VoiceNote";
-import { loadVideoMetadata, validateVideoDuration } from "@/lib/video-utils";
 import { useServiceMenu } from "@/hooks/useServiceMenu";
 
 const PHOTO_TYPE_LABELS: Record<string, string> = {
@@ -45,10 +44,8 @@ export default function TreatmentDetailPage() {
   const [showFaceSwap, setShowFaceSwap] = useState(false);
   const [showVoiceNote, setShowVoiceNote] = useState(false);
   const [annotatingPhoto, setAnnotatingPhoto] = useState<TreatmentPhoto | null>(null);
-
-  // Photo upload state
-  const [uploadType, setUploadType] = useState<string>("after");
-  const [uploading, setUploading] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -66,6 +63,18 @@ export default function TreatmentDetailPage() {
     if (!isReady) return;
     loadData();
   }, [loadData, isReady]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showMenu]);
 
   const sortedPhotos = treatment?.photos
     ? [...treatment.photos]
@@ -93,40 +102,6 @@ export default function TreatmentDetailPage() {
       for (const p of treatment.products_used) {
         tags.push(p.code ? `${p.brand} ${p.code}` : p.brand);
       }
-    }
-  }
-
-  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !treatment) return;
-
-    // 영상 파일인 경우 15초 제한 검증
-    const isVideo = file.type.startsWith("video/");
-    if (isVideo) {
-      try {
-        const { duration } = await loadVideoMetadata(file);
-        const result = validateVideoDuration(duration);
-        if (!result.valid) {
-          alert(result.message);
-          e.target.value = "";
-          return;
-        }
-      } catch {
-        alert("영상 파일을 읽을 수 없습니다.");
-        e.target.value = "";
-        return;
-      }
-    }
-
-    setUploading(true);
-    try {
-      await api.uploadTreatmentPhoto(treatment.id, file, uploadType, undefined, isVideo ? { mediaType: "video" } : undefined);
-      await loadData();
-    } catch {
-      alert("업로드에 실패했습니다.");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
     }
   }
 
@@ -193,7 +168,36 @@ export default function TreatmentDetailPage() {
             <div className="text-xs text-muted-foreground">{customerName} 고객님</div>
           )}
         </div>
-        <div className="w-12" /> {/* Spacer for centering */}
+        {/* 3-dot menu */}
+        <div className="relative w-12 flex justify-end" ref={menuRef}>
+          <button
+            onClick={() => setShowMenu((v) => !v)}
+            className="p-1.5 rounded-full active:bg-white/10"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-muted-foreground">
+              <circle cx="12" cy="5" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="12" cy="19" r="2" />
+            </svg>
+          </button>
+          {showMenu && (
+            <div className="absolute right-0 top-full mt-1 bg-card rounded-xl shadow-lg border border-border py-1 min-w-[160px] z-50">
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  handleDelete();
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-destructive active:bg-muted flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                시술 기록 삭제
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Photo Carousel */}
@@ -442,53 +446,17 @@ export default function TreatmentDetailPage() {
             })}
           </div>
 
-          {/* Upload */}
-          <div className="bg-surface rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-foreground">파일 업로드</h3>
-              <Link
-                href={`/treatments/${id}/capture`}
-                className="text-xs text-accent"
-              >
-                촬영하기
-              </Link>
-            </div>
-            <div className="flex items-center gap-2">
-              <select
-                value={uploadType}
-                onChange={(e) => setUploadType(e.target.value)}
-                className="text-sm border border-border rounded-lg pl-3 pr-8 py-1.5 bg-card text-foreground"
-              >
-                <option value="before">시술 전</option>
-                <option value="during">시술 중</option>
-                <option value="after">시술 후</option>
-              </select>
-              <label
-                className={`flex-1 text-center text-sm py-2 rounded-lg cursor-pointer ${
-                  uploading
-                    ? "bg-muted text-subtle"
-                    : "bg-primary text-primary-foreground active:opacity-80"
-                }`}
-              >
-                {uploading ? "업로드 중..." : "사진/영상 선택"}
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  className="hidden"
-                  onChange={handlePhotoUpload}
-                  disabled={uploading}
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Delete */}
-          <button
-            onClick={handleDelete}
-            className="w-full py-3 border border-destructive text-destructive rounded-xl text-sm font-medium active:bg-red-50"
+          {/* Add Photos */}
+          <Link
+            href={`/treatments/${id}/capture`}
+            className="flex items-center justify-center gap-2 w-full py-3 bg-surface border border-border rounded-xl text-sm font-medium text-foreground active:bg-muted transition-colors"
           >
-            시술 기록 삭제
-          </button>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+            사진/영상 추가
+          </Link>
         </div>
       </div>
 

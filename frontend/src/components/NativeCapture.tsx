@@ -27,7 +27,7 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
       if (!file) return;
 
       const previewUrl = URL.createObjectURL(file);
-      onCapture({ blob: file, type: "photo", previewUrl });
+      onCapture({ blob: file, type: "photo", previewUrl, photoType: "after" });
       e.target.value = "";
     },
     [onCapture],
@@ -66,6 +66,7 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
           thumbnailBlob,
           previewUrl,
           thumbnailUrl,
+          photoType: "after",
         });
       } catch {
         setError("영상 파일을 읽을 수 없습니다.");
