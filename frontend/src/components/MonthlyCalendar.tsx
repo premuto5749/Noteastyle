@@ -124,12 +124,12 @@ export function MonthlyCalendar({
       >
         <div className="max-w-[480px] mx-auto bg-card rounded-t-2xl shadow-xl border-t border-border">
           {/* Handle */}
-          <div className="flex justify-center pt-3 pb-1">
+          <div className="flex justify-center pt-2 pb-0.5">
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
 
           {/* Month navigation */}
-          <div className="flex items-center justify-between px-5 py-3">
+          <div className="flex items-center justify-between px-4 py-1.5">
             <button
               onClick={handlePrevMonth}
               className="p-2 text-muted-foreground hover:text-foreground transition-colors"
@@ -154,11 +154,11 @@ export function MonthlyCalendar({
           </div>
 
           {/* Day headers */}
-          <div className="grid grid-cols-7 px-3">
+          <div className="grid grid-cols-7 px-2">
             {DAY_HEADERS.map((label, i) => (
               <div
                 key={label}
-                className={`text-center text-[11px] font-medium py-1 ${
+                className={`text-center text-[11px] font-medium py-0.5 ${
                   i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-muted-foreground"
                 }`}
               >
@@ -168,7 +168,7 @@ export function MonthlyCalendar({
           </div>
 
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 px-3 pb-6">
+          <div className="grid grid-cols-7 px-2 pb-8">
             {calendarDays.map((cell, idx) => {
               const isSelected = cell.date === selectedDate;
               const isToday = cell.date === today;
@@ -179,10 +179,10 @@ export function MonthlyCalendar({
                 <button
                   key={cell.date + idx}
                   onClick={() => handleDateClick(cell.date)}
-                  className="flex flex-col items-center justify-center py-1.5 min-h-[44px]"
+                  className="flex flex-col items-center justify-center py-0.5"
                 >
                   <span
-                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm transition-colors ${
+                    className={`w-8 h-8 flex items-center justify-center rounded-full text-[13px] transition-colors ${
                       isSelected
                         ? "bg-primary text-primary-foreground font-semibold"
                         : isToday
@@ -199,11 +199,11 @@ export function MonthlyCalendar({
                     {cell.dayNum}
                   </span>
                   {count > 0 && cell.isCurrentMonth ? (
-                    <span className="text-[10px] text-accent font-bold leading-none mt-0.5">
+                    <span className="text-[10px] text-accent font-bold leading-none">
                       {count}
                     </span>
                   ) : (
-                    <span className="text-[10px] leading-none mt-0.5">&nbsp;</span>
+                    <span className="text-[10px] leading-none">&nbsp;</span>
                   )}
                 </button>
               );

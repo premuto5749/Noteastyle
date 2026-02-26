@@ -55,15 +55,15 @@ export function DayCalendarStrip({
 
   return (
     <div className="bg-card border-b border-border px-2 py-2">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         <button
           onClick={handlePrev}
-          className="p-1.5 text-subtle hover:text-muted-foreground shrink-0"
+          className="p-1 text-subtle hover:text-muted-foreground shrink-0"
           aria-label="이전 주"
         >
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -75,7 +75,7 @@ export function DayCalendarStrip({
           </svg>
         </button>
 
-        <div className="flex flex-1 justify-around">
+        <div className="flex flex-1 justify-around min-w-0">
           {days.map((day) => {
             const isSelected = day.date === selectedDate;
             const isToday = day.date === today;
@@ -88,7 +88,7 @@ export function DayCalendarStrip({
               <button
                 key={day.date}
                 onClick={() => onDateSelect(day.date)}
-                className="flex flex-col items-center gap-0.5 py-1 px-1 min-w-[36px]"
+                className="flex flex-col items-center gap-0.5 py-1 px-0.5 min-w-0"
               >
                 <span
                   className={`text-[10px] font-medium ${
@@ -126,12 +126,12 @@ export function DayCalendarStrip({
 
         <button
           onClick={handleNext}
-          className="p-1.5 text-subtle hover:text-muted-foreground shrink-0"
+          className="p-1 text-subtle hover:text-muted-foreground shrink-0"
           aria-label="다음 주"
         >
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -146,12 +146,12 @@ export function DayCalendarStrip({
         {onCalendarOpen && (
           <button
             onClick={onCalendarOpen}
-            className="p-1.5 ml-0.5 text-subtle hover:text-muted-foreground shrink-0"
+            className="p-1.5 text-subtle hover:text-muted-foreground shrink-0"
             aria-label="월간 캘린더"
           >
             <svg
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
