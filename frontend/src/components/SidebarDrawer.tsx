@@ -110,7 +110,6 @@ export function SidebarDrawer() {
           <nav className="flex-1 py-2">
             {/* 작업 메뉴 */}
             <MenuSection title="작업 메뉴">
-              <MenuItem href="/record" label="빠른 기록" />
               <MenuItem href="/treatments" label="시술 목록" />
               <MenuItem href="/treatments/new" label="새 시술 기록" />
               <MenuItem href="/tasks/all" label="작업 전체 보기" />

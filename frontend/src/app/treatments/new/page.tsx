@@ -89,7 +89,7 @@ export default function NewTreatmentPage() {
         price: price ? parseInt(price) : undefined,
         customer_notes: notes || undefined,
       });
-      router.push(`/treatments/${result.id}/capture`);
+      router.push(`/treatments/${result.id}`);
     } catch {
       alert("저장에 실패했습니다.");
     } finally {

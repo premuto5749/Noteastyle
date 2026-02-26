@@ -28,7 +28,6 @@ const AuthContext = createContext<AuthContextType>({
 
 const PROTECTED_PATHS = [
   "/",
-  "/record",
   "/treatments",
   "/customers",
   "/explore",
