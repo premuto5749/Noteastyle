@@ -11,6 +11,7 @@ const PROTECTED_PATHS = [
   "/tasks",
   "/admin",
   "/onboarding",
+  "/trash",
 ];
 
 function isProtectedPath(pathname: string): boolean {

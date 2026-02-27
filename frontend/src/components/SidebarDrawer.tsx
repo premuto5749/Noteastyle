@@ -120,6 +120,7 @@ export function SidebarDrawer() {
             <MenuSection title="매장 관리">
               <MenuItem href="/settings/shop" label="매장 설정" />
               <MenuItem href="/settings/services" label="시술 메뉴 관리" />
+              <MenuItem href="/trash" label="휴지통" />
             </MenuSection>
 
             {/* 설정 */}

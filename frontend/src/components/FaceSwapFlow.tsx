@@ -17,14 +17,15 @@ type Step = "select-photo" | "select-model" | "generating" | "results";
 
 interface FaceSwapFlowProps {
   photos: TreatmentPhoto[];
+  initialPhoto?: TreatmentPhoto;
   onClose: () => void;
   onComplete: () => void;
 }
 
-export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps) {
+export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: FaceSwapFlowProps) {
   const { api } = useShopApi();
-  const [step, setStep] = useState<Step>("select-photo");
-  const [selectedPhoto, setSelectedPhoto] = useState<TreatmentPhoto | null>(null);
+  const [step, setStep] = useState<Step>(initialPhoto ? "select-model" : "select-photo");
+  const [selectedPhoto, setSelectedPhoto] = useState<TreatmentPhoto | null>(initialPhoto ?? null);
   const [models, setModels] = useState<FaceModel[]>([]);
   const [selectedModel, setSelectedModel] = useState<FaceModel | null>(null);
   const [results, setResults] = useState<FaceSwapResult[]>([]);
@@ -55,6 +56,13 @@ export function FaceSwapFlow({ photos, onClose, onComplete }: FaceSwapFlowProps)
       // silent fail
     }
   }, [api]);
+
+  // Load models immediately when starting from initialPhoto
+  useEffect(() => {
+    if (initialPhoto) {
+      loadModels();
+    }
+  }, [initialPhoto, loadModels]);
 
   // Photo selection
   function handlePhotoSelect(photo: TreatmentPhoto) {

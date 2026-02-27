@@ -75,6 +75,7 @@ export interface TreatmentPhoto {
   video_duration_seconds: number | null;
   thumbnail_url: string | null;
   annotations: PhotoAnnotation[] | null;
+  deleted_at: string | null;
 }
 
 export interface Treatment {
@@ -255,6 +256,19 @@ export interface DesignerBadge {
   is_public: boolean;
 }
 
+// Trash
+export interface TrashPhoto {
+  id: string;
+  photo_url: string;
+  photo_type: string;
+  media_type: "photo" | "video";
+  thumbnail_url: string | null;
+  deleted_at: string;
+  treatment_id: string;
+  service_type: string | null;
+  customer_name: string | null;
+}
+
 // ---------- Shop-scoped API factory ----------
 
 export function createShopApi(shopId: string) {
@@ -380,12 +394,33 @@ export function createShopApi(shopId: string) {
     updatePhoto(
       treatmentId: string,
       photoId: string,
-      data: { annotations?: PhotoAnnotation[] }
+      data: { annotations?: PhotoAnnotation[]; photo_type?: string }
     ) {
       return request<TreatmentPhoto>(
         `/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}`,
         { method: "PATCH", body: JSON.stringify(data) }
       );
+    },
+    deletePhoto(treatmentId: string, photoId: string) {
+      return request<{ status: string }>(
+        `/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}`,
+        { method: "DELETE" }
+      );
+    },
+
+    // Trash
+    getTrash() {
+      return request<TrashPhoto[]>(`/shops/${shopId}/trash`);
+    },
+    restorePhoto(photoId: string) {
+      return request<{ status: string }>(`/shops/${shopId}/trash/${photoId}`, {
+        method: "PATCH",
+      });
+    },
+    purgePhoto(photoId: string) {
+      return request<{ status: string }>(`/shops/${shopId}/trash/${photoId}`, {
+        method: "DELETE",
+      });
     },
 
     // Portfolio
