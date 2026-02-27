@@ -82,5 +82,14 @@ export const GET = withShopAuth(async (req, params, member) => {
   const { data, error } = await query;
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
-  return NextResponse.json(data);
+
+  // Filter out soft-deleted photos from each treatment
+  const filtered = (data || []).map((t: Record<string, unknown>) => ({
+    ...t,
+    photos: Array.isArray(t.photos)
+      ? t.photos.filter((p: { deleted_at?: string | null }) => !p.deleted_at)
+      : t.photos,
+  }));
+
+  return NextResponse.json(filtered);
 });

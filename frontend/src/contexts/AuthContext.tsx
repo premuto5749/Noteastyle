@@ -36,6 +36,7 @@ const PROTECTED_PATHS = [
   "/settings",
   "/tasks",
   "/admin",
+  "/trash",
 ];
 
 function isProtectedPath(pathname: string): boolean {

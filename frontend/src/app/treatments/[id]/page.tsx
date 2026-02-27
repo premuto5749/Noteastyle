@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useShopApi } from "@/hooks/useShopApi";
 import {
   type Treatment,
@@ -45,6 +46,8 @@ export default function TreatmentDetailPage() {
   const [showVoiceNote, setShowVoiceNote] = useState(false);
   const [annotatingPhoto, setAnnotatingPhoto] = useState<TreatmentPhoto | null>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [actionPhoto, setActionPhoto] = useState<TreatmentPhoto | null>(null);
+  const [faceSwapPreselect, setFaceSwapPreselect] = useState<TreatmentPhoto | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const loadData = useCallback(async () => {
@@ -132,6 +135,33 @@ export default function TreatmentDetailPage() {
     } catch {
       alert("삭제에 실패했습니다.");
     }
+  }
+
+  async function handleUpdatePhotoType(photo: TreatmentPhoto, newType: string) {
+    try {
+      await api.updatePhoto(photo.treatment_id, photo.id, { photo_type: newType });
+      await loadData();
+      setActionPhoto(null);
+    } catch {
+      alert("분류 변경에 실패했습니다.");
+    }
+  }
+
+  async function handleDeletePhoto(photo: TreatmentPhoto) {
+    if (!confirm("이 사진을 삭제하시겠습니까? 휴지통에서 7일간 복원할 수 있습니다.")) return;
+    try {
+      await api.deletePhoto(photo.treatment_id, photo.id);
+      await loadData();
+      setActionPhoto(null);
+    } catch {
+      alert("사진 삭제에 실패했습니다.");
+    }
+  }
+
+  function handleFaceSwapFromModal(photo: TreatmentPhoto) {
+    setActionPhoto(null);
+    setFaceSwapPreselect(photo);
+    setShowFaceSwap(true);
   }
 
   if (loading) {
@@ -414,51 +444,56 @@ export default function TreatmentDetailPage() {
             </div>
           )}
 
-          {/* Photo Actions */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-foreground">사진 관리</h3>
-
-            {sortedPhotos.map((photo) => {
-              const isPhoto = (photo.media_type || "photo") === "photo";
-              return (
-                <div key={photo.id} className="bg-surface rounded-xl p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">
-                      {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
-                      {photo.media_type === "video" && (
-                        <span className="ml-1 text-accent">영상</span>
-                      )}
-                    </span>
-                    <div className="flex gap-1.5">
-                      <button
-                        onClick={() => setAnnotatingPhoto(photo)}
-                        disabled={!isPhoto}
-                        className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-30"
-                      >
-                        핀 노트{photo.annotations && photo.annotations.length > 0 ? ` (${photo.annotations.length})` : ""}
-                      </button>
-                      <ShareButton
-                        imageUrl={photo.face_swapped_url || photo.photo_url}
-                        title={`${getCategoryLabel(treatment.service_type)} - ${PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}`}
-                        className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md disabled:opacity-50"
+          {/* Photo Grid (3-column) */}
+          {sortedPhotos.length > 0 && (
+            <div>
+              <h3 className="text-sm font-bold text-foreground mb-2">사진 관리</h3>
+              <div className="grid grid-cols-3 gap-1 rounded-xl overflow-hidden">
+                {sortedPhotos.map((photo) => {
+                  const isVideo = photo.media_type === "video";
+                  const thumbUrl = photo.thumbnail_url || photo.photo_url;
+                  return (
+                    <button
+                      key={photo.id}
+                      onClick={() => setActionPhoto(photo)}
+                      className="relative aspect-square bg-muted overflow-hidden active:opacity-70 transition-opacity"
+                    >
+                      <Image
+                        src={thumbUrl}
+                        alt={PHOTO_TYPE_LABELS[photo.photo_type] || "사진"}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 480px) 33vw, 120px"
                       />
-                      <button
-                        onClick={() => handleAddToPortfolio(photo)}
-                        disabled={photo.is_portfolio}
-                        className={`text-xs px-2 py-1 rounded-md ${
-                          photo.is_portfolio
-                            ? "bg-success-bg text-success-foreground"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {photo.is_portfolio ? "추가됨" : "포트폴리오"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                      {/* Type badge */}
+                      <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/60 text-white text-[10px] font-medium rounded">
+                        {PHOTO_TYPE_LABELS[photo.photo_type] || photo.photo_type}
+                      </span>
+                      {/* AI badge */}
+                      {photo.face_swapped_url && (
+                        <span className="absolute top-1 right-1 px-1 py-0.5 bg-accent/90 text-white text-[10px] font-bold rounded">
+                          AI
+                        </span>
+                      )}
+                      {/* Video badge */}
+                      {isVideo && (
+                        <div className="absolute bottom-1 right-1 bg-black/60 rounded px-1 py-0.5 flex items-center gap-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="white">
+                            <polygon points="5 3 19 12 5 21" />
+                          </svg>
+                          {photo.video_duration_seconds && (
+                            <span className="text-white text-[9px]">
+                              {Math.floor(photo.video_duration_seconds / 60)}:{String(Math.floor(photo.video_duration_seconds % 60)).padStart(2, "0")}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Add Photos */}
           <Link
@@ -474,11 +509,148 @@ export default function TreatmentDetailPage() {
         </div>
       </div>
 
+      {/* Photo Action Modal (Bottom Sheet) */}
+      {actionPhoto && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setActionPhoto(null)}
+          />
+          <div className="relative w-full max-w-lg bg-card rounded-t-2xl pb-safe animate-in slide-in-from-bottom duration-200">
+            {/* Preview */}
+            <div className="flex items-center gap-3 p-4 border-b border-border">
+              <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted relative flex-shrink-0">
+                <Image
+                  src={actionPhoto.thumbnail_url || actionPhoto.photo_url}
+                  alt="사진"
+                  fill
+                  className="object-cover"
+                  sizes="56px"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground">
+                  {PHOTO_TYPE_LABELS[actionPhoto.photo_type] || actionPhoto.photo_type}
+                  {actionPhoto.media_type === "video" ? " · 영상" : " · 사진"}
+                </p>
+                {actionPhoto.face_swapped_url && (
+                  <p className="text-xs text-accent">AI Face Swap 완료</p>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="py-1">
+              {/* AI Face Swap - photo only */}
+              {(actionPhoto.media_type || "photo") === "photo" && (
+                <button
+                  onClick={() => handleFaceSwapFromModal(actionPhoto)}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3"
+                >
+                  <span className="text-base">🤖</span>
+                  AI Face Swap
+                </button>
+              )}
+
+              {/* Photo type change */}
+              <div className="px-4 py-3">
+                <p className="text-xs text-muted-foreground mb-2">분류 변경</p>
+                <div className="flex gap-2">
+                  {(["before", "during", "after"] as const).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => {
+                        if (actionPhoto.photo_type !== type) {
+                          handleUpdatePhotoType(actionPhoto, type);
+                        }
+                      }}
+                      className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
+                        actionPhoto.photo_type === type
+                          ? "bg-accent text-accent-foreground"
+                          : "bg-muted text-muted-foreground active:bg-border"
+                      }`}
+                    >
+                      {PHOTO_TYPE_LABELS[type]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mx-4 border-t border-border" />
+
+              {/* Pin note - photo only */}
+              {(actionPhoto.media_type || "photo") === "photo" && (
+                <button
+                  onClick={() => {
+                    setActionPhoto(null);
+                    setAnnotatingPhoto(actionPhoto);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3"
+                >
+                  <span className="text-base">📌</span>
+                  핀 노트
+                  {actionPhoto.annotations && actionPhoto.annotations.length > 0
+                    ? ` (${actionPhoto.annotations.length})`
+                    : ""}
+                </button>
+              )}
+
+              {/* Add to portfolio */}
+              <button
+                onClick={() => {
+                  setActionPhoto(null);
+                  handleAddToPortfolio(actionPhoto);
+                }}
+                disabled={actionPhoto.is_portfolio}
+                className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3 disabled:opacity-50"
+              >
+                <span className="text-base">🖼</span>
+                {actionPhoto.is_portfolio ? "포트폴리오에 추가됨" : "포트폴리오에 추가"}
+              </button>
+
+              {/* Share */}
+              <div className="px-1">
+                <ShareButton
+                  imageUrl={actionPhoto.face_swapped_url || actionPhoto.photo_url}
+                  title={`${getCategoryLabel(treatment.service_type)} - ${PHOTO_TYPE_LABELS[actionPhoto.photo_type] || actionPhoto.photo_type}`}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3"
+                />
+              </div>
+
+              <div className="mx-4 border-t border-border" />
+
+              {/* Delete */}
+              <button
+                onClick={() => handleDeletePhoto(actionPhoto)}
+                className="w-full text-left px-4 py-3 text-sm text-destructive active:bg-muted flex items-center gap-3"
+              >
+                <span className="text-base">🗑</span>
+                삭제
+              </button>
+            </div>
+
+            {/* Cancel */}
+            <div className="px-4 pb-4">
+              <button
+                onClick={() => setActionPhoto(null)}
+                className="w-full py-3 bg-muted text-foreground text-sm font-medium rounded-xl active:bg-border"
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Face Swap Flow Modal */}
       {showFaceSwap && (
         <FaceSwapFlow
           photos={swappablePhotos}
-          onClose={() => setShowFaceSwap(false)}
+          initialPhoto={faceSwapPreselect ?? undefined}
+          onClose={() => {
+            setShowFaceSwap(false);
+            setFaceSwapPreselect(null);
+          }}
           onComplete={() => loadData()}
         />
       )}

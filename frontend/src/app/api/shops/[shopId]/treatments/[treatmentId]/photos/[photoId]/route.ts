@@ -9,6 +9,8 @@ interface PhotoAnnotation {
   text: string;
 }
 
+const VALID_PHOTO_TYPES = ["before", "during", "after"];
+
 export const PATCH = withShopAuth<{
   shopId: string;
   treatmentId: string;
@@ -31,15 +33,15 @@ export const PATCH = withShopAuth<{
     );
   }
 
-  // Verify photo belongs to treatment
+  // Verify photo belongs to treatment and is not deleted
   const { data: existingPhoto } = await supabase
     .from("treatment_photos")
-    .select("id")
+    .select("id, deleted_at")
     .eq("id", params.photoId)
     .eq("treatment_id", params.treatmentId)
     .single();
 
-  if (!existingPhoto) {
+  if (!existingPhoto || existingPhoto.deleted_at) {
     return NextResponse.json(
       { detail: "Photo not found" },
       { status: 404 }
@@ -48,6 +50,17 @@ export const PATCH = withShopAuth<{
 
   const body = await req.json();
   const updateData: Record<string, unknown> = {};
+
+  // Validate and set photo_type
+  if (body.photo_type !== undefined) {
+    if (!VALID_PHOTO_TYPES.includes(body.photo_type)) {
+      return NextResponse.json(
+        { detail: "photo_type must be one of: before, during, after" },
+        { status: 400 }
+      );
+    }
+    updateData.photo_type = body.photo_type;
+  }
 
   // Validate and set annotations
   if (body.annotations !== undefined) {
@@ -115,4 +128,54 @@ export const PATCH = withShopAuth<{
   }
 
   return NextResponse.json(photo);
+});
+
+export const DELETE = withShopAuth<{
+  shopId: string;
+  treatmentId: string;
+  photoId: string;
+}>(async (req, params) => {
+  const supabase = createServiceClient();
+
+  // Verify treatment belongs to shop
+  const { data: treatment } = await supabase
+    .from("treatments")
+    .select("id")
+    .eq("id", params.treatmentId)
+    .eq("shop_id", params.shopId)
+    .single();
+
+  if (!treatment) {
+    return NextResponse.json(
+      { detail: "Treatment not found" },
+      { status: 404 }
+    );
+  }
+
+  // Verify photo exists and is not already deleted
+  const { data: existingPhoto } = await supabase
+    .from("treatment_photos")
+    .select("id, deleted_at")
+    .eq("id", params.photoId)
+    .eq("treatment_id", params.treatmentId)
+    .single();
+
+  if (!existingPhoto || existingPhoto.deleted_at) {
+    return NextResponse.json(
+      { detail: "Photo not found" },
+      { status: 404 }
+    );
+  }
+
+  // Soft delete: set deleted_at
+  const { error } = await supabase
+    .from("treatment_photos")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", params.photoId);
+
+  if (error) {
+    return NextResponse.json({ detail: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ status: "deleted" });
 });

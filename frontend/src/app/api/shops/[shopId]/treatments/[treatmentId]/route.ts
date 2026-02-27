@@ -14,6 +14,12 @@ export const GET = withShopAuth<{ shopId: string; treatmentId: string }>(
       .single();
 
     if (error) return NextResponse.json({ detail: "Treatment not found" }, { status: 404 });
+
+    // Filter out soft-deleted photos
+    if (data.photos) {
+      data.photos = data.photos.filter((p: { deleted_at?: string | null }) => !p.deleted_at);
+    }
+
     return NextResponse.json(data);
   }
 );
@@ -44,6 +50,12 @@ export const PUT = withShopAuth<{ shopId: string; treatmentId: string }>(
       .single();
 
     if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
+
+    // Filter out soft-deleted photos
+    if (data.photos) {
+      data.photos = data.photos.filter((p: { deleted_at?: string | null }) => !p.deleted_at);
+    }
+
     return NextResponse.json(data);
   }
 );
