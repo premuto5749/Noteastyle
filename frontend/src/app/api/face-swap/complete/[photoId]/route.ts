@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ photoId: string }> }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { photoId } = await params;
   const supabase = createServerClient();
   const { face_swapped_url } = await request.json();
