@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFaceSwapStatus } from "@/lib/services/replicate-service";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const { jobId } = await params;
 
   try {

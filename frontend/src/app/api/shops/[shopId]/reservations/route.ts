@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { withShopAuth } from "@/lib/auth/shop";
+import { validateBody, reservationCreateSchema } from "@/lib/validations";
 
 export const GET = withShopAuth(async (req, params, _member) => {
   const supabase = createServiceClient();
@@ -48,7 +49,9 @@ export const GET = withShopAuth(async (req, params, _member) => {
 export const POST = withShopAuth(async (req, params, _member) => {
   const supabase = createServiceClient();
   const shopId = params.shopId;
-  const body = await req.json();
+  const parsed = await validateBody(req, reservationCreateSchema);
+  if ("error" in parsed) return parsed.error;
+  const body = parsed.data;
 
   const { data, error } = await supabase
     .from("reservations")
@@ -58,11 +61,11 @@ export const POST = withShopAuth(async (req, params, _member) => {
       member_id: body.member_id ?? null,
       scheduled_date: body.scheduled_date,
       scheduled_time: body.scheduled_time,
-      estimated_duration_minutes: body.estimated_duration_minutes ?? 60,
+      estimated_duration_minutes: body.estimated_duration_minutes,
       service_type: body.service_type ?? null,
       service_detail: body.service_detail ?? null,
       notes: body.notes ?? null,
-      source: body.source ?? "manual",
+      source: body.source,
     })
     .select(
       "*, customer:customers(name, phone), member:shop_members(display_name), treatment:treatments(id)"

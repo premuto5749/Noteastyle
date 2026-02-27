@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { withShopAuth } from "@/lib/auth/shop";
+import { validateBody, treatmentCreateSchema } from "@/lib/validations";
 
 export const POST = withShopAuth(async (req, params, member) => {
   const supabase = createServiceClient();
-  const body = await req.json();
+  const parsed = await validateBody(req, treatmentCreateSchema);
+  if ("error" in parsed) return parsed.error;
+  const body = parsed.data;
 
   const productsData = body.products_used
-    ? body.products_used.map((p: { brand: string; code?: string; area?: string }) => ({
+    ? body.products_used.map((p) => ({
         brand: p.brand,
         code: p.code ?? null,
         area: p.area ?? null,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { requireAuth } from "@/lib/auth/require-auth";
 
 async function downloadToStorage(
   supabase: ReturnType<typeof createServerClient>,
@@ -29,6 +30,9 @@ async function downloadToStorage(
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const supabase = createServerClient();
   const { treatment_photo_id, face_model_id, result_url } = await request.json();
 
@@ -62,6 +66,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   const supabase = createServerClient();
   const { searchParams } = new URL(request.url);
   const treatmentPhotoId = searchParams.get("treatment_photo_id");

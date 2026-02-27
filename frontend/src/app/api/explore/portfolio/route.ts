@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { escapeIlike } from "@/lib/utils/sanitize";
 
 export async function GET(req: NextRequest) {
   // Auth: require login (but no shop membership check)
@@ -35,7 +36,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (search) {
-    query = query.or(`title.ilike.%${search}%,tags.cs.["${search}"]`);
+    const sanitized = escapeIlike(search).replace(/"/g, "");
+    query = query.or(`title.ilike.%${sanitized}%,tags.cs.["${sanitized}"]`);
   }
 
   const { data, error } = await query;

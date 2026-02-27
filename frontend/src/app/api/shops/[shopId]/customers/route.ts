@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { withShopAuth } from "@/lib/auth/shop";
+import { validateBody, customerCreateSchema } from "@/lib/validations";
+import { escapeIlike } from "@/lib/utils/sanitize";
 
 export const POST = withShopAuth(async (req, params, _member) => {
   const supabase = createServiceClient();
-  const body = await req.json();
+  const parsed = await validateBody(req, customerCreateSchema);
+  if ("error" in parsed) return parsed.error;
+  const body = parsed.data;
 
   const { data, error } = await supabase
     .from("customers")
@@ -39,10 +43,10 @@ export const GET = withShopAuth(async (req, params, _member) => {
     .eq("shop_id", params.shopId);
 
   if (search) {
-    query = query.ilike("name", `%${search}%`);
+    query = query.ilike("name", `%${escapeIlike(search)}%`);
   }
   if (phone) {
-    query = query.ilike("phone", `%${phone}%`);
+    query = query.ilike("phone", `%${escapeIlike(phone)}%`);
   }
 
   query = query

@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import { faceSwap } from "@/lib/services/replicate-service";
+import { requireAuth } from "@/lib/auth/require-auth";
+import { checkRateLimit, AI_API_RATE_LIMIT } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
+  const rl = checkRateLimit(`face-swap:${auth.user.id}`, AI_API_RATE_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." },
+      { status: 429 }
+    );
+  }
+
   const supabase = createServerClient();
   const { searchParams } = new URL(request.url);
   const sourcePhotoId = searchParams.get("source_photo_id");
