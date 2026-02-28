@@ -9,8 +9,10 @@ export const GET = withShopAuth(async (_req, params, _member) => {
   const { data, error } = await supabase
     .from("ai_face_models")
     .select("*")
-    .eq("shop_id", shopId)
     .eq("is_active", true)
+    .or(`shop_id.eq.${shopId},is_global.eq.true`)
+    .order("is_global", { ascending: false })
+    .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
   if (error) return NextResponse.json({ detail: error.message }, { status: 400 });
