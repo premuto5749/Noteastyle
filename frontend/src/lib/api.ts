@@ -114,11 +114,14 @@ export interface PortfolioItem {
 // AI Face Models
 export interface FaceModel {
   id: string;
-  shop_id: string;
+  shop_id: string | null;
   name: string;
   gender: string;
   image_url: string;
   is_active: boolean;
+  is_global: boolean;
+  category: string;
+  sort_order: number;
   created_at: string;
 }
 

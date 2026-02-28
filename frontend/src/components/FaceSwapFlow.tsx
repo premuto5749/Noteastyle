@@ -247,12 +247,12 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
             <h3 className="text-sm font-bold text-foreground">AI 얼굴 모델 선택</h3>
 
             {models.length > 0 ? (
-              <div className="flex gap-3">
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {models.map((model) => (
                   <button
                     key={model.id}
                     onClick={() => handleModelSelect(model)}
-                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border active:border-accent active:bg-info-bg transition-colors flex-1"
+                    className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border active:border-accent active:bg-info-bg transition-colors min-w-[90px]"
                   >
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-muted relative">
                       <Image
@@ -262,6 +262,11 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
                         className="object-cover"
                         sizes="64px"
                       />
+                      {model.is_global && (
+                        <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-accent text-accent-foreground text-[9px] font-bold rounded-full">
+                          기본
+                        </div>
+                      )}
                     </div>
                     <span className="text-xs font-medium text-foreground">{model.name}</span>
                     <span className="text-[10px] text-subtle">
