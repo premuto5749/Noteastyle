@@ -222,15 +222,25 @@ export interface FaceSwapResult {
 // Member Profile
 export interface CareerEntry {
   company: string;
-  role: string;
-  start_year: number;
-  end_year: number | null;
+  position: string;
+  start_date: string;
+  end_date: string | null;
+  duties: string;
 }
 
 export interface CertificationEntry {
   name: string;
   issuer: string;
-  year: number;
+  date: string;
+  license_number: string;
+}
+
+export interface EducationEntry {
+  school: string;
+  major: string;
+  start_date: string;
+  end_date: string | null;
+  status: string;
 }
 
 export interface SnsLinks {
@@ -245,6 +255,8 @@ export interface MemberProfile {
   bio: string | null;
   career_history: CareerEntry[];
   certifications: CertificationEntry[];
+  education: EducationEntry[];
+  address: string | null;
   sns_links: SnsLinks;
   show_contact: boolean;
   is_public: boolean;
@@ -754,6 +766,8 @@ export interface DesignerPublicProfile {
   bio: string | null;
   career_history: CareerEntry[];
   certifications: CertificationEntry[];
+  education: EducationEntry[];
+  address: string | null;
   sns_links: SnsLinks;
   show_contact: boolean;
   shop: { id: string; name: string; shop_type: string };

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getDesignerPublicProfile, type DesignerPublicProfile } from "@/lib/api";
+import { calcDuration, maskAddress } from "@/lib/utils/resume";
 
 export default function DesignerProfilePage() {
   const { memberId } = useParams<{ memberId: string }>();
@@ -49,7 +50,7 @@ export default function DesignerProfilePage() {
 
       {/* Profile Card */}
       <div className="px-4 space-y-4">
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="card-elevated p-5 space-y-4">
           {/* Avatar + Name */}
           <div className="flex items-center gap-4">
             <div className="relative w-16 h-16 rounded-full overflow-hidden bg-muted border border-border flex-shrink-0">
@@ -76,6 +77,9 @@ export default function DesignerProfilePage() {
                 <p className="text-sm text-accent">{profile.specialty}</p>
               )}
               <p className="text-xs text-muted-foreground">{profile.shop.name}</p>
+              {profile.address && (
+                <p className="text-xs text-subtle">{maskAddress(profile.address)}</p>
+              )}
             </div>
           </div>
 
@@ -138,18 +142,33 @@ export default function DesignerProfilePage() {
 
         {/* Career History */}
         {profile.career_history.length > 0 && (
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+          <div className="card-elevated p-5 space-y-3">
             <h3 className="text-sm font-semibold text-foreground">경력</h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {profile.career_history.map((career, i) => (
-                <div key={i} className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{career.company}</p>
-                    <p className="text-xs text-muted-foreground">{career.role}</p>
+                <div key={i} className="space-y-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{career.company}</p>
+                      <p className="text-xs text-accent">{(career as any).position || (career as any).role || ''}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-subtle whitespace-nowrap">
+                        {(career as any).start_date
+                          ? `${(career as any).start_date.replace('-', '.')} ~ ${(career as any).end_date ? (career as any).end_date.replace('-', '.') : '현재'}`
+                          : `${(career as any).start_year || ''} ~ ${(career as any).end_year ?? '현재'}`
+                        }
+                      </p>
+                      {(career as any).start_date && (
+                        <p className="text-[10px] text-accent font-medium">
+                          {calcDuration((career as any).start_date, (career as any).end_date)}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-xs text-subtle whitespace-nowrap">
-                    {career.start_year} ~ {career.end_year ?? "현재"}
-                  </p>
+                  {(career as any).duties && (
+                    <p className="text-xs text-muted-foreground">{(career as any).duties}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -158,7 +177,7 @@ export default function DesignerProfilePage() {
 
         {/* Certifications */}
         {profile.certifications.length > 0 && (
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+          <div className="card-elevated p-5 space-y-3">
             <h3 className="text-sm font-semibold text-foreground">자격증</h3>
             <div className="space-y-2">
               {profile.certifications.map((cert, i) => (
@@ -166,8 +185,36 @@ export default function DesignerProfilePage() {
                   <div>
                     <p className="text-sm font-medium text-foreground">{cert.name}</p>
                     <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+                    {(cert as any).license_number && (
+                      <p className="text-[10px] text-subtle">No. {(cert as any).license_number}</p>
+                    )}
                   </div>
-                  <p className="text-xs text-subtle">{cert.year}</p>
+                  <p className="text-xs text-subtle">
+                    {(cert as any).date ? (cert as any).date.replace('-', '.') : (cert as any).year}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Education */}
+        {profile.education && profile.education.length > 0 && (
+          <div className="card-elevated p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">학력</h3>
+            <div className="space-y-2">
+              {profile.education.map((edu: any, i: number) => (
+                <div key={i} className="flex justify-between items-start">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{edu.school}</p>
+                    {edu.major && <p className="text-xs text-muted-foreground">{edu.major}</p>}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-subtle whitespace-nowrap">
+                      {edu.start_date?.replace('-', '.')} ~ {edu.end_date ? edu.end_date.replace('-', '.') : '현재'}
+                    </p>
+                    <p className="text-[10px] text-accent font-medium">{edu.status}</p>
+                  </div>
                 </div>
               ))}
             </div>

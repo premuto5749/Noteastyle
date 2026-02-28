@@ -65,6 +65,8 @@ export async function GET(
     bio: profile.bio,
     career_history: profile.career_history ?? [],
     certifications: profile.certifications ?? [],
+    education: profile.education ?? [],
+    address: profile.address ?? null,
     sns_links: profile.sns_links ?? {},
     show_contact: profile.show_contact,
     shop: shop ?? { id: member.shop_id, name: "", shop_type: "" },
