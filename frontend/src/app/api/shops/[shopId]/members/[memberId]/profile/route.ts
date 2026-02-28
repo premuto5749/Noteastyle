@@ -27,6 +27,8 @@ export const GET = withShopAuth<{ shopId: string; memberId: string }>(
       bio: profile?.bio ?? null,
       career_history: profile?.career_history ?? [],
       certifications: profile?.certifications ?? [],
+      education: profile?.education ?? [],
+      address: profile?.address ?? null,
       sns_links: profile?.sns_links ?? {},
       show_contact: profile?.show_contact ?? false,
       is_public: profile?.is_public ?? false,
@@ -64,6 +66,8 @@ export const PUT = withShopAuth<{ shopId: string; memberId: string }>(
     if (body.bio !== undefined) profileData.bio = body.bio;
     if (body.career_history !== undefined) profileData.career_history = body.career_history;
     if (body.certifications !== undefined) profileData.certifications = body.certifications;
+    if (body.education !== undefined) profileData.education = body.education;
+    if (body.address !== undefined) profileData.address = body.address;
     if (body.sns_links !== undefined) profileData.sns_links = body.sns_links;
     if (body.show_contact !== undefined) profileData.show_contact = body.show_contact;
     if (body.is_public !== undefined) profileData.is_public = body.is_public;
@@ -94,6 +98,8 @@ export const PUT = withShopAuth<{ shopId: string; memberId: string }>(
       bio: updatedProfile?.bio ?? null,
       career_history: updatedProfile?.career_history ?? [],
       certifications: updatedProfile?.certifications ?? [],
+      education: updatedProfile?.education ?? [],
+      address: updatedProfile?.address ?? null,
       sns_links: updatedProfile?.sns_links ?? {},
       show_contact: updatedProfile?.show_contact ?? false,
       is_public: updatedProfile?.is_public ?? false,
