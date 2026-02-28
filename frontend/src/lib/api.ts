@@ -68,6 +68,7 @@ export interface TreatmentPhoto {
   photo_url: string;
   photo_type: string;
   face_swapped_url: string | null;
+  mosaic_url: string | null;
   is_portfolio: boolean;
   caption: string | null;
   taken_at: string;
@@ -409,6 +410,17 @@ export function createShopApi(shopId: string) {
         `/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}`,
         { method: "DELETE" }
       );
+    },
+    async uploadMosaic(treatmentId: string, photoId: string, blob: Blob) {
+      const formData = new FormData();
+      formData.append("file", new File([blob], "mosaic.jpg", { type: "image/jpeg" }));
+
+      const res = await fetch(
+        `${API_BASE}/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}/mosaic`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("Failed to upload mosaic");
+      return res.json() as Promise<TreatmentPhoto>;
     },
 
     // Trash
