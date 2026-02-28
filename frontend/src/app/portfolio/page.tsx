@@ -122,9 +122,9 @@ export default function PortfolioPage() {
                 className="bg-card rounded-xl border border-border overflow-hidden"
               >
                 <div className="aspect-square bg-muted relative">
-                  {item.photo.face_swapped_url ? (
+                  {(item.photo.face_swapped_url || item.photo.mosaic_url) ? (
                     <Image
-                      src={item.photo.face_swapped_url}
+                      src={item.photo.face_swapped_url || item.photo.mosaic_url || item.photo.photo_url}
                       alt={item.title || "포트폴리오"}
                       fill
                       className="object-cover"
@@ -183,7 +183,7 @@ export default function PortfolioPage() {
                       {item.is_published ? "비공개" : "공개하기"}
                     </button>
                     <ShareButton
-                      imageUrl={item.photo.face_swapped_url || item.photo.photo_url}
+                      imageUrl={item.photo.face_swapped_url || item.photo.mosaic_url || item.photo.photo_url}
                       title={item.title || "포트폴리오"}
                       className="py-1.5 px-3 rounded-lg text-xs font-medium bg-muted text-muted-foreground"
                     />

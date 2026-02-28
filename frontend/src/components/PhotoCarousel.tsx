@@ -56,7 +56,7 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
               />
             ) : (
               <Image
-                src={photo.face_swapped_url || photo.photo_url}
+                src={photo.face_swapped_url || photo.mosaic_url || photo.photo_url}
                 alt={photo.photo_type}
                 fill
                 className="object-cover"
@@ -69,6 +69,11 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
             {photo.face_swapped_url && (
               <span className="absolute top-3 left-3 px-2 py-0.5 bg-accent text-accent-foreground text-[10px] font-bold rounded-full">
                 AI
+              </span>
+            )}
+            {photo.mosaic_url && !photo.face_swapped_url && (
+              <span className="absolute top-3 left-3 px-2 py-0.5 bg-blue-500 text-white text-[10px] font-bold rounded-full">
+                M
               </span>
             )}
           </div>

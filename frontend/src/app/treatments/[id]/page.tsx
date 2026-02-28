@@ -16,6 +16,7 @@ import { StyleNoteOverlay } from "@/components/StyleNoteOverlay";
 import { AnnotationOverlay } from "@/components/AnnotationOverlay";
 import { PhotoAnnotationEditor } from "@/components/PhotoAnnotationEditor";
 import { FaceSwapFlow } from "@/components/FaceSwapFlow";
+import { MosaicEditor } from "@/components/MosaicEditor";
 import { VoiceNote } from "@/components/VoiceNote";
 import { useServiceMenu } from "@/hooks/useServiceMenu";
 
@@ -47,6 +48,7 @@ export default function TreatmentDetailPage() {
   const [annotatingPhoto, setAnnotatingPhoto] = useState<TreatmentPhoto | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [actionPhoto, setActionPhoto] = useState<TreatmentPhoto | null>(null);
+  const [mosaicPhoto, setMosaicPhoto] = useState<TreatmentPhoto | null>(null);
   const [faceSwapPreselect, setFaceSwapPreselect] = useState<TreatmentPhoto | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +127,18 @@ export default function TreatmentDetailPage() {
   async function handleSaveAnnotations(photo: TreatmentPhoto, annotations: PhotoAnnotation[]) {
     await api.updatePhoto(photo.treatment_id, photo.id, { annotations });
     await loadData();
+  }
+
+  async function handleMosaicComplete(blob: Blob) {
+    if (!mosaicPhoto) return;
+    try {
+      await api.uploadMosaic(mosaicPhoto.treatment_id, mosaicPhoto.id, blob);
+      setMosaicPhoto(null);
+      await loadData();
+    } catch {
+      alert("모자이크 처리에 실패했습니다.");
+      setMosaicPhoto(null);
+    }
   }
 
   async function handleDelete() {
@@ -475,6 +489,12 @@ export default function TreatmentDetailPage() {
                           AI
                         </span>
                       )}
+                      {/* Mosaic badge */}
+                      {photo.mosaic_url && !photo.face_swapped_url && (
+                        <span className="absolute top-1 right-1 px-1 py-0.5 bg-blue-500/90 text-white text-[10px] font-bold rounded">
+                          M
+                        </span>
+                      )}
                       {/* Video badge */}
                       {isVideo && (
                         <div className="absolute bottom-1 right-1 bg-black/60 rounded px-1 py-0.5 flex items-center gap-0.5">
@@ -536,6 +556,9 @@ export default function TreatmentDetailPage() {
                 {actionPhoto.face_swapped_url && (
                   <p className="text-xs text-accent">AI Face Swap 완료</p>
                 )}
+                {actionPhoto.mosaic_url && (
+                  <p className="text-xs text-blue-500">모자이크 적용됨</p>
+                )}
               </div>
             </div>
 
@@ -549,6 +572,20 @@ export default function TreatmentDetailPage() {
                 >
                   <span className="text-base">🤖</span>
                   AI Face Swap
+                </button>
+              )}
+
+              {/* Mosaic - photo only */}
+              {(actionPhoto.media_type || "photo") === "photo" && (
+                <button
+                  onClick={() => {
+                    setActionPhoto(null);
+                    setMosaicPhoto(actionPhoto);
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3"
+                >
+                  <span className="text-base">🟦</span>
+                  모자이크{actionPhoto.mosaic_url ? " (재적용)" : ""}
                 </button>
               )}
 
@@ -611,7 +648,7 @@ export default function TreatmentDetailPage() {
               {/* Share */}
               <div className="px-1">
                 <ShareButton
-                  imageUrl={actionPhoto.face_swapped_url || actionPhoto.photo_url}
+                  imageUrl={actionPhoto.face_swapped_url || actionPhoto.mosaic_url || actionPhoto.photo_url}
                   title={`${getCategoryLabel(treatment.service_type)} - ${PHOTO_TYPE_LABELS[actionPhoto.photo_type] || actionPhoto.photo_type}`}
                   className="w-full text-left px-4 py-3 text-sm text-foreground active:bg-muted flex items-center gap-3"
                 />
@@ -661,6 +698,15 @@ export default function TreatmentDetailPage() {
           photo={annotatingPhoto}
           onSave={(annotations) => handleSaveAnnotations(annotatingPhoto, annotations)}
           onClose={() => setAnnotatingPhoto(null)}
+        />
+      )}
+
+      {/* Mosaic Editor Modal */}
+      {mosaicPhoto && (
+        <MosaicEditor
+          photoUrl={mosaicPhoto.photo_url}
+          onComplete={handleMosaicComplete}
+          onCancel={() => setMosaicPhoto(null)}
         />
       )}
 
