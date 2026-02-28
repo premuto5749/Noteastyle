@@ -159,6 +159,35 @@ export default function AdminPage() {
                 />
               </svg>
             </a>
+            <a
+              href="/admin/face-models"
+              className="flex items-center justify-between p-4 bg-card border border-border rounded-xl hover:border-accent/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🤖</span>
+                <div>
+                  <div className="text-sm font-medium text-foreground">
+                    기본 Face Model 관리
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    모든 매장에 제공되는 기본 AI 얼굴 모델
+                  </div>
+                </div>
+              </div>
+              <svg
+                className="w-5 h-5 text-muted-foreground"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </a>
           </div>
         </section>
 
