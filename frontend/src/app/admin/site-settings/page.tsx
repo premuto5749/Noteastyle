@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
-import Link from "next/link";
 import type { SiteSettings } from "@/lib/site-settings";
 import { DEFAULT_SETTINGS } from "@/lib/site-settings";
 
@@ -330,7 +329,7 @@ export default function AdminSiteSettingsPage() {
   if (loading) {
     return (
       <div className="max-w-[480px] mx-auto">
-        <PageHeader title="사이트 설정" action={<Link href="/admin" className="text-sm text-accent">&larr; 관리자</Link>} />
+        <PageHeader title="사이트 설정" backHref="/admin" />
         <div className="px-4 py-8 text-center text-subtle text-sm">
           불러오는 중...
         </div>
@@ -340,7 +339,7 @@ export default function AdminSiteSettingsPage() {
 
   return (
     <div className="max-w-[480px] mx-auto">
-      <PageHeader title="사이트 설정" action={<Link href="/admin" className="text-sm text-accent">&larr; 관리자</Link>} />
+      <PageHeader title="사이트 설정" backHref="/admin" />
 
       <div className="px-4 pb-24 space-y-6">
         {/* 상태 메시지 */}
