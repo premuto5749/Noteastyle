@@ -153,11 +153,7 @@ export default function AdminFaceModelsPage() {
     <div className="max-w-[480px] mx-auto">
       <PageHeader
         title="기본 Face Model 관리"
-        action={
-          <a href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
-            ← 관리자
-          </a>
-        }
+        backHref="/admin"
       />
 
       <div className="px-4 pb-24">

@@ -121,7 +121,7 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-[480px] mx-auto">
-      <PageHeader title="관리자 설정" />
+      <PageHeader title="관리자 설정" backHref="/" />
 
       <div className="px-4 pb-24">
         {/* 관리 메뉴 */}
