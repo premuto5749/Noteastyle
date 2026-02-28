@@ -90,12 +90,12 @@ export default function TreatmentsPage() {
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-header-bg backdrop-blur-sm border-b border-border px-4 py-3">
+      <div className="sticky top-0 z-40 glass border-b border-border/30 shadow-sm px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-lg font-bold text-foreground">시술 기록</h1>
           <Link
             href="/treatments/new"
-            className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+            className="px-3 py-1.5 bg-accent text-accent-foreground rounded-full text-sm font-medium"
           >
             + 새 기록
           </Link>
@@ -120,7 +120,7 @@ export default function TreatmentsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="시술, 고객명 검색"
-            className="w-full pl-10 pr-4 py-2.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+            className="w-full pl-10 pr-4 py-2.5 border border-border rounded-2xl text-sm bg-surface text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
           />
         </div>
       </div>
@@ -151,14 +151,14 @@ export default function TreatmentsPage() {
               </svg>
               필터
               {activeFilters.length > 0 && (
-                <span className="w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                <span className="w-5 h-5 bg-accent text-accent-foreground text-xs rounded-full flex items-center justify-center">
                   {activeFilters.length}
                 </span>
               )}
             </button>
 
             {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-xl shadow-lg p-2 z-10 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 card-elevated p-2 z-10 min-w-[140px]">
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
@@ -190,9 +190,19 @@ export default function TreatmentsPage() {
 
         {/* Treatment Grid */}
         {loading ? (
-          <div className="text-center py-8 text-subtle">불러오는 중...</div>
+          <div className="grid grid-cols-2 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="card-elevated overflow-hidden animate-pulse">
+                <div className="aspect-square bg-muted" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-muted rounded w-16" />
+                  <div className="h-4 bg-muted rounded w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 bg-surface rounded-xl border border-border">
+          <div className="text-center py-12 card-elevated">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-subtle">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -204,7 +214,7 @@ export default function TreatmentsPage() {
             <p className="text-subtle text-sm">시술 기록이 없습니다</p>
             <Link
               href="/treatments/new"
-              className="inline-block mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm"
+              className="inline-block mt-3 px-4 py-2 bg-accent text-accent-foreground rounded-full text-sm"
             >
               기록 시작하기
             </Link>
@@ -219,13 +229,13 @@ export default function TreatmentsPage() {
                 <Link
                   key={t.id}
                   href={`/treatments/${t.id}`}
-                  className="block rounded-xl overflow-hidden border border-border active:scale-[0.98] transition-transform"
+                  className="block card-elevated overflow-hidden active:scale-[0.98] transition-transform"
                 >
                   {/* Photo */}
                   <div className="aspect-square bg-muted relative">
                     {photo ? (
                       <Image
-                        src={photo.face_swapped_url || photo.photo_url}
+                        src={photo.face_swapped_url || photo.mosaic_url || photo.photo_url}
                         alt={getCategoryLabel(t.service_type)}
                         fill
                         className="object-cover"
@@ -243,14 +253,21 @@ export default function TreatmentsPage() {
 
                     {/* AI Badge */}
                     {hasAiFaceSwap && (
-                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-accent text-primary-foreground text-[10px] font-bold rounded-full">
+                      <span className="absolute top-2 left-2 px-2 py-0.5 bg-accent/90 backdrop-blur-sm text-white text-[10px] font-bold rounded-full">
                         AI
+                      </span>
+                    )}
+
+                    {/* Mosaic Badge */}
+                    {photo && photo.mosaic_url && !photo.face_swapped_url && (
+                      <span className="absolute top-2 right-2 px-2 py-0.5 bg-blue-500/90 text-white text-[10px] font-bold rounded-full">
+                        M
                       </span>
                     )}
                   </div>
 
                   {/* Info */}
-                  <div className="p-2.5">
+                  <div className="p-3">
                     <div className="text-xs text-subtle">
                       {new Date(t.created_at).toLocaleDateString("ko-KR")}
                     </div>

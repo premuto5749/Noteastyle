@@ -18,7 +18,7 @@ export function AppHeader() {
   if (!isMainPage || !currentShop) return null;
 
   return (
-    <header className="sticky top-0 z-40 bg-header-bg backdrop-blur-sm border-b border-border">
+    <header className="sticky top-0 z-40 glass border-b border-border/30 shadow-sm">
       <div className="flex items-center justify-between px-4 h-12">
         {/* Left: Logo or shop name */}
         <div className="flex items-center gap-2 min-w-0">
