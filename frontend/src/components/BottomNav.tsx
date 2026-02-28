@@ -7,7 +7,7 @@ import { useShop } from "@/contexts/ShopContext";
 const NAV_ITEMS = [
   { href: "/customers", label: "고객", icon: CustomerIcon },
   { href: "/explore", label: "탐색", icon: ExploreIcon },
-  { href: "/", label: "홈", icon: HomeLogoIcon, isCenter: true },
+  { href: "/", label: "홈", icon: HomeIcon, isCenter: true },
   { href: "/tasks", label: "작업", icon: TaskIcon },
   { href: "/portfolio", label: "포트폴리오", icon: PortfolioIcon },
 ];
@@ -25,51 +25,59 @@ export function BottomNav() {
   if (!currentShop) return null;
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-card border-t border-border z-50">
-      <div className="flex justify-around items-center h-16">
-        {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 text-xs transition-colors ${
-                isActive
-                  ? "text-foreground"
-                  : item.isCenter
-                    ? "text-muted-foreground"
-                    : "text-subtle"
-              }`}
-            >
-              <item.icon active={isActive} />
-              <span className={item.isCenter ? "font-semibold" : ""}>
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50">
+      <div className="glass border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
+        <div className="flex justify-around items-end h-16 px-2">
+          {NAV_ITEMS.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative flex flex-col items-center gap-0.5 px-3 pt-2 pb-1.5 transition-colors ${
+                  isActive ? "text-accent" : "text-subtle"
+                }`}
+              >
+                {/* Active indicator dot */}
+                {isActive && (
+                  <span className="absolute top-0 w-5 h-0.5 rounded-full bg-accent" />
+                )}
+                <item.icon active={isActive} />
+                <span className={`text-[10px] ${isActive ? "font-semibold" : "font-normal"}`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
 }
 
-function HomeLogoIcon({ active }: { active: boolean }) {
+function HomeIcon({ active }: { active: boolean }) {
   return (
     <svg
-      width="26"
-      height="26"
+      width="24"
+      height="24"
       viewBox="0 0 24 24"
-      fill="none"
+      fill={active ? "currentColor" : "none"}
       stroke="currentColor"
-      strokeWidth={active ? 2.5 : 2}
+      strokeWidth={active ? 0 : 1.8}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
+      {active ? (
+        <path d="M3 9.5L12 2l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9.5z" />
+      ) : (
+        <>
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </>
+      )}
     </svg>
   );
 }
@@ -77,17 +85,17 @@ function HomeLogoIcon({ active }: { active: boolean }) {
 function ExploreIcon({ active }: { active: boolean }) {
   return (
     <svg
-      width="24"
-      height="24"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={active ? 2.5 : 2}
+      strokeWidth={active ? 2.2 : 1.8}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="12" cy="12" r="10" />
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" />
     </svg>
   );
 }
@@ -95,12 +103,12 @@ function ExploreIcon({ active }: { active: boolean }) {
 function CustomerIcon({ active }: { active: boolean }) {
   return (
     <svg
-      width="24"
-      height="24"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={active ? 2.5 : 2}
+      strokeWidth={active ? 2.2 : 1.8}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -113,18 +121,19 @@ function CustomerIcon({ active }: { active: boolean }) {
 function TaskIcon({ active }: { active: boolean }) {
   return (
     <svg
-      width="24"
-      height="24"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={active ? 2.5 : 2}
+      strokeWidth={active ? 2.2 : 1.8}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      <rect x="8" y="2" width="8" height="4" rx="1" />
-      <path d="9 14l2 2 4-4" />
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4" />
+      <path d="M8 2v4" />
+      <path d="M3 10h18" />
     </svg>
   );
 }
@@ -132,12 +141,12 @@ function TaskIcon({ active }: { active: boolean }) {
 function PortfolioIcon({ active }: { active: boolean }) {
   return (
     <svg
-      width="24"
-      height="24"
+      width="22"
+      height="22"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={active ? 2.5 : 2}
+      strokeWidth={active ? 2.2 : 1.8}
       strokeLinecap="round"
       strokeLinejoin="round"
     >
