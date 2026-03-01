@@ -83,9 +83,8 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
     if (!modelName || !modelFile) return;
     setModelUploading(true);
     try {
-      await api.uploadFaceModel(modelName, modelGender, modelFile);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      await loadModels();
+      const newModel = await api.uploadFaceModel(modelName, modelGender, modelFile);
+      setModels((prev) => [...prev, newModel]);
       setShowModelAdd(false);
       setModelName("");
       setModelFile(null);
