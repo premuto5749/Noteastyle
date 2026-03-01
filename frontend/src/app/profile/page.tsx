@@ -163,7 +163,7 @@ export default function ProfilePage() {
               value={specialty}
               onChange={(e) => setSpecialty(e.target.value)}
               placeholder="예: 헤어 컬러, 네일 아트"
-              className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
           </div>
           <div>
@@ -173,7 +173,7 @@ export default function ProfilePage() {
               onChange={(e) => setBio(e.target.value.slice(0, 100))}
               placeholder="간단한 자기소개를 작성해주세요"
               rows={2}
-              className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring resize-none"
+              className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none"
             />
             <p className="text-[11px] text-subtle text-right mt-0.5">{bio.length}/100</p>
           </div>
@@ -188,7 +188,7 @@ export default function ProfilePage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="주소 입력 (공개 프로필에서는 시/구까지만 표시됩니다)"
-              className="w-full px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-full px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
             <p className="text-[11px] text-subtle mt-1">예: 서울시 강남구 역삼동 → 공개 시 "서울시 강남구"로 표시</p>
           </div>
@@ -219,13 +219,13 @@ export default function ProfilePage() {
                     value={career.company}
                     onChange={(e) => updateCareer(i, { company: e.target.value })}
                     placeholder="회사/매장명"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   {/* 직급 */}
                   <select
                     value={career.position}
                     onChange={(e) => updateCareer(i, { position: e.target.value })}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
                     <option value="">직급 선택</option>
                     {POSITION_PRESETS.map((p) => (
@@ -243,7 +243,7 @@ export default function ProfilePage() {
                         updateCareer(i, { start_date: `${y}-${m}` });
                       }}
                       placeholder="년"
-                      className="w-16 px-2 py-2 bg-surface border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:border-ring"
+                      className="w-16 px-2 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-accent/20"
                     />
                     <select
                       value={parseInt(career.start_date.split('-')[1]) || 1}
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                         const y = career.start_date.split('-')[0] || new Date().getFullYear();
                         updateCareer(i, { start_date: `${y}-${String(e.target.value).padStart(2, '0')}` });
                       }}
-                      className="w-16 px-1 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                      className="w-16 px-1 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                     >
                       {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
                     </select>
@@ -277,7 +277,7 @@ export default function ProfilePage() {
                             updateCareer(i, { end_date: `${y}-${m}` });
                           }}
                           placeholder="년"
-                          className="w-16 px-2 py-2 bg-surface border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:border-ring"
+                          className="w-16 px-2 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-accent/20"
                         />
                         <select
                           value={parseInt(career.end_date.split('-')[1]) || 1}
@@ -285,7 +285,7 @@ export default function ProfilePage() {
                             const y = career.end_date!.split('-')[0] || new Date().getFullYear();
                             updateCareer(i, { end_date: `${y}-${String(e.target.value).padStart(2, '0')}` });
                           }}
-                          className="w-16 px-1 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                          className="w-16 px-1 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                         >
                           {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
                         </select>
@@ -313,7 +313,7 @@ export default function ProfilePage() {
                     value={career.duties}
                     onChange={(e) => updateCareer(i, { duties: e.target.value })}
                     placeholder="담당 업무 (예: 헤어 컬러 전담, 교육 담당)"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                 </div>
                 <button
@@ -363,7 +363,7 @@ export default function ProfilePage() {
                         if (preset) updateCertification(i, { name: preset.name, issuer: preset.issuer });
                       }
                     }}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
                     <option value="">자격증 선택</option>
                     {CERT_PRESETS.map((p) => (
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                       value={cert.name}
                       onChange={(e) => updateCertification(i, { name: e.target.value })}
                       placeholder="자격증명 직접 입력"
-                      className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                      className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                     />
                   )}
                   {/* 발급기관 */}
@@ -387,7 +387,7 @@ export default function ProfilePage() {
                     value={cert.issuer}
                     onChange={(e) => updateCertification(i, { issuer: e.target.value })}
                     placeholder="발급기관"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   {/* 취득일 — 년 + 월 */}
                   <div className="flex items-center gap-1.5">
@@ -400,7 +400,7 @@ export default function ProfilePage() {
                         updateCertification(i, { date: `${y}-${m}` });
                       }}
                       placeholder="년"
-                      className="w-16 px-2 py-2 bg-surface border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:border-ring"
+                      className="w-16 px-2 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-accent/20"
                     />
                     <select
                       value={parseInt(cert.date.split('-')[1]) || 1}
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                         const y = cert.date.split('-')[0] || new Date().getFullYear();
                         updateCertification(i, { date: `${y}-${String(e.target.value).padStart(2, '0')}` });
                       }}
-                      className="w-16 px-1 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                      className="w-16 px-1 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                     >
                       {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
                     </select>
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                     value={cert.license_number}
                     onChange={(e) => updateCertification(i, { license_number: e.target.value })}
                     placeholder="자격증 번호 (선택)"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                 </div>
                 <button
@@ -463,7 +463,7 @@ export default function ProfilePage() {
                     value={edu.school}
                     onChange={(e) => updateEducation(i, { school: e.target.value })}
                     placeholder="학교명"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   {/* 전공/학과 */}
                   <input
@@ -471,7 +471,7 @@ export default function ProfilePage() {
                     value={edu.major}
                     onChange={(e) => updateEducation(i, { major: e.target.value })}
                     placeholder="전공/학과 (예: 미용예술학과)"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   {/* 기간 */}
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -484,7 +484,7 @@ export default function ProfilePage() {
                         updateEducation(i, { start_date: `${y}-${m}` });
                       }}
                       placeholder="년"
-                      className="w-16 px-2 py-2 bg-surface border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:border-ring"
+                      className="w-16 px-2 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-accent/20"
                     />
                     <select
                       value={parseInt(edu.start_date.split('-')[1]) || 3}
@@ -492,7 +492,7 @@ export default function ProfilePage() {
                         const y = edu.start_date.split('-')[0] || new Date().getFullYear();
                         updateEducation(i, { start_date: `${y}-${String(e.target.value).padStart(2, '0')}` });
                       }}
-                      className="w-16 px-1 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                      className="w-16 px-1 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                     >
                       {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
                     </select>
@@ -518,7 +518,7 @@ export default function ProfilePage() {
                             updateEducation(i, { end_date: `${y}-${m}` });
                           }}
                           placeholder="년"
-                          className="w-16 px-2 py-2 bg-surface border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:border-ring"
+                          className="w-16 px-2 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground text-center focus:outline-none focus:ring-2 focus:ring-accent/20"
                         />
                         <select
                           value={parseInt(edu.end_date.split('-')[1]) || 2}
@@ -526,7 +526,7 @@ export default function ProfilePage() {
                             const y = edu.end_date!.split('-')[0] || new Date().getFullYear();
                             updateEducation(i, { end_date: `${y}-${String(e.target.value).padStart(2, '0')}` });
                           }}
-                          className="w-16 px-1 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                          className="w-16 px-1 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                         >
                           {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
                         </select>
@@ -546,7 +546,7 @@ export default function ProfilePage() {
                   <select
                     value={edu.status}
                     onChange={(e) => updateEducation(i, { status: e.target.value })}
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-ring"
+                    className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
                     {GRADUATION_STATUS.map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -579,7 +579,7 @@ export default function ProfilePage() {
                 value={snsLinks.instagram ?? ""}
                 onChange={(e) => setSnsLinks({ ...snsLinks, instagram: e.target.value || undefined })}
                 placeholder="@username 또는 URL"
-                className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
             <div>
@@ -589,7 +589,7 @@ export default function ProfilePage() {
                 value={snsLinks.kakao ?? ""}
                 onChange={(e) => setSnsLinks({ ...snsLinks, kakao: e.target.value || undefined })}
                 placeholder="카카오톡 ID 또는 오픈채팅 URL"
-                className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
             <div>
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                 value={snsLinks.youtube ?? ""}
                 onChange={(e) => setSnsLinks({ ...snsLinks, youtube: e.target.value || undefined })}
                 placeholder="채널 URL"
-                className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
             <div>
@@ -609,7 +609,7 @@ export default function ProfilePage() {
                 value={snsLinks.blog ?? ""}
                 onChange={(e) => setSnsLinks({ ...snsLinks, blog: e.target.value || undefined })}
                 placeholder="블로그 URL"
-                className="w-full mt-1 px-3 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full mt-1 px-3 py-2.5 bg-surface border border-border rounded-xl text-sm text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
           </div>
@@ -628,7 +628,7 @@ export default function ProfilePage() {
                 type="checkbox"
                 checked={showContact}
                 onChange={(e) => setShowContact(e.target.checked)}
-                className="w-5 h-5 rounded text-primary focus:ring-primary"
+                className="w-5 h-5 rounded text-accent focus:ring-accent"
               />
             </label>
             <label className="flex items-center justify-between p-3 bg-card border border-border rounded-xl cursor-pointer">
@@ -640,7 +640,7 @@ export default function ProfilePage() {
                 type="checkbox"
                 checked={isPublic}
                 onChange={(e) => setIsPublic(e.target.checked)}
-                className="w-5 h-5 rounded text-primary focus:ring-primary"
+                className="w-5 h-5 rounded text-accent focus:ring-accent"
               />
             </label>
           </div>
@@ -650,7 +650,7 @@ export default function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-3 bg-primary text-primary-foreground rounded-xl text-sm font-semibold disabled:opacity-50 transition-opacity"
+          className="w-full py-3 bg-accent text-white rounded-xl text-sm font-semibold disabled:opacity-50 transition-opacity"
         >
           {saving ? "저장 중..." : "저장"}
         </button>

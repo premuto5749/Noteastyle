@@ -288,7 +288,7 @@ function ReservationForm() {
                 }}
                 placeholder="010-0000-0000"
                 readOnly={!!matchedCustomer}
-                className={`w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent ${matchedCustomer ? "bg-muted text-muted-foreground" : ""}`}
+                className={`w-full px-3 py-2.5 border border-border rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-accent/20 ${matchedCustomer ? "bg-muted text-muted-foreground" : "bg-surface"}`}
                 autoFocus
               />
             </div>
@@ -305,7 +305,7 @@ function ReservationForm() {
                 }}
                 placeholder="홍길동"
                 readOnly={!!matchedCustomer}
-                className={`w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent ${matchedCustomer ? "bg-muted text-muted-foreground" : ""}`}
+                className={`w-full px-3 py-2.5 border border-border rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-accent/20 ${matchedCustomer ? "bg-muted text-muted-foreground" : "bg-surface"}`}
               />
             </div>
           </div>
@@ -385,7 +385,7 @@ function ReservationForm() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            className="w-full px-3 py-2.5 border border-border rounded-xl text-base bg-surface focus:outline-none focus:ring-2 focus:ring-accent/20"
           />
         </div>
 
@@ -397,7 +397,7 @@ function ReservationForm() {
           <select
             value={time}
             onChange={(e) => setTime(e.target.value)}
-            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent bg-card"
+            className="w-full px-3 py-2.5 border border-border rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-accent/20 bg-surface"
           >
             {TIME_OPTIONS.map((t) => (
               <option key={t} value={t}>
@@ -420,8 +420,8 @@ function ReservationForm() {
                 onClick={() => setDuration(d)}
                 className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
                   duration === d
-                    ? "bg-primary text-primary-foreground border-ring"
-                    : "bg-card text-muted-foreground border-input"
+                    ? "bg-accent text-white border-accent"
+                    : "bg-card text-muted-foreground border-border"
                 }`}
               >
                 {d}분
@@ -457,7 +457,7 @@ function ReservationForm() {
             onChange={(e) => setNotes(e.target.value)}
             placeholder="요청사항, 특이사항 등"
             rows={2}
-            className="w-full px-4 py-3 border border-input rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent resize-none"
+            className="w-full px-3 py-2.5 border border-border rounded-xl text-base bg-surface focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none"
           />
         </div>
 
@@ -465,7 +465,7 @@ function ReservationForm() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-base active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-accent text-white rounded-2xl font-bold text-base active:scale-95 transition-transform disabled:opacity-50"
         >
           {submitting ? "등록 중..." : "예약 등록"}
         </button>

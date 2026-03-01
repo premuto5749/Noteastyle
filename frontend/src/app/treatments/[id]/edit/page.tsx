@@ -162,14 +162,14 @@ export default function EditTreatmentPage() {
               value={productBrand}
               onChange={(e) => setProductBrand(e.target.value)}
               placeholder="브랜드 (예: 로레알)"
-              className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
             <input
               type="text"
               value={productCode}
               onChange={(e) => setProductCode(e.target.value)}
               placeholder="코드 (예: 7.1)"
-              className="w-24 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-24 px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
             <button
               onClick={addProduct}
@@ -191,7 +191,7 @@ export default function EditTreatmentPage() {
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 placeholder="예: 뿌리, 전체"
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
             <div>
@@ -201,7 +201,7 @@ export default function EditTreatmentPage() {
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 placeholder="30"
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
           </div>
@@ -212,7 +212,7 @@ export default function EditTreatmentPage() {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="50000"
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
           </div>
           <div>
@@ -239,7 +239,7 @@ export default function EditTreatmentPage() {
               onChange={(e) => setNotes(e.target.value)}
               placeholder="시술 관련 메모..."
               rows={3}
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring resize-none"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none"
             />
           </div>
           <div>
@@ -249,7 +249,7 @@ export default function EditTreatmentPage() {
               value={nextVisit}
               onChange={(e) => setNextVisit(e.target.value)}
               placeholder="예: 4주 후 리터치 권장"
-              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
           </div>
         </div>
@@ -258,7 +258,7 @@ export default function EditTreatmentPage() {
         <button
           onClick={handleSubmit}
           disabled={saving || !selectedCategory}
-          className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
+          className="w-full py-4 bg-accent text-white rounded-2xl font-bold text-lg active:scale-95 transition-transform disabled:opacity-50"
         >
           {saving ? "저장 중..." : "수정 완료"}
         </button>

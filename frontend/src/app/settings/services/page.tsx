@@ -245,19 +245,19 @@ export default function ServiceSettingsPage() {
                         type="text"
                         value={editCatIcon}
                         onChange={(e) => setEditCatIcon(e.target.value)}
-                        className="w-10 px-1 py-1.5 border border-border rounded-lg text-center text-sm bg-card text-foreground"
+                        className="w-10 px-1 py-1.5 border border-border rounded-lg text-center text-sm bg-muted/50 text-foreground"
                         placeholder="🔧"
                       />
                       <input
                         type="text"
                         value={editCatName}
                         onChange={(e) => setEditCatName(e.target.value)}
-                        className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                       />
                       <button
                         onClick={() => handleUpdateCategory(cat.id)}
                         disabled={saving}
-                        className="px-2 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium disabled:opacity-50"
+                        className="px-2 py-1.5 rounded-lg bg-accent text-white text-xs font-medium disabled:opacity-50"
                       >
                         저장
                       </button>
@@ -364,7 +364,7 @@ export default function ServiceSettingsPage() {
                                   type="text"
                                   value={editSvcName}
                                   onChange={(e) => setEditSvcName(e.target.value)}
-                                  className="w-full px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                                  className="w-full px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                                   placeholder="시술명"
                                 />
                                 <div className="flex gap-2">
@@ -372,14 +372,14 @@ export default function ServiceSettingsPage() {
                                     type="number"
                                     value={editSvcDuration}
                                     onChange={(e) => setEditSvcDuration(e.target.value)}
-                                    className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground"
+                                    className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground"
                                     placeholder="소요시간(분)"
                                   />
                                   <input
                                     type="number"
                                     value={editSvcPrice}
                                     onChange={(e) => setEditSvcPrice(e.target.value)}
-                                    className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground"
+                                    className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground"
                                     placeholder="가격(원)"
                                   />
                                 </div>
@@ -387,7 +387,7 @@ export default function ServiceSettingsPage() {
                                   <button
                                     onClick={() => handleUpdateService(svc.id)}
                                     disabled={saving}
-                                    className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium disabled:opacity-50"
+                                    className="px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium disabled:opacity-50"
                                   >
                                     저장
                                   </button>
@@ -452,7 +452,7 @@ export default function ServiceSettingsPage() {
                           type="text"
                           value={newSvcName}
                           onChange={(e) => setNewSvcName(e.target.value)}
-                          className="w-full px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                          className="w-full px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                           placeholder="시술명 (예: 여성 커트)"
                           autoFocus
                         />
@@ -461,14 +461,14 @@ export default function ServiceSettingsPage() {
                             type="number"
                             value={newSvcDuration}
                             onChange={(e) => setNewSvcDuration(e.target.value)}
-                            className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground"
+                            className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground"
                             placeholder="소요시간(분)"
                           />
                           <input
                             type="number"
                             value={newSvcPrice}
                             onChange={(e) => setNewSvcPrice(e.target.value)}
-                            className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-card text-foreground"
+                            className="flex-1 px-3 py-1.5 border border-border rounded-lg text-sm bg-muted/50 text-foreground"
                             placeholder="가격(원)"
                           />
                         </div>
@@ -476,7 +476,7 @@ export default function ServiceSettingsPage() {
                           <button
                             onClick={() => handleAddService(cat.id)}
                             disabled={saving || !newSvcName.trim()}
-                            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium disabled:opacity-50"
+                            className="px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium disabled:opacity-50"
                           >
                             추가
                           </button>
@@ -496,7 +496,7 @@ export default function ServiceSettingsPage() {
                     ) : (
                       <button
                         onClick={() => setAddingSvcToCatId(cat.id)}
-                        className="w-full px-4 py-2.5 text-sm text-primary font-medium border-t border-border text-center"
+                        className="w-full px-4 py-2.5 text-sm text-accent font-medium border-t border-border text-center"
                       >
                         + 시술 추가
                       </button>
@@ -514,14 +514,14 @@ export default function ServiceSettingsPage() {
                     type="text"
                     value={newCatIcon}
                     onChange={(e) => setNewCatIcon(e.target.value)}
-                    className="w-12 px-2 py-2 border border-border rounded-lg text-center text-sm bg-card text-foreground"
+                    className="w-12 px-2 py-2 border border-border rounded-lg text-center text-sm bg-muted/50 text-foreground"
                     placeholder="🔧"
                   />
                   <input
                     type="text"
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="flex-1 px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                     placeholder="카테고리 이름 (예: 헤드스파)"
                     autoFocus
                   />
@@ -530,7 +530,7 @@ export default function ServiceSettingsPage() {
                   <button
                     onClick={handleAddCategory}
                     disabled={saving || !newCatName.trim()}
-                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium disabled:opacity-50"
                   >
                     추가
                   </button>

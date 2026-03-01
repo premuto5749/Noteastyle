@@ -19,7 +19,7 @@ export default function SettingsPage() {
   return (
     <div className="pb-4">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-header-bg backdrop-blur-sm border-b border-border px-4 py-3">
+      <div className="sticky top-0 z-40 glass border-b border-border px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
             href="/"
@@ -70,7 +70,7 @@ export default function SettingsPage() {
                 <select
                   value={currentShop.shop_id}
                   onChange={(e) => switchShop(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                 >
                   {shops.map((s) => (
                     <option key={s.shop_id} value={s.shop_id}>
