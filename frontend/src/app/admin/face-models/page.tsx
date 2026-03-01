@@ -40,12 +40,14 @@ export default function AdminFaceModelsPage() {
 
   const fetchModels = async () => {
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/admin/face-models");
       if (res.ok) {
         setModels(await res.json());
       } else {
-        setError("모델 목록을 불러오지 못했습니다.");
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || `모델 목록을 불러오지 못했습니다. (${res.status})`);
       }
     } catch {
       setError("네트워크 오류가 발생했습니다.");
@@ -70,7 +72,8 @@ export default function AdminFaceModelsPage() {
       });
 
       if (res.ok) {
-        await fetchModels();
+        const newModel = await res.json();
+        setModels((prev) => [...prev, newModel]);
         setShowAdd(false);
         setName("");
         setCategory("");
@@ -158,8 +161,14 @@ export default function AdminFaceModelsPage() {
 
       <div className="px-4 pb-24">
         {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
-            {error}
+          <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-center justify-between gap-2">
+            <span>{error}</span>
+            <button
+              onClick={fetchModels}
+              className="shrink-0 text-xs underline text-red-500 dark:text-red-400"
+            >
+              재시도
+            </button>
           </div>
         )}
 
