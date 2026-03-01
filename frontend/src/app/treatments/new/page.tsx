@@ -7,11 +7,13 @@ import { ServiceSelector } from "@/components/ServiceSelector";
 import { VoiceMemo } from "@/components/VoiceMemo";
 import { transcribeVoiceMemo, type ProductUsed, type ShopService } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
+import { useShop } from "@/contexts/ShopContext";
 import { useServiceMenu } from "@/hooks/useServiceMenu";
 
 export default function NewTreatmentPage() {
   const router = useRouter();
   const { api } = useShopApi();
+  const { currentShop } = useShop();
   const { categories } = useServiceMenu();
   const [customerName, setCustomerName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function NewTreatmentPage() {
   const handleVoiceMemo = async (blob: Blob) => {
     setVoiceProcessing(true);
     try {
-      const result = await transcribeVoiceMemo(blob);
+      const result = await transcribeVoiceMemo(blob, currentShop?.shop_id);
       if (result.customer_name) setCustomerName(result.customer_name);
       if (result.service_type) setSelectedCategory(result.service_type);
       if (result.products_used) setProducts(result.products_used);

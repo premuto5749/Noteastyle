@@ -7,7 +7,14 @@ interface PhotoAnnotation {
   x: number;
   y: number;
   text: string;
+  type?: "pin" | "chip";
+  category?: "area" | "product" | "time" | "caution" | "result";
+  source?: "manual" | "voice_ai";
 }
+
+const VALID_ANNOTATION_TYPES = ["pin", "chip"];
+const VALID_CATEGORIES = ["area", "product", "time", "caution", "result"];
+const VALID_SOURCES = ["manual", "voice_ai"];
 
 const VALID_PHOTO_TYPES = ["before", "during", "after"];
 
@@ -104,9 +111,46 @@ export const PATCH = withShopAuth<{
           { status: 400 }
         );
       }
+      if (ann.type !== undefined && !VALID_ANNOTATION_TYPES.includes(ann.type)) {
+        return NextResponse.json(
+          { detail: "Annotation type must be 'pin' or 'chip'" },
+          { status: 400 }
+        );
+      }
+      if (ann.category !== undefined && !VALID_CATEGORIES.includes(ann.category)) {
+        return NextResponse.json(
+          { detail: "Invalid annotation category" },
+          { status: 400 }
+        );
+      }
+      if (ann.source !== undefined && !VALID_SOURCES.includes(ann.source)) {
+        return NextResponse.json(
+          { detail: "Annotation source must be 'manual' or 'voice_ai'" },
+          { status: 400 }
+        );
+      }
     }
 
     updateData.annotations = annotations;
+  }
+
+  // Validate and set drawing_data
+  if (body.drawing_data !== undefined) {
+    if (body.drawing_data !== null) {
+      if (!body.drawing_data.shapes || !Array.isArray(body.drawing_data.shapes)) {
+        return NextResponse.json(
+          { detail: "drawing_data.shapes must be an array" },
+          { status: 400 }
+        );
+      }
+      if (body.drawing_data.shapes.length > 50) {
+        return NextResponse.json(
+          { detail: "Maximum 50 drawing shapes allowed" },
+          { status: 400 }
+        );
+      }
+    }
+    updateData.drawing_data = body.drawing_data;
   }
 
   if (Object.keys(updateData).length === 0) {

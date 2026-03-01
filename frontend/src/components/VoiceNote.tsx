@@ -2,13 +2,23 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useShopApi } from "@/hooks/useShopApi";
+import { useShop } from "@/contexts/ShopContext";
 import {
   transcribeVoiceMemo,
   type Reservation,
   type VoiceMemoResult,
+  type KeyComment,
 } from "@/lib/api";
 
 type VoiceNoteState = "idle" | "recording" | "processing" | "confirming" | "saved";
+
+const CHIP_COLORS: Record<string, string> = {
+  area: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+  product: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
+  time: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
+  caution: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+  result: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300",
+};
 
 interface VoiceNoteProps {
   reservation?: Reservation;
@@ -24,6 +34,7 @@ export function VoiceNote({
   onClose,
 }: VoiceNoteProps) {
   const { api } = useShopApi();
+  const { currentShop } = useShop();
   const [state, setState] = useState<VoiceNoteState>("idle");
   const [duration, setDuration] = useState(0);
   const [aiResult, setAiResult] = useState<VoiceMemoResult | null>(null);
@@ -92,7 +103,7 @@ export function VoiceNote({
         setState("processing");
 
         try {
-          const result = await transcribeVoiceMemo(blob);
+          const result = await transcribeVoiceMemo(blob, currentShop?.shop_id);
           setAiResult(result);
           setEditedResult({ ...result });
           setState("confirming");
@@ -361,6 +372,26 @@ export function VoiceNote({
                 placeholder="메모"
               />
             </div>
+
+            {/* AI Key Comments (Chips) */}
+            {editedResult.key_comments && editedResult.key_comments.length > 0 && (
+              <div>
+                <label className="text-xs text-muted-foreground block mb-2">핵심 코멘트</label>
+                <div className="flex flex-wrap gap-2">
+                  {editedResult.key_comments.map((comment, i) => (
+                    <span
+                      key={i}
+                      className={`text-xs px-2 py-1 rounded-full ${CHIP_COLORS[comment.category] || "bg-muted text-muted-foreground"}`}
+                    >
+                      {comment.text}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[10px] text-subtle mt-1">
+                  저장 후 사진 위에 배치할 수 있습니다
+                </p>
+              </div>
+            )}
 
             {/* Next visit */}
             {editedResult.next_visit_recommendation && (

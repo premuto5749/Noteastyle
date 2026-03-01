@@ -124,8 +124,14 @@ export default function TreatmentDetailPage() {
     }
   }
 
-  async function handleSaveAnnotations(photo: TreatmentPhoto, annotations: PhotoAnnotation[]) {
-    await api.updatePhoto(photo.treatment_id, photo.id, { annotations });
+  async function handleSaveAnnotations(
+    photo: TreatmentPhoto,
+    data: { annotations: PhotoAnnotation[]; drawing_data: import("@/lib/api").DrawingData | null }
+  ) {
+    await api.updatePhoto(photo.treatment_id, photo.id, {
+      annotations: data.annotations,
+      drawing_data: data.drawing_data,
+    });
     await loadData();
   }
 
@@ -265,6 +271,7 @@ export default function TreatmentDetailPage() {
             <StyleNoteOverlay treatment={treatment} />
             <AnnotationOverlay
               annotations={sortedPhotos[activeIndex]?.annotations || []}
+              drawingData={sortedPhotos[activeIndex]?.drawing_data}
               onPinTap={() => {
                 const photo = sortedPhotos[activeIndex];
                 if (photo && (photo.media_type || "photo") === "photo") {
@@ -696,7 +703,7 @@ export default function TreatmentDetailPage() {
       {annotatingPhoto && (
         <PhotoAnnotationEditor
           photo={annotatingPhoto}
-          onSave={(annotations) => handleSaveAnnotations(annotatingPhoto, annotations)}
+          onSave={(data) => handleSaveAnnotations(annotatingPhoto, data)}
           onClose={() => setAnnotatingPhoto(null)}
         />
       )}

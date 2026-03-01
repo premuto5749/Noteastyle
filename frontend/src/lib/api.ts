@@ -60,6 +60,32 @@ export interface PhotoAnnotation {
   x: number;
   y: number;
   text: string;
+  type?: "pin" | "chip";
+  category?: "area" | "product" | "time" | "caution" | "result";
+  source?: "manual" | "voice_ai";
+}
+
+// AI Voice Key Comments
+export interface KeyComment {
+  text: string;
+  category: "area" | "product" | "time" | "caution" | "result";
+}
+
+// Drawing Canvas
+export interface DrawingShape {
+  id: string;
+  type: "freehand" | "circle" | "arrow" | "line";
+  points?: number[];      // % 좌표 [x1,y1,x2,y2,...]
+  x?: number;             // % — circle 중심
+  y?: number;             // % — circle 중심
+  radius?: number;        // % — circle 반지름
+  stroke: string;         // hex color
+  strokeWidth: number;    // px
+}
+
+export interface DrawingData {
+  version: 1;
+  shapes: DrawingShape[];
 }
 
 export interface TreatmentPhoto {
@@ -76,6 +102,7 @@ export interface TreatmentPhoto {
   video_duration_seconds: number | null;
   thumbnail_url: string | null;
   annotations: PhotoAnnotation[] | null;
+  drawing_data: DrawingData | null;
   deleted_at: string | null;
 }
 
@@ -196,6 +223,7 @@ export interface VoiceMemoResult {
   satisfaction: string | null;
   next_visit_recommendation: string | null;
   summary: string | null;
+  key_comments: KeyComment[] | null;
 }
 
 // Face Swap types
@@ -410,7 +438,7 @@ export function createShopApi(shopId: string) {
     updatePhoto(
       treatmentId: string,
       photoId: string,
-      data: { annotations?: PhotoAnnotation[]; photo_type?: string }
+      data: { annotations?: PhotoAnnotation[]; photo_type?: string; drawing_data?: DrawingData | null }
     ) {
       return request<TreatmentPhoto>(
         `/shops/${shopId}/treatments/${treatmentId}/photos/${photoId}`,
@@ -652,9 +680,10 @@ export function createShopApi(shopId: string) {
 
 // ---------- Non-shop-scoped APIs ----------
 
-export async function transcribeVoiceMemo(audioBlob: Blob): Promise<VoiceMemoResult> {
+export async function transcribeVoiceMemo(audioBlob: Blob, shopId?: string): Promise<VoiceMemoResult> {
   const formData = new FormData();
   formData.append("file", audioBlob, "voice-memo.webm");
+  if (shopId) formData.append("shop_id", shopId);
 
   const res = await fetch(`${API_BASE}/voice/transcribe`, {
     method: "POST",

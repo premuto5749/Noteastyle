@@ -16,6 +16,11 @@ const ProductInfo = z.object({
   area: z.string().nullable().optional(),
 });
 
+const KeyComment = z.object({
+  text: z.string(),
+  category: z.enum(["area", "product", "time", "caution", "result"]),
+});
+
 const TreatmentExtraction = z.object({
   customer_name: z.string().nullable().optional(),
   service_type: z.string().nullable().optional(),
@@ -25,17 +30,25 @@ const TreatmentExtraction = z.object({
   satisfaction: z.string().nullable().optional(),
   next_visit_recommendation: z.string().nullable().optional(),
   summary: z.string().nullable().optional(),
+  key_comments: z.array(KeyComment).nullable().optional(),
 });
 
 export type TreatmentExtractionResult = z.infer<typeof TreatmentExtraction>;
 
-export async function transcribeAudio(audioBuffer: Buffer, filename: string): Promise<string> {
+export async function transcribeAudio(
+  audioBuffer: Buffer,
+  filename: string,
+  terminology?: string[]
+): Promise<string> {
   const file = new File([new Uint8Array(audioBuffer)], filename, { type: "audio/webm" });
 
   const transcription = await getOpenAI().audio.transcriptions.create({
     model: "whisper-1",
     file,
     language: "ko",
+    ...(terminology?.length && {
+      prompt: `미용실 시술 기록입니다. 관련 용어: ${terminology.slice(0, 50).join(", ")}`,
+    }),
   });
 
   if (!transcription.text || transcription.text.trim().length === 0) {
@@ -45,7 +58,14 @@ export async function transcribeAudio(audioBuffer: Buffer, filename: string): Pr
   return transcription.text;
 }
 
-export async function extractTreatmentInfo(transcript: string): Promise<TreatmentExtractionResult> {
+export async function extractTreatmentInfo(
+  transcript: string,
+  terminology?: string[]
+): Promise<TreatmentExtractionResult> {
+  const terminologyHint = terminology?.length
+    ? `\n매장 전문 용어: ${terminology.join(", ")}`
+    : "";
+
   const completion = await getOpenAI().chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -56,6 +76,11 @@ export async function extractTreatmentInfo(transcript: string): Promise<Treatmen
           "음성 메모 텍스트에서 시술 정보를 정확하게 추출하세요. " +
           "브랜드명과 제품 코드를 정확히 구분하세요. " +
           "예: '로레알 7.1' → brand='로레알', code='7.1'" +
+          "\n\nkey_comments: 음성에서 핵심 코멘트를 추출하세요. " +
+          "각 코멘트는 사진 위에 배치할 수 있는 짧은 문구(20자 이내)입니다. " +
+          "카테고리: area(시술부위), product(약제/제품), time(시간), caution(주의사항), result(결과평가). " +
+          "최대 8개까지 추출하세요." +
+          terminologyHint +
           "\n\n반드시 JSON 형식으로 응답하세요.",
       },
       {
@@ -69,7 +94,11 @@ export async function extractTreatmentInfo(transcript: string): Promise<Treatmen
   return TreatmentExtraction.parse(JSON.parse(content || "{}"));
 }
 
-export async function transcribeAndExtract(audioBuffer: Buffer, filename: string): Promise<TreatmentExtractionResult> {
-  const transcript = await transcribeAudio(audioBuffer, filename);
-  return extractTreatmentInfo(transcript);
+export async function transcribeAndExtract(
+  audioBuffer: Buffer,
+  filename: string,
+  terminology?: string[]
+): Promise<TreatmentExtractionResult> {
+  const transcript = await transcribeAudio(audioBuffer, filename, terminology);
+  return extractTreatmentInfo(transcript, terminology);
 }
