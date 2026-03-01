@@ -3,3 +3,4 @@
 | Feature | Match Rate | Archived | Documents |
 |---------|-----------|----------|-----------|
 | voice-photo-annotation | 93% | 2026-03-01 | plan, design, analysis, report |
+| fal-faceswap | 100% | 2026-03-01 | report |
