@@ -154,7 +154,7 @@ export function VoiceMemo({ onResult, disabled }: VoiceMemoProps) {
             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all active:scale-90 ${
               recording
                 ? "bg-red-500 animate-pulse shadow-lg shadow-red-900/30"
-                : "bg-primary"
+                : "bg-red-500 shadow-lg shadow-red-900/20"
             } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             {recording ? (

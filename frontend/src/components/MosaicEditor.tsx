@@ -43,40 +43,34 @@ export function MosaicEditor({ photoUrl, onComplete, onCancel }: MosaicEditorPro
     img.src = photoUrl;
   }, [photoUrl]);
 
-  const applyMosaic = useCallback(
+  const applyBlur = useCallback(
     (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
       if (w < 2 || h < 2) return;
-      const blockSize = Math.max(8, Math.min(w, h) / 6);
       const px = Math.max(0, Math.floor(x));
       const py = Math.max(0, Math.floor(y));
-      const pw = Math.min(Math.floor(w), ctx.canvas.width - px);
-      const ph = Math.min(Math.floor(h), ctx.canvas.height - py);
+      const pw = Math.min(Math.ceil(w), ctx.canvas.width - px);
+      const ph = Math.min(Math.ceil(h), ctx.canvas.height - py);
       if (pw <= 0 || ph <= 0) return;
 
-      const imageData = ctx.getImageData(px, py, pw, ph);
-      const data = imageData.data;
+      // Render the region to an offscreen canvas with blur filter
+      const offscreen = document.createElement("canvas");
+      offscreen.width = pw;
+      offscreen.height = ph;
+      const offCtx = offscreen.getContext("2d");
+      if (!offCtx) return;
 
-      for (let by = 0; by < ph; by += blockSize) {
-        for (let bx = 0; bx < pw; bx += blockSize) {
-          const sx = Math.min(Math.floor(bx + blockSize / 2), pw - 1);
-          const sy = Math.min(Math.floor(by + blockSize / 2), ph - 1);
-          const si = (sy * pw + sx) * 4;
-          const r = data[si];
-          const g = data[si + 1];
-          const b = data[si + 2];
+      const blurAmount = Math.max(12, Math.min(pw, ph) / 5);
+      offCtx.filter = `blur(${blurAmount}px)`;
+      offCtx.drawImage(ctx.canvas, px, py, pw, ph, 0, 0, pw, ph);
+      offCtx.filter = "none";
 
-          for (let fy = by; fy < Math.min(by + blockSize, ph); fy++) {
-            for (let fx = bx; fx < Math.min(bx + blockSize, pw); fx++) {
-              const fi = (fy * pw + fx) * 4;
-              data[fi] = r;
-              data[fi + 1] = g;
-              data[fi + 2] = b;
-            }
-          }
-        }
-      }
-
-      ctx.putImageData(imageData, px, py);
+      // Clip to ellipse and composite back
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(px + pw / 2, py + ph / 2, pw / 2, ph / 2, 0, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(offscreen, px, py);
+      ctx.restore();
     },
     []
   );
@@ -94,19 +88,29 @@ export function MosaicEditor({ photoUrl, onComplete, onCancel }: MosaicEditorPro
 
       const allRegions = tempReg ? [...regs, tempReg] : regs;
       for (const reg of allRegions) {
-        applyMosaic(ctx, reg.x, reg.y, reg.width, reg.height);
+        applyBlur(ctx, reg.x, reg.y, reg.width, reg.height);
       }
 
-      // Draw dashed border on temp region while drawing
+      // Draw dashed ellipse border on temp region while drawing
       if (tempReg) {
         ctx.strokeStyle = "rgba(255,255,255,0.7)";
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 4]);
-        ctx.strokeRect(tempReg.x, tempReg.y, tempReg.width, tempReg.height);
+        ctx.beginPath();
+        ctx.ellipse(
+          tempReg.x + tempReg.width / 2,
+          tempReg.y + tempReg.height / 2,
+          tempReg.width / 2,
+          tempReg.height / 2,
+          0,
+          0,
+          Math.PI * 2
+        );
+        ctx.stroke();
         ctx.setLineDash([]);
       }
     },
-    [applyMosaic]
+    [applyBlur]
   );
 
   useEffect(() => {
@@ -207,7 +211,7 @@ export function MosaicEditor({ photoUrl, onComplete, onCancel }: MosaicEditorPro
 
       {/* Instruction */}
       <div className="text-center py-2">
-        <p className="text-white/60 text-xs">모자이크할 영역을 드래그하세요</p>
+        <p className="text-white/60 text-xs">블러 처리할 타원 영역을 드래그하세요</p>
       </div>
 
       {/* Canvas area */}

@@ -84,6 +84,7 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
     setModelUploading(true);
     try {
       await api.uploadFaceModel(modelName, modelGender, modelFile);
+      await new Promise((resolve) => setTimeout(resolve, 800));
       await loadModels();
       setShowModelAdd(false);
       setModelName("");
@@ -410,7 +411,7 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
                     onClick={() => setSelectedResultId(result.id)}
                     className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-muted transition-all ${
                       selectedResultId === result.id
-                        ? "ring-3 ring-accent ring-offset-2 ring-offset-background"
+                        ? "ring-4 ring-accent ring-offset-2 ring-offset-background"
                         : ""
                     }`}
                   >

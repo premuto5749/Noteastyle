@@ -167,14 +167,16 @@ export function PhotoAnnotationEditor({
   if (showDrawingCanvas) {
     const dims = getImageDimensions();
     return (
-      <DrawingCanvas
-        imageUrl={photoSrc}
-        initialShapes={drawingShapes}
-        onSave={handleDrawingSave}
-        onClose={() => setShowDrawingCanvas(false)}
-        width={dims.width}
-        height={dims.height}
-      />
+      <div className="fixed inset-0 z-[60] flex flex-col bg-background">
+        <DrawingCanvas
+          imageUrl={photoSrc}
+          initialShapes={drawingShapes}
+          onSave={handleDrawingSave}
+          onClose={() => setShowDrawingCanvas(false)}
+          width={dims.width}
+          height={dims.height}
+        />
+      </div>
     );
   }
 
