@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { faceSwap } from "@/lib/services/replicate-service";
+import { faceSwap } from "@/lib/services/fal-service";
 import { requireAuth } from "@/lib/auth/require-auth";
 import { checkRateLimit, AI_API_RATE_LIMIT } from "@/lib/rate-limit";
 

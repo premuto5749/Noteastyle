@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFaceSwapStatus } from "@/lib/services/replicate-service";
+import { getFaceSwapStatus } from "@/lib/services/fal-service";
 import { requireAuth } from "@/lib/auth/require-auth";
 
 export async function GET(
