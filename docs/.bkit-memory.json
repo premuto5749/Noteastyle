@@ -1,0 +1,17 @@
+{
+  "sessionCount": 10,
+  "lastSession": {
+    "startedAt": "2026-03-01T05:02:27.561Z",
+    "platform": "claude",
+    "level": "Enterprise"
+  },
+  "currentFeature": null,
+  "phase": "archived",
+  "matchRate": 93,
+  "lastArchived": {
+    "feature": "voice-photo-annotation",
+    "matchRate": 93,
+    "archivedAt": "2026-03-01",
+    "archivedTo": "docs/archive/2026-03/voice-photo-annotation/"
+  }
+}
