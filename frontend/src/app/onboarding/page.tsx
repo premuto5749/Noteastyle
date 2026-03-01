@@ -126,7 +126,7 @@ export default function OnboardingPage() {
               onClick={() => setStep("create-shop")}
               className="w-full p-4 bg-surface border border-border rounded-2xl flex items-center gap-4 active:scale-[0.98] transition-transform text-left"
             >
-              <div className="w-12 h-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-accent text-white rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg
                   width="24"
                   height="24"
@@ -254,7 +254,7 @@ export default function OnboardingPage() {
                 onChange={(e) => setShopName(e.target.value)}
                 placeholder="예: 헤어라운지 강남점"
                 required
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -271,11 +271,11 @@ export default function OnboardingPage() {
                     onClick={() => setShopType(type.value)}
                     className={`p-3 rounded-xl border text-sm font-medium flex flex-col items-center gap-2 transition-all active:scale-95 ${
                       shopType === type.value
-                        ? "border-primary bg-primary text-primary-foreground"
+                        ? "border-accent bg-accent text-white"
                         : "border-border bg-surface text-foreground hover:border-subtle"
                     }`}
                   >
-                    <span className={shopType === type.value ? "text-primary-foreground" : "text-muted-foreground"}>
+                    <span className={shopType === type.value ? "text-white" : "text-muted-foreground"}>
                       {type.icon}
                     </span>
                     {type.label}
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="예: 서울 강남구 역삼동 123-45"
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -308,7 +308,7 @@ export default function OnboardingPage() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="예: 02-1234-5678"
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -322,7 +322,7 @@ export default function OnboardingPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="매장에서 사용할 이름 (미입력시 계정 이름 사용)"
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
 
@@ -331,7 +331,7 @@ export default function OnboardingPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 bg-primary text-primary-foreground rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
+                className="w-full py-3.5 bg-accent text-white rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
               >
                 {isSubmitting ? "등록 중..." : "매장 등록하기"}
               </button>
@@ -380,7 +380,7 @@ export default function OnboardingPage() {
                 onChange={(e) => setInviteToken(e.target.value)}
                 placeholder="링크 또는 초대 코드를 붙여넣기"
                 required
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
               <p className="text-xs text-muted-foreground mt-2">
                 예: https://noteastyle.com/invite/abc123 또는 abc123
@@ -391,7 +391,7 @@ export default function OnboardingPage() {
               <button
                 type="submit"
                 disabled={!inviteToken.trim()}
-                className="w-full py-3.5 bg-primary text-primary-foreground rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
+                className="w-full py-3.5 bg-accent text-white rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
               >
                 참여하기
               </button>

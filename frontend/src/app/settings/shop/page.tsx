@@ -281,12 +281,12 @@ export default function ShopSettingsPage() {
                   type="text"
                   value={shopName}
                   onChange={(e) => setShopName(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex-1 px-3 py-2 rounded-xl border border-border bg-muted/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                 />
                 <button
                   onClick={handleSaveName}
                   disabled={savingName || !shopName.trim()}
-                  className="px-3 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+                  className="px-3 py-2 rounded-xl bg-accent text-white text-sm font-medium disabled:opacity-50"
                 >
                   {savingName ? "저장 중..." : "저장"}
                 </button>
@@ -308,7 +308,7 @@ export default function ShopSettingsPage() {
                 {isOwnerOrAdmin && (
                   <button
                     onClick={() => setIsEditingName(true)}
-                    className="text-xs text-primary font-medium"
+                    className="text-xs text-accent font-medium"
                   >
                     수정
                   </button>
@@ -436,7 +436,7 @@ export default function ShopSettingsPage() {
                               handleRoleChange(member.id, e.target.value)
                             }
                             disabled={changingRole === member.id}
-                            className="text-xs px-2 py-1 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                            className="text-xs px-2 py-1 rounded-lg border border-border bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:opacity-50"
                           >
                             {isOwner && (
                               <option value="owner">
@@ -490,7 +490,7 @@ export default function ShopSettingsPage() {
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="text-sm px-3 py-2 rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="text-sm px-3 py-2 rounded-xl border border-border bg-muted/50 text-foreground focus:outline-none focus:ring-2 focus:ring-accent/20"
                 >
                   <option value="designer">{ROLE_LABELS.designer}</option>
                   <option value="assistant">{ROLE_LABELS.assistant}</option>
@@ -501,7 +501,7 @@ export default function ShopSettingsPage() {
                 <button
                   onClick={handleCreateInvite}
                   disabled={creatingInvite}
-                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-accent text-white text-sm font-medium disabled:opacity-50"
                 >
                   {creatingInvite ? "생성 중..." : "생성"}
                 </button>

@@ -235,7 +235,7 @@ function LoginContent() {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="이름"
                 required
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
             </div>
           )}
@@ -247,7 +247,7 @@ function LoginContent() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="이메일"
               required
-              className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring"
+              className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20"
             />
           </div>
 
@@ -260,7 +260,7 @@ function LoginContent() {
                 placeholder="비밀번호"
                 required
                 minLength={6}
-                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:border-ring pr-12"
+                className="w-full px-4 py-3.5 border border-border rounded-xl text-sm bg-card text-foreground placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-accent/20 pr-12"
               />
               <button
                 type="button"
@@ -301,7 +301,7 @@ function LoginContent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 bg-primary text-primary-foreground rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
+            className="w-full py-3.5 bg-accent text-white rounded-full font-bold text-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100"
           >
             {isLoading
               ? "처리 중..."
