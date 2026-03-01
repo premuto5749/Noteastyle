@@ -51,6 +51,7 @@ export default function TreatmentDetailPage() {
   const [mosaicPhoto, setMosaicPhoto] = useState<TreatmentPhoto | null>(null);
   const [faceSwapPreselect, setFaceSwapPreselect] = useState<TreatmentPhoto | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mountTimeRef = useRef(Date.now());
 
   const loadData = useCallback(async () => {
     try {
@@ -273,6 +274,7 @@ export default function TreatmentDetailPage() {
               annotations={sortedPhotos[activeIndex]?.annotations || []}
               drawingData={sortedPhotos[activeIndex]?.drawing_data}
               onPinTap={() => {
+                if (Date.now() - mountTimeRef.current < 600) return;
                 const photo = sortedPhotos[activeIndex];
                 if (photo && (photo.media_type || "photo") === "photo") {
                   setAnnotatingPhoto(photo);
@@ -476,7 +478,10 @@ export default function TreatmentDetailPage() {
                   return (
                     <button
                       key={photo.id}
-                      onClick={() => setActionPhoto(photo)}
+                      onClick={() => {
+                        if (Date.now() - mountTimeRef.current < 600) return;
+                        setActionPhoto(photo);
+                      }}
                       className="relative aspect-square bg-muted overflow-hidden active:opacity-70 transition-opacity"
                     >
                       <Image

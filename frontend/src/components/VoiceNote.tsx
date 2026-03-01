@@ -224,7 +224,7 @@ export function VoiceNote({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-background flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <button
@@ -309,7 +309,7 @@ export function VoiceNote({
             <h3 className="text-sm font-bold text-foreground">AI 분석 결과</h3>
 
             {/* Customer name */}
-            {!treatmentId && (
+            {!treatmentId && !reservation && (
               <div>
                 <label className="text-xs text-muted-foreground block mb-1">고객명</label>
                 <input
