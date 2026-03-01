@@ -1,15 +1,410 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-28T00:00:00.000Z",
-  "activeFeatures": ["api-security-hardening"],
-  "primaryFeature": "api-security-hardening",
+  "lastUpdated": "2026-03-01T05:13:06.101Z",
+  "activeFeatures": [
+    "voice-photo-annotation",
+    "api-security-hardening",
+    "frontend",
+    "face-models",
+    "[modelId]",
+    "admin",
+    "site-settings",
+    "mosaic",
+    "[id]",
+    "portfolio",
+    "treatments",
+    "customers",
+    "constants",
+    "profile",
+    "[memberId]",
+    "login",
+    "onboarding",
+    "new",
+    "edit",
+    "reservation",
+    "settings",
+    "shop",
+    "page.tsx",
+    "transcribe",
+    "[photoId]",
+    "history",
+    "products",
+    "terminology",
+    "[termId]"
+  ],
+  "primaryFeature": "voice-photo-annotation",
   "features": {
+    "voice-photo-annotation": {
+      "phase": "act",
+      "startedAt": "2026-03-01T00:00:00.000Z",
+      "planDoc": "docs/01-plan/features/voice-photo-annotation.plan.md",
+      "designDoc": "docs/02-design/features/voice-photo-annotation.design.md",
+      "matchRate": null,
+      "iterationCount": 0,
+      "phaseNumber": 5,
+      "previousPhase": "check",
+      "autoAdvanced": true,
+      "timestamps": {
+        "lastUpdated": "2026-03-01T05:13:06.100Z"
+      }
+    },
     "api-security-hardening": {
       "phase": "plan",
       "startedAt": "2026-02-28T00:00:00.000Z",
       "planDoc": "docs/01-plan/features/api-security-hardening.plan.md",
       "matchRate": null,
       "iterationCount": 0
+    },
+    "frontend": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T01:56:11.978Z",
+        "lastUpdated": "2026-03-01T04:45:52.757Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\components\\PhotoAnnotationEditor.tsx"
+    },
+    "face-models": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T01:56:34.237Z",
+        "lastUpdated": "2026-02-28T02:20:24.752Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-admin-ux/frontend/src/app/admin/face-models/page.tsx"
+    },
+    "[modelId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T01:57:13.243Z",
+        "lastUpdated": "2026-02-28T01:57:13.243Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-face-model-mgmt/frontend/src/app/api/admin/face-models/[modelId]/route.ts"
+    },
+    "admin": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T01:57:48.957Z",
+        "lastUpdated": "2026-02-28T02:20:14.246Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-admin-ux/frontend/src/app/admin/page.tsx"
+    },
+    "site-settings": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T02:20:27.813Z",
+        "lastUpdated": "2026-02-28T02:20:34.784Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-admin-ux/frontend/src/app/admin/site-settings/page.tsx"
+    },
+    "mosaic": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T02:32:42.524Z",
+        "lastUpdated": "2026-02-28T02:32:42.524Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-mosaic/frontend/src/app/api/shops/[shopId]/treatments/[treatmentId]/photos/[photoId]/mosaic/route.ts"
+    },
+    "[id]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T02:33:29.503Z",
+        "lastUpdated": "2026-03-01T04:46:15.850Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\treatments\\[id]\\page.tsx"
+    },
+    "portfolio": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T02:33:49.552Z",
+        "lastUpdated": "2026-02-28T04:50:40.398Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-ui-redesign/frontend/src/app/portfolio/page.tsx"
+    },
+    "treatments": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T04:50:29.524Z",
+        "lastUpdated": "2026-02-28T04:50:29.524Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-ui-redesign/frontend/src/app/treatments/page.tsx"
+    },
+    "customers": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T04:51:20.319Z",
+        "lastUpdated": "2026-02-28T04:51:20.319Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-ui-redesign/frontend/src/app/customers/page.tsx"
+    },
+    "constants": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T11:53:14.841Z",
+        "lastUpdated": "2026-02-28T11:53:14.841Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-profile-resume/frontend/src/lib/constants/resume-presets.ts"
+    },
+    "profile": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T11:54:15.629Z",
+        "lastUpdated": "2026-02-28T22:10:16.117Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/profile/page.tsx"
+    },
+    "[memberId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T11:54:31.077Z",
+        "lastUpdated": "2026-02-28T11:55:41.785Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-profile-resume/frontend/src/app/explore/designer/[memberId]/page.tsx"
+    },
+    "login": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:10:19.693Z",
+        "lastUpdated": "2026-02-28T22:10:55.878Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/login/page.tsx"
+    },
+    "onboarding": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:10:29.061Z",
+        "lastUpdated": "2026-02-28T22:10:42.371Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/onboarding/page.tsx"
+    },
+    "new": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:11:45.664Z",
+        "lastUpdated": "2026-03-01T04:41:47.256Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\treatments\\new\\page.tsx"
+    },
+    "edit": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:12:12.220Z",
+        "lastUpdated": "2026-02-28T22:12:25.962Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/treatments/[id]/edit/page.tsx"
+    },
+    "reservation": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:12:32.271Z",
+        "lastUpdated": "2026-02-28T22:12:55.025Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/reservation/page.tsx"
+    },
+    "settings": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:13:48.621Z",
+        "lastUpdated": "2026-02-28T22:13:52.178Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/settings/page.tsx"
+    },
+    "shop": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:13:55.698Z",
+        "lastUpdated": "2026-02-28T22:14:12.129Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/settings/shop/page.tsx"
+    },
+    "page.tsx": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-28T22:14:17.465Z",
+        "lastUpdated": "2026-02-28T22:15:05.962Z"
+      },
+      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/settings/services/page.tsx"
+    },
+    "transcribe": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:40:10.132Z",
+        "lastUpdated": "2026-03-01T04:40:10.132Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\voice\\transcribe\\route.ts"
+    },
+    "[photoId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:43:14.758Z",
+        "lastUpdated": "2026-03-01T04:43:23.660Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\treatments\\[treatmentId]\\photos\\[photoId]\\route.ts"
+    },
+    "history": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:46:56.786Z",
+        "lastUpdated": "2026-03-01T04:46:56.786Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\customers\\[customerId]\\history\\route.ts"
+    },
+    "products": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:47:07.426Z",
+        "lastUpdated": "2026-03-01T04:47:07.426Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\analytics\\products\\route.ts"
+    },
+    "terminology": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:47:13.303Z",
+        "lastUpdated": "2026-03-01T04:47:13.303Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\terminology\\route.ts"
+    },
+    "[termId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T04:47:22.177Z",
+        "lastUpdated": "2026-03-01T04:47:22.177Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\terminology\\[termId]\\route.ts"
     }
   },
   "pipeline": {
@@ -20,13 +415,889 @@
   "session": {
     "startedAt": "2026-02-28T00:00:00.000Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-28T00:00:00.000Z"
+    "lastActivity": "2026-03-01T05:13:06.101Z"
   },
   "history": [
     {
       "action": "plan_created",
       "feature": "api-security-hardening",
       "timestamp": "2026-02-28T00:00:00.000Z"
+    },
+    {
+      "timestamp": "2026-02-28T01:56:11.978Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:56:34.237Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:57:00.070Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:57:08.581Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:57:13.243Z",
+      "feature": "[modelId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:57:41.299Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:57:48.957Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T01:59:23.294Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:12.000Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:14.246Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:24.752Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:27.813Z",
+      "feature": "site-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:31.898Z",
+      "feature": "site-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:20:34.784Z",
+      "feature": "site-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:32:34.430Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:32:38.358Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:32:42.524Z",
+      "feature": "mosaic",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:32:43.367Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:29.503Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:32.464Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:36.062Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:37.313Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:40.609Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:42.594Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:46.783Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:49.552Z",
+      "feature": "portfolio",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:52.248Z",
+      "feature": "portfolio",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:53.845Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:33:56.870Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T02:34:03.738Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:45:26.985Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:45:40.545Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:47:10.241Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:50:29.524Z",
+      "feature": "treatments",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:50:40.398Z",
+      "feature": "portfolio",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T04:51:20.319Z",
+      "feature": "customers",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:04.634Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:08.123Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:10.968Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:14.841Z",
+      "feature": "constants",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:20.991Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:53:27.045Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:54:15.629Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:54:18.955Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:54:22.450Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:54:27.330Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:54:31.077Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:55:14.629Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:55:18.704Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:55:22.755Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:55:32.174Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:55:41.785Z",
+      "feature": "[memberId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:56:25.740Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:57:51.167Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T11:57:52.200Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:09:41.771Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:09:46.526Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:09:51.308Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:09:56.957Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:02.140Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:08.413Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:12.624Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:16.117Z",
+      "feature": "profile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:19.693Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:26.156Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:29.061Z",
+      "feature": "onboarding",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:33.488Z",
+      "feature": "onboarding",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:38.526Z",
+      "feature": "onboarding",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:42.371Z",
+      "feature": "onboarding",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:10:55.878Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:11:45.664Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:11:48.876Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:11:53.709Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:11:56.405Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:01.422Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:04.908Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:08.516Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:12.220Z",
+      "feature": "edit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:15.027Z",
+      "feature": "edit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:19.314Z",
+      "feature": "edit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:22.743Z",
+      "feature": "edit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:25.962Z",
+      "feature": "edit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:32.271Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:35.418Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:41.776Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:45.118Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:48.437Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:51.577Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:12:55.025Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:13:48.621Z",
+      "feature": "settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:13:52.178Z",
+      "feature": "settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:13:55.698Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:13:58.462Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:01.147Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:04.950Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:09.638Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:12.129Z",
+      "feature": "shop",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:17.465Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:21.045Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:24.270Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:27.762Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:33.212Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:37.219Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:41.681Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:46.376Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:50.919Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:54.144Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:14:58.429Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:15:02.838Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-28T22:15:05.962Z",
+      "feature": "page.tsx",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:37:57.004Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:38:01.258Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:38:06.122Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:38:10.542Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:38:15.604Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:39:22.874Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:39:29.296Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:39:42.401Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:39:46.536Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:39:57.078Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:40:10.132Z",
+      "feature": "transcribe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:40:40.366Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:40:46.151Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:40:51.103Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:06.195Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:13.386Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:17.202Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:25.147Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:31.247Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:39.641Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:43.471Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:41:47.256Z",
+      "feature": "new",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:43:02.808Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:43:14.758Z",
+      "feature": "[photoId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:43:23.660Z",
+      "feature": "[photoId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:43:51.174Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:44:03.154Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:44:26.162Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:45:52.757Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:46:11.351Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:46:15.850Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:46:56.786Z",
+      "feature": "history",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:47:07.426Z",
+      "feature": "products",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:47:13.303Z",
+      "feature": "terminology",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T04:47:22.177Z",
+      "feature": "[termId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T05:13:06.101Z",
+      "feature": "voice-photo-annotation",
+      "phase": "act",
+      "action": "updated"
     }
   ]
 }
