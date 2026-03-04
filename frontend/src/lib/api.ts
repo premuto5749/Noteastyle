@@ -121,6 +121,7 @@ export interface Treatment {
   customer_notes: string | null;
   ai_summary: string | null;
   next_visit_recommendation: string | null;
+  key_comments: KeyComment[] | null;
   created_at: string;
   photos: TreatmentPhoto[];
   customer?: { name: string; visit_count?: number };

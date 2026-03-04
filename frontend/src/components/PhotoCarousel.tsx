@@ -80,6 +80,49 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
         ))}
       </div>
 
+      {/* Navigation arrows */}
+      {photos.length > 1 && (
+        <>
+          {activeIndex > 0 && (
+            <button
+              onClick={() => {
+                scrollRef.current?.scrollTo({
+                  left: (activeIndex - 1) * scrollRef.current!.clientWidth,
+                  behavior: "smooth",
+                });
+              }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          )}
+          {activeIndex < photos.length - 1 && (
+            <button
+              onClick={() => {
+                scrollRef.current?.scrollTo({
+                  left: (activeIndex + 1) * scrollRef.current!.clientWidth,
+                  behavior: "smooth",
+                });
+              }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 text-white rounded-full flex items-center justify-center z-10"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Page indicator */}
+      {photos.length > 1 && (
+        <span className="absolute top-3 right-3 px-2 py-0.5 bg-black/50 text-white text-xs rounded-full z-10">
+          {activeIndex + 1} / {photos.length}
+        </span>
+      )}
+
       {/* Overlay children (StyleNoteOverlay) */}
       {children && (
         <div className="absolute inset-0 pointer-events-none">

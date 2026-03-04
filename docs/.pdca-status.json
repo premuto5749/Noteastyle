@@ -1,7 +1,8 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-01T05:13:06.101Z",
+  "lastUpdated": "2026-03-01T13:54:58.401Z",
   "activeFeatures": [
+    "fix-notion-issues",
     "voice-photo-annotation",
     "api-security-hardening",
     "frontend",
@@ -30,10 +31,31 @@
     "history",
     "products",
     "terminology",
-    "[termId]"
+    "[termId]",
+    "generate",
+    "[jobId]",
+    "face-swap"
   ],
-  "primaryFeature": "voice-photo-annotation",
+  "primaryFeature": "fix-notion-issues",
   "features": {
+    "fix-notion-issues": {
+      "phase": "act",
+      "startedAt": "2026-03-01T00:00:00.000Z",
+      "reportDoc": "docs/04-report/features/fix-notion-issues.report.md",
+      "matchRate": 100,
+      "iterationCount": 0,
+      "phaseNumber": 5,
+      "previousPhase": "check",
+      "issuesFixed": 9,
+      "filesModified": 7,
+      "codeChanges": "+67/-47",
+      "prNumber": 77,
+      "timestamps": {
+        "completedAt": "2026-03-01T12:00:00.000Z",
+        "lastUpdated": "2026-03-01T12:00:00.000Z"
+      },
+      "summary": "Bug fix batch - 9 issues resolved (노션 이슈 트래커 '노터스타일' 태그)"
+    },
     "voice-photo-annotation": {
       "phase": "act",
       "startedAt": "2026-03-01T00:00:00.000Z",
@@ -64,9 +86,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-28T01:56:11.978Z",
-        "lastUpdated": "2026-03-01T04:45:52.757Z"
+        "lastUpdated": "2026-03-01T13:54:58.401Z"
       },
-      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\components\\PhotoAnnotationEditor.tsx"
+      "lastFile": "C:\\Dev\\Noteastyle-fal-faceswap\\frontend\\src\\lib\\services\\fal-service.ts"
     },
     "face-models": {
       "phase": "do",
@@ -77,9 +99,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-28T01:56:34.237Z",
-        "lastUpdated": "2026-02-28T02:20:24.752Z"
+        "lastUpdated": "2026-03-01T08:22:41.807Z"
       },
-      "lastFile": "C:/Dev/Noteastyle-admin-ux/frontend/src/app/admin/face-models/page.tsx"
+      "lastFile": "C:/Dev/Noteastyle-fix-admin-facemodel/frontend/src/app/admin/face-models/page.tsx"
     },
     "[modelId]": {
       "phase": "do",
@@ -142,9 +164,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-28T02:33:29.503Z",
-        "lastUpdated": "2026-03-01T04:46:15.850Z"
+        "lastUpdated": "2026-03-01T06:21:17.200Z"
       },
-      "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\treatments\\[id]\\page.tsx"
+      "lastFile": "C:\\Dev\\Noteastyle-fix-notion-issues\\frontend\\src\\app\\treatments\\[id]\\page.tsx"
     },
     "portfolio": {
       "phase": "do",
@@ -285,9 +307,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-28T22:12:32.271Z",
-        "lastUpdated": "2026-02-28T22:12:55.025Z"
+        "lastUpdated": "2026-03-01T06:21:33.222Z"
       },
-      "lastFile": "C:/Dev/Noteastyle-design-consistency/frontend/src/app/reservation/page.tsx"
+      "lastFile": "C:\\Dev\\Noteastyle-fix-notion-issues\\frontend\\src\\app\\reservation\\page.tsx"
     },
     "settings": {
       "phase": "do",
@@ -405,6 +427,45 @@
         "lastUpdated": "2026-03-01T04:47:22.177Z"
       },
       "lastFile": "C:\\Dev\\Noteastyle-voice-photo-annotation\\frontend\\src\\app\\api\\shops\\[shopId]\\terminology\\[termId]\\route.ts"
+    },
+    "generate": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T13:54:06.754Z",
+        "lastUpdated": "2026-03-01T13:54:06.754Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-fal-faceswap\\frontend\\src\\app\\api\\face-swap\\generate\\route.ts"
+    },
+    "[jobId]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T13:54:14.656Z",
+        "lastUpdated": "2026-03-01T13:54:14.656Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-fal-faceswap\\frontend\\src\\app\\api\\face-swap\\status\\[jobId]\\route.ts"
+    },
+    "face-swap": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-01T13:54:24.964Z",
+        "lastUpdated": "2026-03-01T13:54:24.964Z"
+      },
+      "lastFile": "C:\\Dev\\Noteastyle-fal-faceswap\\frontend\\src\\app\\api\\face-swap\\route.ts"
     }
   },
   "pipeline": {
@@ -415,7 +476,7 @@
   "session": {
     "startedAt": "2026-02-28T00:00:00.000Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-01T05:13:06.101Z"
+    "lastActivity": "2026-03-01T13:54:58.401Z"
   },
   "history": [
     {
@@ -1297,6 +1358,138 @@
       "timestamp": "2026-03-01T05:13:06.101Z",
       "feature": "voice-photo-annotation",
       "phase": "act",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:19.688Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:22.363Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:27.175Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:30.213Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:33.276Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:38.513Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:20:58.010Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:02.036Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:06.237Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:11.909Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:17.200Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:23.355Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T06:21:33.222Z",
+      "feature": "reservation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T08:12:10.230Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T08:22:29.039Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T08:22:33.040Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T08:22:41.807Z",
+      "feature": "face-models",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T13:53:53.876Z",
+      "feature": "frontend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T13:54:06.754Z",
+      "feature": "generate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T13:54:14.656Z",
+      "feature": "[jobId]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T13:54:24.964Z",
+      "feature": "face-swap",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-01T13:54:58.401Z",
+      "feature": "frontend",
+      "phase": "do",
       "action": "updated"
     }
   ]

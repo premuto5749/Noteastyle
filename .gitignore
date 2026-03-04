@@ -46,3 +46,13 @@ supabase/.temp/
 
 # Windows artifacts
 nul
+
+# Playwright test artifacts
+.playwright-mcp/
+
+# Root-level test screenshots
+/*.jpg
+/*.png
+
+# bkit temp files
+.bkit/

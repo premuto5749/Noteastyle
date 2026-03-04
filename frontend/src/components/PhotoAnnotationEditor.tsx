@@ -47,9 +47,9 @@ export function PhotoAnnotationEditor({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const getImageDimensions = useCallback(() => {
-    if (!containerRef.current) return { width: 480, height: 480 };
+    if (!containerRef.current) return { width: 480, height: 360 };
     const rect = containerRef.current.getBoundingClientRect();
-    return { width: rect.width, height: rect.width }; // square
+    return { width: rect.width, height: rect.width * 0.75 }; // 4:3
   }, []);
 
   // ===== Pin mode handlers =====
@@ -223,12 +223,12 @@ export function PhotoAnnotationEditor({
 
       {/* Image area */}
       <div className="flex-1 overflow-hidden flex items-center justify-center bg-black/5 dark:bg-white/5 p-2">
-        <div ref={containerRef} className="relative w-full max-w-md aspect-square">
+        <div ref={containerRef} className="relative w-full max-w-md aspect-[4/3]">
           <img
             ref={imageRef}
             src={photoSrc}
             alt="Treatment photo"
-            className="absolute inset-0 w-full h-full object-cover rounded-xl"
+            className="absolute inset-0 w-full h-full object-contain rounded-xl bg-black"
             onClick={handleImageTap}
           />
 
@@ -249,15 +249,15 @@ export function PhotoAnnotationEditor({
             >
               <div className="flex flex-col items-center">
                 {ann.type === "chip" ? (
-                  <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 text-[10px] font-medium px-2 py-0.5 rounded-full shadow-sm max-w-[120px] truncate">
+                  <div className="bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 text-xs font-medium px-2.5 py-1 rounded-full shadow-sm max-w-[160px] truncate">
                     {ann.text}
                   </div>
                 ) : (
                   <>
-                    <div className="bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full shadow-md max-w-[120px] truncate">
+                    <div className="bg-accent text-accent-foreground text-xs font-medium px-2.5 py-1 rounded-full shadow-lg max-w-[160px] truncate drop-shadow-md">
                       {ann.text}
                     </div>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="-mt-0.5">
+                    <svg width="14" height="14" viewBox="0 0 12 12" fill="none" className="-mt-0.5">
                       <path d="M6 12L2 6h8L6 12z" fill="var(--accent, #f97316)" />
                     </svg>
                   </>
