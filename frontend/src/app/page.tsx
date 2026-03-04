@@ -138,7 +138,15 @@ export default function HomePage() {
         <>
           {/* Stories Row — Recent Treatments */}
           {recentTreatments.length > 0 && (
-            <div className="pt-3 pb-1">
+            <div className="pb-1">
+              <div className="flex items-center justify-between px-4 pt-3 pb-1">
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  최근 시술
+                </h2>
+                <Link href="/treatments" className="text-xs text-accent font-medium">
+                  전체보기
+                </Link>
+              </div>
               <div className="flex gap-3 overflow-x-auto px-4 scrollbar-hide">
                 {recentTreatments.map((t) => {
                   const photo = getRepresentativePhoto(t.photos || []);
@@ -173,23 +181,14 @@ export default function HomePage() {
                         </div>
                       </div>
                       <span className="text-[10px] text-muted-foreground max-w-[60px] truncate">
-                        {customerName || SERVICE_LABELS[t.service_type] || "시술"}
+                        {customerName || "고객"}
+                      </span>
+                      <span className="text-[9px] text-subtle max-w-[60px] truncate -mt-0.5">
+                        {SERVICE_LABELS[t.service_type] || t.service_type}
                       </span>
                     </button>
                   );
                 })}
-                {/* "More" circle */}
-                <Link
-                  href="/treatments"
-                  className="flex flex-col items-center gap-1 flex-shrink-0"
-                >
-                  <div className="w-[60px] h-[60px] rounded-full border-2 border-dashed border-border flex items-center justify-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="text-subtle">
-                      <path d="M5 12h14M12 5v14" />
-                    </svg>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">전체보기</span>
-                </Link>
               </div>
             </div>
           )}

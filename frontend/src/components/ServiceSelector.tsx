@@ -70,10 +70,11 @@ export function ServiceSelector({
       {/* Sub-services - slide down */}
       <div
         ref={servicesRef}
-        className="overflow-hidden transition-all duration-300 ease-in-out"
+        className="overflow-hidden transition-all duration-300 ease-in-out relative z-10"
         style={{
           maxHeight: activeCat && activeCat.services.length > 0 ? "300px" : "0px",
           opacity: activeCat && activeCat.services.length > 0 ? 1 : 0,
+          pointerEvents: activeCat && activeCat.services.length > 0 ? "auto" : "none",
         }}
       >
         {activeCat && activeCat.services.length > 0 && (
@@ -83,7 +84,7 @@ export function ServiceSelector({
                 key={svc.id}
                 type="button"
                 onClick={() => handleServiceClick(activeCat.name, svc)}
-                className={`px-3 py-2 rounded-xl text-sm font-medium border transition-all active:scale-95 ${
+                className={`px-3 py-2.5 rounded-xl text-sm font-medium border transition-all active:scale-95 touch-manipulation ${
                   selectedService === svc.name
                     ? "border-ring bg-muted text-foreground"
                     : "border-border bg-card text-muted-foreground hover:border-input"
