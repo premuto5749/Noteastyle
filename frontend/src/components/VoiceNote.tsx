@@ -198,6 +198,7 @@ export function VoiceNote({
           ...(editedResult.summary ? { customer_notes: editedResult.summary } : {}),
           ...(editedResult.summary ? { ai_summary: editedResult.summary } : {}),
           ...(editedResult.next_visit_recommendation ? { next_visit_recommendation: editedResult.next_visit_recommendation } : {}),
+          ...(editedResult.key_comments ? { key_comments: editedResult.key_comments } : {}),
         });
       }
 

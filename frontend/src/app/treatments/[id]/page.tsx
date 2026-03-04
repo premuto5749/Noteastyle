@@ -710,6 +710,7 @@ export default function TreatmentDetailPage() {
           photo={annotatingPhoto}
           onSave={(data) => handleSaveAnnotations(annotatingPhoto, data)}
           onClose={() => setAnnotatingPhoto(null)}
+          pendingChips={treatment?.key_comments || []}
         />
       )}
 

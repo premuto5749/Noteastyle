@@ -12,6 +12,7 @@ export default function PortfolioPage() {
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showPublished, setShowPublished] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
   const loadPortfolio = useCallback(async () => {
     setLoading(true);
@@ -137,7 +138,7 @@ export default function PortfolioPage() {
             {/* Instagram-style 3-column tight grid */}
             <div className="grid grid-cols-3 gap-0.5">
               {items.map((item) => (
-                <div key={item.id} className="aspect-square relative group">
+                <button key={item.id} className="aspect-square relative group" onClick={() => setSelectedItem(item)}>
                   {/* Image */}
                   {(item.photo.face_swapped_url || item.photo.mosaic_url) ? (
                     <Image
@@ -163,35 +164,58 @@ export default function PortfolioPage() {
                       공개
                     </span>
                   )}
-
-                  {/* Overlay on hover/tap */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                    {item.title && (
-                      <span className="text-white text-xs font-medium px-2 text-center line-clamp-2">
-                        {item.title}
-                      </span>
-                    )}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleTogglePublish(item.id)}
-                        className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full"
-                      >
-                        {item.is_published ? "비공개" : "공개하기"}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="px-3 py-1 bg-red-500/60 backdrop-blur-sm text-white text-xs rounded-full"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                </button>
               ))}
             </div>
           </>
         )}
       </div>
+
+      {/* Fullscreen modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <button onClick={() => setSelectedItem(null)} className="text-white text-sm">
+              닫기
+            </button>
+            <span className="text-white text-xs">
+              {selectedItem.is_published ? "공개됨" : "비공개"}
+            </span>
+          </div>
+          {/* Photo */}
+          <div className="flex-1 flex items-center justify-center p-4">
+            <Image
+              src={selectedItem.photo.face_swapped_url || selectedItem.photo.mosaic_url || selectedItem.photo.photo_url}
+              alt={selectedItem.title || "포트폴리오"}
+              width={480}
+              height={640}
+              className="max-w-full max-h-full object-contain"
+            />
+          </div>
+          {/* Title */}
+          {selectedItem.title && (
+            <p className="text-white text-sm font-medium text-center px-4 pb-2">
+              {selectedItem.title}
+            </p>
+          )}
+          {/* Actions */}
+          <div className="px-4 pb-6 flex gap-3">
+            <button
+              onClick={() => { handleTogglePublish(selectedItem.id); setSelectedItem(null); }}
+              className="flex-1 py-3 bg-white/10 text-white rounded-xl text-sm font-medium"
+            >
+              {selectedItem.is_published ? "비공개로 전환" : "공개하기"}
+            </button>
+            <button
+              onClick={() => { handleDelete(selectedItem.id); setSelectedItem(null); }}
+              className="px-6 py-3 bg-red-500/80 text-white rounded-xl text-sm font-medium"
+            >
+              삭제
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -17,96 +17,110 @@ interface AnnotationOverlayProps {
   onPinTap?: () => void;
 }
 
-function DrawingOverlay({ drawingData, width, height }: { drawingData: DrawingData; width: number; height: number }) {
+function DrawingOverlay({ drawingData }: { drawingData: DrawingData }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !drawingData.shapes.length) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const container = containerRef.current;
+    if (!canvas || !container || !drawingData.shapes.length) return;
 
-    canvas.width = width;
-    canvas.height = height;
-    ctx.clearRect(0, 0, width, height);
+    const draw = () => {
+      const rect = container.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
 
-    const toPx = (pct: number, total: number) => (pct / 100) * total;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.clearRect(0, 0, width, height);
 
-    for (const shape of drawingData.shapes) {
-      ctx.strokeStyle = shape.stroke;
-      ctx.lineWidth = shape.strokeWidth;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+      const toPx = (pct: number, total: number) => (pct / 100) * total;
 
-      switch (shape.type) {
-        case "freehand":
-          if (shape.points && shape.points.length >= 4) {
-            ctx.beginPath();
-            ctx.moveTo(toPx(shape.points[0], width), toPx(shape.points[1], height));
-            for (let i = 2; i < shape.points.length; i += 2) {
-              ctx.lineTo(toPx(shape.points[i], width), toPx(shape.points[i + 1], height));
-            }
-            ctx.stroke();
-          }
-          break;
+      for (const shape of drawingData.shapes) {
+        ctx.strokeStyle = shape.stroke;
+        ctx.lineWidth = shape.strokeWidth;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
-        case "circle":
-          if (shape.x != null && shape.y != null && shape.radius != null) {
-            ctx.beginPath();
-            ctx.arc(
-              toPx(shape.x, width),
-              toPx(shape.y, height),
-              toPx(shape.radius, Math.min(width, height)),
-              0,
-              Math.PI * 2
-            );
-            ctx.stroke();
-          }
-          break;
-
-        case "arrow":
-        case "line":
-          if (shape.points && shape.points.length >= 4) {
-            const x1 = toPx(shape.points[0], width);
-            const y1 = toPx(shape.points[1], height);
-            const x2 = toPx(shape.points[2], width);
-            const y2 = toPx(shape.points[3], height);
-
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-
-            // Arrow head
-            if (shape.type === "arrow") {
-              const angle = Math.atan2(y2 - y1, x2 - x1);
-              const headLen = 10;
-              ctx.fillStyle = shape.stroke;
+        switch (shape.type) {
+          case "freehand":
+            if (shape.points && shape.points.length >= 4) {
               ctx.beginPath();
-              ctx.moveTo(x2, y2);
-              ctx.lineTo(
-                x2 - headLen * Math.cos(angle - Math.PI / 6),
-                y2 - headLen * Math.sin(angle - Math.PI / 6)
-              );
-              ctx.lineTo(
-                x2 - headLen * Math.cos(angle + Math.PI / 6),
-                y2 - headLen * Math.sin(angle + Math.PI / 6)
-              );
-              ctx.closePath();
-              ctx.fill();
+              ctx.moveTo(toPx(shape.points[0], width), toPx(shape.points[1], height));
+              for (let i = 2; i < shape.points.length; i += 2) {
+                ctx.lineTo(toPx(shape.points[i], width), toPx(shape.points[i + 1], height));
+              }
+              ctx.stroke();
             }
-          }
-          break;
+            break;
+
+          case "circle":
+            if (shape.x != null && shape.y != null && shape.radius != null) {
+              ctx.beginPath();
+              ctx.arc(
+                toPx(shape.x, width),
+                toPx(shape.y, height),
+                toPx(shape.radius, Math.min(width, height)),
+                0,
+                Math.PI * 2
+              );
+              ctx.stroke();
+            }
+            break;
+
+          case "arrow":
+          case "line":
+            if (shape.points && shape.points.length >= 4) {
+              const x1 = toPx(shape.points[0], width);
+              const y1 = toPx(shape.points[1], height);
+              const x2 = toPx(shape.points[2], width);
+              const y2 = toPx(shape.points[3], height);
+
+              ctx.beginPath();
+              ctx.moveTo(x1, y1);
+              ctx.lineTo(x2, y2);
+              ctx.stroke();
+
+              if (shape.type === "arrow") {
+                const angle = Math.atan2(y2 - y1, x2 - x1);
+                const headLen = 10;
+                ctx.fillStyle = shape.stroke;
+                ctx.beginPath();
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(
+                  x2 - headLen * Math.cos(angle - Math.PI / 6),
+                  y2 - headLen * Math.sin(angle - Math.PI / 6)
+                );
+                ctx.lineTo(
+                  x2 - headLen * Math.cos(angle + Math.PI / 6),
+                  y2 - headLen * Math.sin(angle + Math.PI / 6)
+                );
+                ctx.closePath();
+                ctx.fill();
+              }
+            }
+            break;
+        }
       }
-    }
-  }, [drawingData, width, height]);
+    };
+
+    draw();
+
+    const observer = new ResizeObserver(() => draw());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [drawingData]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ width, height }}
-    />
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none">
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+      />
+    </div>
   );
 }
 
@@ -124,7 +138,7 @@ export function AnnotationOverlay({
     <>
       {/* Drawing overlay (uses native canvas for performance in read-only mode) */}
       {hasDrawing && (
-        <DrawingOverlay drawingData={drawingData} width={480} height={480} />
+        <DrawingOverlay drawingData={drawingData} />
       )}
 
       {/* Pin annotations */}
@@ -146,19 +160,19 @@ export function AnnotationOverlay({
               {isChip && chipStyle ? (
                 /* Chip style badge */
                 <div
-                  className={`${chipStyle.bg} ${chipStyle.text} ${chipStyle.border} border text-[10px] font-medium px-2 py-0.5 rounded-full shadow-sm max-w-[120px] truncate whitespace-nowrap`}
+                  className={`${chipStyle.bg} ${chipStyle.text} ${chipStyle.border} border text-xs font-medium px-2.5 py-1 rounded-full shadow-sm max-w-[160px] truncate whitespace-nowrap`}
                 >
                   {ann.text}
                 </div>
               ) : (
                 /* Default pin style */
                 <>
-                  <div className="bg-accent text-accent-foreground text-[10px] font-medium px-2 py-0.5 rounded-full shadow-md max-w-[120px] truncate whitespace-nowrap">
+                  <div className="bg-accent text-accent-foreground text-xs font-medium px-2.5 py-1 rounded-full shadow-lg max-w-[160px] truncate whitespace-nowrap drop-shadow-md">
                     {ann.text}
                   </div>
                   <svg
-                    width="12"
-                    height="12"
+                    width="14"
+                    height="14"
                     viewBox="0 0 12 12"
                     fill="none"
                     className="-mt-0.5"
