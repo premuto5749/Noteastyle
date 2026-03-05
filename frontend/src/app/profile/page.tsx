@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useShop } from "@/contexts/ShopContext";
 import { useShopApi } from "@/hooks/useShopApi";
 import { ProfilePhotoUpload } from "@/components/ProfilePhotoUpload";
+import { getTalentSettings, updateTalentSettings } from "@/lib/api";
 import type { MemberProfile, CareerEntry, CertificationEntry, EducationEntry, SnsLinks } from "@/lib/api";
 import { POSITION_PRESETS, CERT_PRESETS, GRADUATION_STATUS, MONTHS } from "@/lib/constants/resume-presets";
 import { calcDuration, migrateCareerEntry, migrateCertEntry } from "@/lib/utils/resume";
@@ -26,6 +27,8 @@ export default function ProfilePage() {
   const [snsLinks, setSnsLinks] = useState<SnsLinks>({});
   const [showContact, setShowContact] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
+  const [openToProposals, setOpenToProposals] = useState(false);
+  const [savingTalent, setSavingTalent] = useState(false);
 
   const memberId = currentShop?.member_id;
 
@@ -45,6 +48,13 @@ export default function ProfilePage() {
       setSnsLinks(data.sns_links ?? {});
       setShowContact(data.show_contact);
       setIsPublic(data.is_public);
+      // Load talent settings
+      try {
+        const talentData = await getTalentSettings();
+        setOpenToProposals(talentData.open_to_proposals);
+      } catch {
+        // ignore
+      }
     } catch {
       // profile doesn't exist yet
     } finally {
@@ -644,6 +654,35 @@ export default function ProfilePage() {
               />
             </label>
           </div>
+        </section>
+
+        {/* 제안 수신 설정 */}
+        <section className="space-y-3">
+          <h3 className="text-sm font-semibold text-foreground">제안 수신 설정</h3>
+          <label className="flex items-center justify-between p-3 bg-card border border-border rounded-xl cursor-pointer">
+            <div>
+              <p className="text-sm font-medium text-foreground">제안 받기</p>
+              <p className="text-xs text-muted-foreground">현재 소속 매장에서는 자동으로 차단됩니다</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={openToProposals}
+              onChange={async (e) => {
+                const newVal = e.target.checked;
+                setOpenToProposals(newVal);
+                setSavingTalent(true);
+                try {
+                  await updateTalentSettings({ open_to_proposals: newVal });
+                } catch {
+                  setOpenToProposals(!newVal);
+                } finally {
+                  setSavingTalent(false);
+                }
+              }}
+              disabled={savingTalent}
+              className="w-5 h-5 rounded text-accent focus:ring-accent"
+            />
+          </label>
         </section>
 
         {/* 9. Save Button */}

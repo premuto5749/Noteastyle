@@ -845,6 +845,7 @@ export interface DesignerPublicProfile {
   address: string | null;
   sns_links: SnsLinks;
   show_contact: boolean;
+  open_to_proposals: boolean;
   shop: { id: string; name: string; shop_type: string };
   portfolios: ExplorePortfolioItem[];
 }
