@@ -11,6 +11,7 @@ import { ShopProvider } from "@/contexts/ShopContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { getSiteSettings } from "@/lib/site-settings.server";
+import { PushSubscriber } from "@/components/PushSubscriber";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -71,6 +72,7 @@ export default async function RootLayout({
                   </ErrorBoundary>
                   <BottomNav />
                   <SidebarDrawer />
+                  <PushSubscriber />
                 </SidebarProvider>
               </ShopProvider>
             </AuthProvider>
