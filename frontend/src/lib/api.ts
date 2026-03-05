@@ -676,6 +676,47 @@ export function createShopApi(shopId: string) {
         method: "DELETE",
       });
     },
+
+    // Bookmarks
+    getBookmarks() {
+      return request<PortfolioBookmark[]>(`/shops/${shopId}/bookmarks`);
+    },
+    addBookmark(portfolioId: string) {
+      return request<PortfolioBookmark>(`/shops/${shopId}/bookmarks`, {
+        method: "POST",
+        body: JSON.stringify({ portfolio_id: portfolioId }),
+      });
+    },
+    removeBookmark(bookmarkId: string) {
+      return request<{ status: string }>(`/shops/${shopId}/bookmarks/${bookmarkId}`, {
+        method: "DELETE",
+      });
+    },
+
+    // Proposal Credits
+    getProposalCredits() {
+      return request<{ total_credits: number; monthly_free: number; last_monthly_reset: string }>(
+        `/shops/${shopId}/proposal-credits`
+      );
+    },
+
+    // Proposals (sent)
+    sendProposal(data: {
+      to_member_id: string;
+      position: string;
+      salary_range: string;
+      benefits?: string;
+      shop_intro?: string;
+      message?: string;
+    }) {
+      return request<TalentProposal>(`/shops/${shopId}/proposals`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    getSentProposals() {
+      return request<TalentProposal[]>(`/shops/${shopId}/proposals`);
+    },
   };
 }
 
@@ -806,6 +847,145 @@ export interface DesignerPublicProfile {
 
 export function getDesignerPublicProfile(memberId: string) {
   return request<DesignerPublicProfile>(`/explore/designer/${memberId}`);
+}
+
+// --- Community: Portfolio Bookmark ---
+
+export interface PortfolioBookmark {
+  id: string;
+  portfolio_id: string;
+  shop_id: string;
+  created_at: string;
+}
+
+// --- Talent Pool: Proposals ---
+
+export interface TalentProposal {
+  id: string;
+  from_shop_id: string;
+  to_member_id: string;
+  status: "pending" | "accepted" | "declined" | "expired";
+  position: string;
+  salary_range: string;
+  benefits: string | null;
+  shop_intro: string | null;
+  message: string | null;
+  expires_at: string;
+  responded_at: string | null;
+  created_at: string;
+  from_shop?: { id: string; name: string; shop_type: string; address?: string };
+  to_member?: { id: string; display_name: string; specialty: string | null; profile_photo_url?: string | null };
+}
+
+// --- Community: Likes ---
+
+export function togglePortfolioLike(portfolioId: string) {
+  return request<{ liked: boolean }>(`/explore/portfolio/${portfolioId}/like`, {
+    method: "POST",
+  });
+}
+
+export function getPortfolioLikeCount(portfolioId: string) {
+  return request<{ count: number; liked: boolean }>(
+    `/explore/portfolio/${portfolioId}/like-count`
+  );
+}
+
+// --- Notifications ---
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  data: Record<string, unknown>;
+  is_read: boolean;
+  created_at: string;
+}
+
+export function getNotifications(skip?: number, limit?: number) {
+  const p = new URLSearchParams();
+  if (skip != null) p.set("skip", String(skip));
+  if (limit != null) p.set("limit", String(limit));
+  const qs = p.toString();
+  return request<Notification[]>(`/me/notifications${qs ? `?${qs}` : ""}`);
+}
+
+export function getUnreadNotificationCount() {
+  return request<{ count: number }>("/me/notifications/unread-count");
+}
+
+export function markNotificationRead(notificationId: string) {
+  return request<{ status: string }>(`/me/notifications/${notificationId}/read`, {
+    method: "PUT",
+  });
+}
+
+export function markAllNotificationsRead() {
+  return request<{ status: string }>("/me/notifications/read-all", {
+    method: "PUT",
+  });
+}
+
+// --- Talent Settings ---
+
+export interface TalentSettings {
+  open_to_proposals: boolean;
+  blocked_shop_ids: string[];
+}
+
+export function getTalentSettings() {
+  return request<TalentSettings>("/me/talent-settings");
+}
+
+export function updateTalentSettings(data: Partial<TalentSettings>) {
+  return request<{ status: string }>("/me/talent-settings", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+// --- Talent Pool Search ---
+
+export interface TalentSearchItem {
+  member_id: string;
+  display_name: string;
+  specialty: string | null;
+  profile_photo_url: string | null;
+  career_years: number | null;
+  portfolio_count: number;
+  shop: { id: string; name: string; shop_type: string };
+}
+
+export function searchTalentPool(params?: {
+  shop_type?: string;
+  search?: string;
+  shop_id?: string;
+  skip?: number;
+  limit?: number;
+}) {
+  const p = new URLSearchParams();
+  if (params?.shop_type) p.set("shop_type", params.shop_type);
+  if (params?.search) p.set("search", params.search);
+  if (params?.shop_id) p.set("shop_id", params.shop_id);
+  if (params?.skip != null) p.set("skip", String(params.skip));
+  if (params?.limit != null) p.set("limit", String(params.limit));
+  const qs = p.toString();
+  return request<TalentSearchItem[]>(`/explore/talent${qs ? `?${qs}` : ""}`);
+}
+
+// --- Proposals (received) ---
+
+export function getReceivedProposals() {
+  return request<TalentProposal[]>("/me/proposals");
+}
+
+export function respondToProposal(proposalId: string, action: "accept" | "decline") {
+  return request<TalentProposal>(`/me/proposals/${proposalId}/respond`, {
+    method: "PUT",
+    body: JSON.stringify({ action }),
+  });
 }
 
 // Shop creation (no shop context needed)
