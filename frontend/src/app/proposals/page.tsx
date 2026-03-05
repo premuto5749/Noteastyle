@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   getReceivedProposals,
   respondToProposal,
   type TalentProposal,
 } from "@/lib/api";
-import { ShopContext } from "@/contexts/ShopContext";
+import { useShop } from "@/contexts/ShopContext";
 import { useShopApi } from "@/hooks/useShopApi";
 
 type ViewTab = "received" | "sent";
@@ -32,7 +32,7 @@ function timeRemaining(expiresAt: string) {
 
 export default function ProposalsPage() {
   const router = useRouter();
-  const { currentShop } = useContext(ShopContext);
+  const { currentShop } = useShop();
   const { api: shopApi, isReady: shopApiReady } = useShopApi();
 
   const isOwnerOrAdmin = currentShop?.role === "owner" || currentShop?.role === "admin";

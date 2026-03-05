@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, useContext } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getExplorePortfolio, togglePortfolioLike, type ExplorePortfolioItem } from "@/lib/api";
 import { useShopApi } from "@/hooks/useShopApi";
-import { ShopContext } from "@/contexts/ShopContext";
+import { useShop } from "@/contexts/ShopContext";
 import { DesignerBadge } from "@/components/DesignerBadge";
 
 const SHOP_TYPE_FILTERS = [
@@ -23,7 +23,7 @@ type TabType = "portfolio" | "talent";
 
 export default function ExplorePage() {
   const router = useRouter();
-  const { currentShop } = useContext(ShopContext);
+  const { currentShop } = useShop();
   const { api: shopApi, isReady: shopApiReady } = useShopApi();
 
   const [tab, setTab] = useState<TabType>("portfolio");
@@ -75,6 +75,12 @@ export default function ExplorePage() {
   );
 
   useEffect(() => {
+    if (tab === "talent") {
+      router.push("/explore/talent");
+    }
+  }, [tab, router]);
+
+  useEffect(() => {
     loadItems(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shopType, search, sort]);
@@ -123,11 +129,6 @@ export default function ExplorePage() {
       });
     }
   };
-
-  if (tab === "talent") {
-    router.push("/explore/talent");
-    return null;
-  }
 
   return (
     <div className="pb-20">

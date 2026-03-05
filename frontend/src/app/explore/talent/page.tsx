@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback, useContext } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { searchTalentPool, type TalentSearchItem } from "@/lib/api";
-import { ShopContext } from "@/contexts/ShopContext";
+import { useShop } from "@/contexts/ShopContext";
 
 const SHOP_TYPE_FILTERS = [
   { value: "", label: "전체" },
@@ -18,7 +18,7 @@ const PAGE_SIZE = 20;
 
 export default function TalentPoolPage() {
   const router = useRouter();
-  const { currentShop } = useContext(ShopContext);
+  const { currentShop } = useShop();
 
   const [items, setItems] = useState<TalentSearchItem[]>([]);
   const [loading, setLoading] = useState(true);

@@ -7,8 +7,9 @@ import { deductCredit } from "@/lib/services/proposal-credits";
 
 export const POST = withShopAuth(
   async (req: NextRequest, params, member) => {
-    const body = await validateBody(req, createProposalSchema);
-    if (body instanceof NextResponse) return body;
+    const bodyResult = await validateBody(req, createProposalSchema);
+    if ("error" in bodyResult) return bodyResult.error;
+    const body = bodyResult.data;
 
     const supabase = createServiceClient();
 
@@ -33,7 +34,7 @@ export const POST = withShopAuth(
     }
 
     // Block: same shop
-    const targetMember = (targetProfile.member as { id: string; shop_id: string; user_id: string } | null);
+    const targetMember = (targetProfile.member as unknown as { id: string; shop_id: string; user_id: string } | null);
     if (targetMember?.shop_id === params.shopId) {
       return NextResponse.json({ error: "소속 매장 멤버에게는 제안을 보낼 수 없습니다." }, { status: 400 });
     }

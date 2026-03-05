@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     portfolio_count: { count: number }[];
   };
 
-  const filtered = (data as RawItem[]).filter((item) => {
+  const filtered = (data as unknown as RawItem[]).filter((item) => {
     const member = item.member;
     if (!member || !member.shop) return false;
     if (!item.open_to_proposals) return false;

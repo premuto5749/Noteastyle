@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getDesignerPublicProfile, type DesignerPublicProfile } from "@/lib/api";
 import { calcDuration, maskAddress } from "@/lib/utils/resume";
-import { ShopContext } from "@/contexts/ShopContext";
+import { useShop } from "@/contexts/ShopContext";
 import { useShopApi } from "@/hooks/useShopApi";
 import { ProposalModal } from "@/components/ProposalModal";
 
 export default function DesignerProfilePage() {
   const { memberId } = useParams<{ memberId: string }>();
-  const { currentShop } = useContext(ShopContext);
+  const { currentShop } = useShop();
   const { api: shopApi, isReady: shopApiReady } = useShopApi();
   const [profile, setProfile] = useState<DesignerPublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
