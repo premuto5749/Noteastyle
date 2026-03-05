@@ -798,6 +798,8 @@ export function selectFaceSwapResult(resultId: string) {
 // Explore (cross-shop public portfolio)
 export interface ExplorePortfolioItem {
   id: string;
+  like_count?: number;
+  liked?: boolean;
   title: string | null;
   description: string | null;
   tags: string[] | null;
@@ -815,12 +817,14 @@ export interface ExplorePortfolioItem {
 export function getExplorePortfolio(params?: {
   shop_type?: string;
   search?: string;
+  sort?: "latest" | "popular";
   skip?: number;
   limit?: number;
 }) {
   const p = new URLSearchParams();
   if (params?.shop_type) p.set("shop_type", params.shop_type);
   if (params?.search) p.set("search", params.search);
+  if (params?.sort) p.set("sort", params.sort);
   if (params?.skip != null) p.set("skip", String(params.skip));
   if (params?.limit != null) p.set("limit", String(params.limit));
   const qs = p.toString();

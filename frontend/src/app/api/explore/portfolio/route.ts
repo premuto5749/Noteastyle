@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const shopType = searchParams.get("shop_type");
   const search = searchParams.get("search");
+  const sort = searchParams.get("sort") || "latest"; // "latest" | "popular"
   const skip = parseInt(searchParams.get("skip") || "0");
   const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);
 
@@ -66,5 +67,44 @@ export async function GET(req: NextRequest) {
     return { ...rest, designer };
   });
 
-  return NextResponse.json(result);
+  // Batch fetch like counts and user like status
+  const portfolioIds = result.map((item: Record<string, unknown>) => item.id as string);
+
+  const [likeCounts, userLikes] = await Promise.all([
+    portfolioIds.length > 0
+      ? service
+          .from("portfolio_likes")
+          .select("portfolio_id")
+          .in("portfolio_id", portfolioIds)
+      : Promise.resolve({ data: [] }),
+    portfolioIds.length > 0
+      ? service
+          .from("portfolio_likes")
+          .select("portfolio_id")
+          .in("portfolio_id", portfolioIds)
+          .eq("user_id", user.id)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const likeCountMap: Record<string, number> = {};
+  for (const row of (likeCounts.data || [])) {
+    const pid = (row as { portfolio_id: string }).portfolio_id;
+    likeCountMap[pid] = (likeCountMap[pid] || 0) + 1;
+  }
+  const userLikedSet = new Set(
+    (userLikes.data || []).map((row) => (row as { portfolio_id: string }).portfolio_id)
+  );
+
+  const withLikes = result.map((item: Record<string, unknown>) => ({
+    ...item,
+    like_count: likeCountMap[item.id as string] ?? 0,
+    liked: userLikedSet.has(item.id as string),
+  }));
+
+  // Sort by popularity if requested
+  if (sort === "popular") {
+    withLikes.sort((a, b) => (b.like_count as number) - (a.like_count as number));
+  }
+
+  return NextResponse.json(withLikes);
 }
