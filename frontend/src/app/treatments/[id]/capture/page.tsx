@@ -34,6 +34,10 @@ export default function CapturePage() {
     setItems((prev) => [...prev, { ...media, photoType: "after" }]);
   }, []);
 
+  const handleCaptureMultiple = useCallback((media: CapturedMedia[]) => {
+    setItems((prev) => [...prev, ...media.map((m) => ({ ...m, photoType: "after" }))]);
+  }, []);
+
   const handleRemove = useCallback((index: number) => {
     setItems((prev) => {
       const item = prev[index];
@@ -60,24 +64,47 @@ export default function CapturePage() {
     setUploading(true);
     setUploadProgress({ current: 0, total: items.length });
 
+    const CONCURRENT_LIMIT = 3;
+    const results: { index: number; status: "ok" | "fail" }[] = [];
+
     try {
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        setUploadProgress({ current: i + 1, total: items.length });
+      await new Promise<void>((resolve) => {
+        let inFlight = 0;
+        let nextIdx = 0;
 
-        await api.uploadTreatmentPhoto(
-          treatmentId,
-          item.blob,
-          item.photoType,
-          undefined,
-          {
-            mediaType: item.type,
-            videoDuration: item.durationSeconds,
-            thumbnail: item.thumbnailBlob,
+        function startNext() {
+          while (inFlight < CONCURRENT_LIMIT && nextIdx < items.length) {
+            const idx = nextIdx++;
+            const item = items[idx];
+            inFlight++;
+            api.uploadTreatmentPhoto(
+              treatmentId,
+              item.blob,
+              item.photoType,
+              undefined,
+              {
+                mediaType: item.type,
+                videoDuration: item.durationSeconds,
+                thumbnail: item.thumbnailBlob,
+              }
+            )
+              .then(() => { results.push({ index: idx, status: "ok" }); })
+              .catch(() => { results.push({ index: idx, status: "fail" }); })
+              .finally(() => {
+                inFlight--;
+                setUploadProgress({ current: results.length, total: items.length });
+                if (results.length === items.length) resolve();
+                else startNext();
+              });
           }
-        );
-      }
+        }
+        startNext();
+      });
 
+      const failed = results.filter((r) => r.status === "fail");
+      if (failed.length > 0) {
+        alert(`${failed.length}장 업로드 실패. 나머지 ${results.length - failed.length}장은 성공했습니다.`);
+      }
       router.push(`/treatments/${treatmentId}`);
     } catch {
       alert("업로드에 실패했습니다. 다시 시도해주세요.");
@@ -103,7 +130,7 @@ export default function CapturePage() {
 
       <div className="p-4 space-y-4">
         {/* Native capture */}
-        <NativeCapture onCapture={handleCapture} disabled={uploading} />
+        <NativeCapture onCapture={handleCapture} onCaptureMultiple={handleCaptureMultiple} disabled={uploading} />
 
         {/* Captured items with per-item type classification */}
         {items.length > 0 && (

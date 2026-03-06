@@ -4,12 +4,15 @@ import { useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import type { TreatmentPhoto } from "@/lib/api";
 
+type QuickAction = "annotate" | "faceswap" | "mosaic" | "portfolio";
+
 interface PhotoCarouselProps {
   photos: TreatmentPhoto[];
   children?: (activeIndex: number) => React.ReactNode;
+  onAction?: (photo: TreatmentPhoto, action: QuickAction) => void;
 }
 
-export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
+export function PhotoCarousel({ photos, children, onAction }: PhotoCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -141,6 +144,60 @@ export function PhotoCarousel({ photos, children }: PhotoCarouselProps) {
               }`}
             />
           ))}
+        </div>
+      )}
+
+      {/* Quick Action Bar */}
+      {onAction && photos.length > 0 && (
+        <div className="flex items-center justify-between px-3 py-2 bg-muted/50">
+          {/* Left: annotate, faceswap, mosaic */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onAction(photos[activeIndex], "annotate")}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-muted-foreground active:bg-muted transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span className="text-xs">어노테이션</span>
+            </button>
+            <button
+              onClick={() => onAction(photos[activeIndex], "faceswap")}
+              disabled={photos[activeIndex]?.media_type === "video"}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-muted-foreground active:bg-muted transition-colors disabled:opacity-30"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="8" r="5" />
+                <path d="M20 21a8 8 0 1 0-16 0" />
+              </svg>
+              <span className="text-xs">페이스스왑</span>
+            </button>
+            <button
+              onClick={() => onAction(photos[activeIndex], "mosaic")}
+              disabled={photos[activeIndex]?.media_type === "video"}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-muted-foreground active:bg-muted transition-colors disabled:opacity-30"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+              <span className="text-xs">모자이크</span>
+            </button>
+          </div>
+          {/* Right: portfolio bookmark */}
+          <button
+            onClick={() => onAction(photos[activeIndex], "portfolio")}
+            className={`p-2 rounded-lg active:bg-muted transition-colors ${
+              photos[activeIndex]?.is_portfolio ? "text-accent" : "text-muted-foreground"
+            }`}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={photos[activeIndex]?.is_portfolio ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
         </div>
       )}
     </div>

@@ -42,6 +42,7 @@ export function PhotoAnnotationEditor({
   const [chipPlacingIndex, setChipPlacingIndex] = useState<number | null>(null);
   const [placedChipIndexes, setPlacedChipIndexes] = useState<Set<number>>(new Set());
   const [showDrawingCanvas, setShowDrawingCanvas] = useState(false);
+  const [imageAspect, setImageAspect] = useState(4 / 3);
   const imageRef = useRef<HTMLImageElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +50,14 @@ export function PhotoAnnotationEditor({
   const getImageDimensions = useCallback(() => {
     if (!containerRef.current) return { width: 480, height: 360 };
     const rect = containerRef.current.getBoundingClientRect();
-    return { width: rect.width, height: rect.width * 0.75 }; // 4:3
+    return { width: rect.width, height: rect.width / imageAspect };
+  }, [imageAspect]);
+
+  const handleImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setImageAspect(img.naturalWidth / img.naturalHeight);
+    }
   }, []);
 
   // ===== Pin mode handlers =====
@@ -223,13 +231,14 @@ export function PhotoAnnotationEditor({
 
       {/* Image area */}
       <div className="flex-1 overflow-hidden flex items-center justify-center bg-black/5 dark:bg-white/5 p-2">
-        <div ref={containerRef} className="relative w-full max-w-md aspect-[4/3]">
+        <div ref={containerRef} className="relative w-full max-w-md" style={{ aspectRatio: `${imageAspect}` }}>
           <img
             ref={imageRef}
             src={photoSrc}
             alt="Treatment photo"
             className="absolute inset-0 w-full h-full object-contain rounded-xl bg-black"
             onClick={handleImageTap}
+            onLoad={handleImageLoad}
           />
 
           {/* Existing annotations overlay */}
