@@ -108,12 +108,22 @@ export function SidebarDrawer() {
 
           {/* Menu sections */}
           <nav className="flex-1 py-2">
+            {/* 포트폴리오 */}
+            <MenuSection title="포트폴리오">
+              <MenuItem href="/explore" label="탐색" />
+              <MenuItem href="/portfolio" label="포트폴리오 갤러리" />
+              <MenuItem href="/profile" label="이력서 관리" />
+            </MenuSection>
+
             {/* 작업 메뉴 */}
             <MenuSection title="작업 메뉴">
-              <MenuItem href="/treatments" label="시술 목록" />
-              <MenuItem href="/treatments/new" label="새 시술 기록" />
-              <MenuItem href="/tasks/all" label="작업 전체 보기" />
+              <MenuItem href="/" label="홈" />
+              <MenuItem href="/tasks" label="예약 보드" />
               <MenuItem href="/reservation" label="예약 등록" />
+              <MenuItem href="/customers" label="고객 목록" />
+              <MenuItem href="/treatments" label="시술 기록 목록" />
+              <MenuItem href="/treatments/new" label="새 시술 기록" />
+              <MenuItem href="/tasks/all" label="전체 예약 목록" />
             </MenuSection>
 
             {/* 매장 관리 */}

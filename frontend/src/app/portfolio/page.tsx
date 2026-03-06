@@ -59,11 +59,11 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      {/* Sticky glass header */}
-      <div className="sticky top-0 z-40 glass border-b border-border/30 shadow-sm px-4 py-3">
+      {/* Page title (non-sticky, below AppHeader) */}
+      <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-foreground">포트폴리오</h1>
+            <h1 className="text-lg font-bold text-foreground">갤러리</h1>
             <p className="text-xs text-muted-foreground mt-0.5">AI 페이스 스왑 포트폴리오</p>
           </div>
           <Link

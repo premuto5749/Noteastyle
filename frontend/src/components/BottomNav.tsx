@@ -1,20 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useShop } from "@/contexts/ShopContext";
+import { QuickActionSheet } from "@/components/QuickActionSheet";
 
 const NAV_ITEMS = [
+  { href: "/", label: "홈", icon: HomeIcon },
+  { href: "/tasks", label: "예약", icon: CalendarIcon },
+  { href: "__quick_action__", label: "", icon: PlusIcon, isFab: true },
   { href: "/customers", label: "고객", icon: CustomerIcon },
-  { href: "/explore", label: "탐색", icon: ExploreIcon },
-  { href: "/", label: "홈", icon: HomeIcon, isCenter: true },
-  { href: "/tasks", label: "작업", icon: TaskIcon },
-  { href: "/portfolio", label: "포트폴리오", icon: PortfolioIcon },
+  { href: "/portfolio", label: "갤러리", icon: GalleryIcon },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
   const { currentShop } = useShop();
+  const [quickActionOpen, setQuickActionOpen] = useState(false);
 
   if (pathname === "/login") return null;
   if (pathname === "/reset-password") return null;
@@ -25,36 +28,62 @@ export function BottomNav() {
   if (!currentShop) return null;
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50">
-      <div className="glass border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
-        <div className="flex justify-around items-end h-16 px-2">
-          {NAV_ITEMS.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative flex flex-col items-center gap-0.5 px-3 pt-2 pb-1.5 transition-colors ${
-                  isActive ? "text-accent" : "text-subtle"
-                }`}
-              >
-                {/* Active indicator dot */}
-                {isActive && (
-                  <span className="absolute top-0 w-5 h-0.5 rounded-full bg-accent" />
-                )}
-                <item.icon active={isActive} />
-                <span className={`text-[10px] ${isActive ? "font-semibold" : "font-normal"}`}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+    <>
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-50">
+        <div className="glass border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex justify-around items-end h-16 px-2">
+            {NAV_ITEMS.map((item) => {
+              if (item.isFab) {
+                return (
+                  <button
+                    key="fab"
+                    onClick={() => setQuickActionOpen(true)}
+                    className="relative flex flex-col items-center px-3 -mt-3"
+                    aria-label="빠른 등록"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-accent shadow-lg flex items-center justify-center active:scale-95 transition-transform">
+                      <PlusIcon />
+                    </div>
+                  </button>
+                );
+              }
+
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative flex flex-col items-center gap-0.5 px-3 pt-2 pb-1.5 transition-colors ${
+                    isActive ? "text-accent" : "text-subtle"
+                  }`}
+                >
+                  {isActive && (
+                    <span className="absolute top-0 w-5 h-0.5 rounded-full bg-accent" />
+                  )}
+                  <item.icon active={isActive} />
+                  <span
+                    className={`text-[10px] ${
+                      isActive ? "font-semibold" : "font-normal"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <QuickActionSheet
+        isOpen={quickActionOpen}
+        onClose={() => setQuickActionOpen(false)}
+      />
+    </>
   );
 }
 
@@ -82,7 +111,7 @@ function HomeIcon({ active }: { active: boolean }) {
   );
 }
 
-function ExploreIcon({ active }: { active: boolean }) {
+function CalendarIcon({ active }: { active: boolean }) {
   return (
     <svg
       width="22"
@@ -94,8 +123,28 @@ function ExploreIcon({ active }: { active: boolean }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="11" cy="11" r="8" />
-      <path d="M21 21l-4.35-4.35" />
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4" />
+      <path d="M8 2v4" />
+      <path d="M3 10h18" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );
 }
@@ -118,27 +167,7 @@ function CustomerIcon({ active }: { active: boolean }) {
   );
 }
 
-function TaskIcon({ active }: { active: boolean }) {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={active ? 2.2 : 1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="4" width="18" height="18" rx="2" />
-      <path d="M16 2v4" />
-      <path d="M8 2v4" />
-      <path d="M3 10h18" />
-    </svg>
-  );
-}
-
-function PortfolioIcon({ active }: { active: boolean }) {
+function GalleryIcon({ active }: { active: boolean }) {
   return (
     <svg
       width="22"
