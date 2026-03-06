@@ -236,7 +236,7 @@ export interface FaceSwapJob {
 }
 
 export interface FaceSwapGenerateResult {
-  jobs: { _id: string; status: number }[];
+  jobs: { _id: string; status: number; url?: string }[];
 }
 
 export interface FaceSwapResult {

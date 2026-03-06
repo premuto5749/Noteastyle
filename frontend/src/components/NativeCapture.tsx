@@ -11,11 +11,13 @@ import {
 
 interface NativeCaptureProps {
   onCapture: (media: CapturedMedia) => void;
+  onCaptureMultiple?: (media: CapturedMedia[]) => void;
   disabled?: boolean;
 }
 
-export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
+export function NativeCapture({ onCapture, onCaptureMultiple, disabled }: NativeCaptureProps) {
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -31,6 +33,30 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
       e.target.value = "";
     },
     [onCapture],
+  );
+
+  const handleGalleryChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setError(null);
+      const files = Array.from(e.target.files || []);
+      if (files.length === 0) return;
+
+      if (files.length === 1 || !onCaptureMultiple) {
+        const file = files[0];
+        const previewUrl = URL.createObjectURL(file);
+        onCapture({ blob: file, type: "photo", previewUrl, photoType: "after" });
+      } else {
+        const items: CapturedMedia[] = files.map((f) => ({
+          blob: f,
+          type: "photo" as const,
+          previewUrl: URL.createObjectURL(f),
+          photoType: "after",
+        }));
+        onCaptureMultiple(items);
+      }
+      e.target.value = "";
+    },
+    [onCapture, onCaptureMultiple],
   );
 
   const handleVideoChange = useCallback(
@@ -88,16 +114,16 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
         <p className="text-sm text-destructive text-center mb-3">{error}</p>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
-        {/* 사진 촬영 버튼 */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* 카메라 버튼 */}
         <button
           onClick={() => photoInputRef.current?.click()}
           disabled={disabled || processing}
-          className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
+          className="flex flex-col items-center gap-2 py-5 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
         >
           <svg
-            width="32"
-            height="32"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -107,18 +133,40 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
             <circle cx="12" cy="13" r="4" />
           </svg>
-          <span className="text-sm font-medium text-foreground">사진 촬영</span>
+          <span className="text-xs font-medium text-foreground">카메라</span>
+        </button>
+
+        {/* 갤러리 버튼 */}
+        <button
+          onClick={() => galleryInputRef.current?.click()}
+          disabled={disabled || processing}
+          className="flex flex-col items-center gap-2 py-5 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            className="text-muted-foreground"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <span className="text-xs font-medium text-foreground">갤러리</span>
         </button>
 
         {/* 영상 촬영 버튼 */}
         <button
           onClick={() => videoInputRef.current?.click()}
           disabled={disabled || processing}
-          className="flex flex-col items-center gap-2 py-6 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
+          className="flex flex-col items-center gap-2 py-5 bg-card rounded-xl border border-border active:scale-95 transition-transform disabled:opacity-50"
         >
           <svg
-            width="32"
-            height="32"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -128,14 +176,13 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
             <rect x="2" y="4" width="15" height="16" rx="2" />
             <path d="M17 9l5-3v12l-5-3" />
           </svg>
-          <span className="text-sm font-medium text-foreground">
-            {processing ? "처리 중..." : "영상 촬영"}
+          <span className="text-xs font-medium text-foreground">
+            {processing ? "처리 중..." : "영상"}
           </span>
-          <span className="text-[10px] text-subtle">최대 {MAX_VIDEO_DURATION}초</span>
         </button>
       </div>
 
-      {/* 숨겨진 file input — 네이티브 카메라 호출 */}
+      {/* Hidden file inputs */}
       <input
         ref={photoInputRef}
         type="file"
@@ -143,6 +190,14 @@ export function NativeCapture({ onCapture, disabled }: NativeCaptureProps) {
         capture="environment"
         className="hidden"
         onChange={handlePhotoChange}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleGalleryChange}
       />
       <input
         ref={videoInputRef}

@@ -120,8 +120,13 @@ export default function TreatmentDetailPage() {
           : undefined,
       });
       await loadData();
-    } catch {
-      alert("포트폴리오 추가에 실패했습니다.");
+    } catch (err: unknown) {
+      // Already in portfolio — silently reload to sync is_portfolio flag
+      if (err instanceof Error && err.message.includes("이미 포트폴리오")) {
+        await loadData();
+      } else {
+        alert("포트폴리오 추가에 실패했습니다.");
+      }
     }
   }
 
@@ -266,7 +271,26 @@ export default function TreatmentDetailPage() {
       </div>
 
       {/* Photo Carousel */}
-      <PhotoCarousel photos={sortedPhotos}>
+      <PhotoCarousel
+        photos={sortedPhotos}
+        onAction={(photo, action) => {
+          switch (action) {
+            case "annotate":
+              if ((photo.media_type || "photo") === "photo") setAnnotatingPhoto(photo);
+              break;
+            case "faceswap":
+              setFaceSwapPreselect(photo);
+              setShowFaceSwap(true);
+              break;
+            case "mosaic":
+              setMosaicPhoto(photo);
+              break;
+            case "portfolio":
+              handleAddToPortfolio(photo);
+              break;
+          }
+        }}
+      >
         {(activeIndex) => (
           <>
             <StyleNoteOverlay treatment={treatment} />
@@ -397,15 +421,6 @@ export default function TreatmentDetailPage() {
             </div>
           )}
 
-          {/* AI Faceswap Button - Full Width */}
-          <button
-            onClick={() => setShowFaceSwap(true)}
-            disabled={swappablePhotos.length === 0}
-            className="w-full py-3 bg-accent text-primary-foreground rounded-xl text-sm font-medium active:opacity-80 disabled:opacity-50"
-          >
-            AI Faceswap
-          </button>
-
           {/* Detail Info */}
           <div className="bg-surface rounded-xl p-4 space-y-2">
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -469,9 +484,9 @@ export default function TreatmentDetailPage() {
 
           {/* Photo Grid (3-column) */}
           {sortedPhotos.length > 0 && (
-            <div>
+            <div className="bg-surface rounded-2xl p-3">
               <h3 className="text-sm font-bold text-foreground mb-2">사진 관리</h3>
-              <div className="grid grid-cols-3 gap-1 rounded-xl overflow-hidden">
+              <div className="grid grid-cols-3 gap-1.5 rounded-xl overflow-hidden">
                 {sortedPhotos.map((photo) => {
                   const isVideo = photo.media_type === "video";
                   const thumbUrl = photo.thumbnail_url || photo.photo_url;
@@ -482,7 +497,7 @@ export default function TreatmentDetailPage() {
                         if (Date.now() - mountTimeRef.current < 600) return;
                         setActionPhoto(photo);
                       }}
-                      className="relative aspect-square bg-muted overflow-hidden active:opacity-70 transition-opacity"
+                      className="relative aspect-square bg-muted rounded-lg overflow-hidden active:opacity-70 transition-opacity"
                     >
                       <Image
                         src={thumbUrl}

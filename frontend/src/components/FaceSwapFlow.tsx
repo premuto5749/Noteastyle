@@ -101,16 +101,30 @@ export function FaceSwapFlow({ photos, initialPhoto, onClose, onComplete }: Face
     try {
       const { jobs } = await generateFaceSwap(selectedPhoto.id, model.id, 2);
 
-      // Poll each job (5s interval, 2min timeout)
       let completed = 0;
       const totalJobs = jobs.length;
       const POLL_INTERVAL = 5000;
       const POLL_TIMEOUT = 120000;
 
       for (const job of jobs) {
+        // Already completed (server blocks via fal.subscribe)
+        if (job.status === 2 && job.url) {
+          try {
+            const saved = await saveFaceSwapResult({
+              treatment_photo_id: selectedPhoto.id,
+              face_model_id: model.id,
+              result_url: job.url,
+            });
+            setResults((prev) => [...prev, saved]);
+          } catch { /* save failed, skip */ }
+          completed++;
+          if (completed >= totalJobs) setStep("results");
+          continue;
+        }
+
+        // Fallback: poll incomplete jobs
         const startTime = Date.now();
         const interval = setInterval(async () => {
-          // Timeout: stop polling after 2 minutes
           if (Date.now() - startTime > POLL_TIMEOUT) {
             clearInterval(interval);
             pollingRef.current = pollingRef.current.filter((i) => i !== interval);
