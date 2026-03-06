@@ -6,7 +6,7 @@ import { useShop } from "@/contexts/ShopContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
-const MAIN_PAGES = ["/", "/customers", "/explore", "/tasks", "/portfolio"];
+const MAIN_PAGES = ["/", "/tasks", "/customers", "/portfolio"];
 
 export function AppHeader() {
   const pathname = usePathname();

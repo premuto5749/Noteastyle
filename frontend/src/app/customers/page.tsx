@@ -89,8 +89,8 @@ export default function CustomersPage() {
 
   return (
     <div>
-      {/* Sticky glass header */}
-      <div className="sticky top-0 z-40 glass border-b border-border/30 shadow-sm px-4 py-3">
+      {/* Page title (non-sticky, below AppHeader) */}
+      <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold text-foreground">고객 관리</h1>
@@ -105,7 +105,7 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <div className="px-4 pb-4 pt-4 space-y-4">
+      <div className="px-4 pb-4 space-y-4">
         {/* Search bar with icon */}
         <div className="relative">
           <svg
