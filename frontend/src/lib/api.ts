@@ -172,7 +172,8 @@ export interface Reservation {
   created_at: string;
   customer?: { name: string; phone: string | null };
   member?: { display_name: string } | null;
-  treatment?: { id: string } | null;
+  treatment?: { id: string; customer_notes: string | null; voice_memo_text: string | null; ai_summary: string | null } | null;
+  last_treatment?: { service_type: string; date: string; ai_summary: string | null; photo_count: number } | null;
 }
 
 // Shop Services

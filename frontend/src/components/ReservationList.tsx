@@ -1,14 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, forwardRef } from "react";
 import { ReservationCard } from "./ReservationCard";
 import type { Reservation } from "@/lib/api";
 
 interface ReservationListProps {
   reservations: Reservation[];
   loading: boolean;
-  expandedId: string | null;
-  onToggle: (id: string) => void;
   onVoiceMemo: (reservation: Reservation) => void;
   onCamera: (reservation: Reservation) => void;
   onDetail: (reservation: Reservation) => void;
@@ -18,13 +16,13 @@ interface ReservationListProps {
 export function ReservationList({
   reservations,
   loading,
-  expandedId,
-  onToggle,
   onVoiceMemo,
   onCamera,
   onDetail,
   isToday,
 }: ReservationListProps) {
+  const nowLineRef = useRef<HTMLDivElement>(null);
+
   // Current time line position
   const nowTimeStr = useMemo(() => {
     if (!isToday) return null;
@@ -41,13 +39,23 @@ export function ReservationList({
     return idx === -1 ? reservations.length : idx;
   }, [reservations, nowTimeStr]);
 
+  // Auto-scroll to "now" line on today's view after loading
+  useEffect(() => {
+    if (isToday && nowInsertIndex >= 0 && reservations.length > 0) {
+      const timer = setTimeout(() => {
+        nowLineRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isToday, nowInsertIndex, reservations.length]);
+
   if (loading) {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-14 bg-muted rounded-xl animate-pulse"
+            className="h-16 bg-muted rounded-2xl animate-pulse"
           />
         ))}
       </div>
@@ -56,24 +64,29 @@ export function ReservationList({
 
   if (reservations.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="text-4xl mb-3">📅</div>
-        <p className="text-subtle text-sm">오늘 예약이 없습니다</p>
-        <p className="text-hint text-xs mt-1">예약을 등록하세요</p>
+      <div className="text-center py-20">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-subtle">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4" />
+            <path d="M8 2v4" />
+            <path d="M3 10h18" />
+          </svg>
+        </div>
+        <p className="text-muted-foreground text-base font-medium">예약이 없습니다</p>
+        <p className="text-subtle text-sm mt-1">하단 + 버튼으로 예약을 등록하세요</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {reservations.map((reservation, index) => (
         <div key={reservation.id}>
           {/* Now line before this card */}
-          {isToday && nowInsertIndex === index && <NowLine />}
+          {isToday && nowInsertIndex === index && <NowLine ref={nowLineRef} />}
           <ReservationCard
             reservation={reservation}
-            isExpanded={expandedId === reservation.id}
-            onToggle={() => onToggle(reservation.id)}
             onVoiceMemo={() => onVoiceMemo(reservation)}
             onCamera={() => onCamera(reservation)}
             onDetail={() => onDetail(reservation)}
@@ -81,21 +94,21 @@ export function ReservationList({
         </div>
       ))}
       {/* Now line after all cards */}
-      {isToday && nowInsertIndex === reservations.length && <NowLine />}
+      {isToday && nowInsertIndex === reservations.length && <NowLine ref={nowLineRef} />}
     </div>
   );
 }
 
-function NowLine() {
+const NowLine = forwardRef<HTMLDivElement>(function NowLine(_props, ref) {
   return (
-    <div className="flex items-center gap-2 py-1">
-      <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
-      <div className="flex-1 h-px bg-red-400" />
-      <span className="text-[10px] font-medium text-red-500 shrink-0">
+    <div ref={ref} className="flex items-center gap-2 py-1.5">
+      <div className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 shadow-sm shadow-red-500/30" />
+      <div className="flex-1 h-px bg-red-400/60" />
+      <span className="text-[11px] font-semibold text-red-500 shrink-0">
         지금
       </span>
-      <div className="flex-1 h-px bg-red-400" />
-      <div className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+      <div className="flex-1 h-px bg-red-400/60" />
+      <div className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0 shadow-sm shadow-red-500/30" />
     </div>
   );
-}
+});

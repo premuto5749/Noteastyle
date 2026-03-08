@@ -7,7 +7,7 @@ import { VoiceNote } from "@/components/VoiceNote";
 import { useShopApi } from "@/hooks/useShopApi";
 import { type Reservation } from "@/lib/api";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const STATUS_FILTERS = [
   { value: "", label: "전체" },
@@ -37,7 +37,6 @@ export default function TasksAllPage() {
   const { api, isReady } = useShopApi();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [statusFilter, setStatusFilter] = useState("");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -48,7 +47,6 @@ export default function TasksAllPage() {
     async (reset: boolean) => {
       if (reset) {
         setLoading(true);
-        setExpandedId(null);
       } else {
         setLoadingMore(true);
       }
@@ -83,10 +81,6 @@ export default function TasksAllPage() {
     loadReservations(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, statusFilter, api]);
-
-  const handleToggle = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
 
   const ensureTreatment = useCallback(
     async (reservation: Reservation): Promise<string | null> => {
@@ -189,8 +183,6 @@ export default function TasksAllPage() {
                     <ReservationCard
                       key={r.id}
                       reservation={r}
-                      isExpanded={expandedId === r.id}
-                      onToggle={() => handleToggle(r.id)}
                       onVoiceMemo={() => handleVoiceMemo(r)}
                       onCamera={() => handleCamera(r)}
                       onDetail={() => handleDetail(r)}
