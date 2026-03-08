@@ -110,7 +110,7 @@ export function MonthlyCalendar({
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/40 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[60] bg-black/40 transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
@@ -118,7 +118,7 @@ export function MonthlyCalendar({
 
       {/* Bottom sheet */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-x-0 bottom-0 z-[60] transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -168,7 +168,7 @@ export function MonthlyCalendar({
           </div>
 
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 px-2 pb-8">
+          <div className="grid grid-cols-7 px-2 pb-6 gap-y-1">
             {calendarDays.map((cell, idx) => {
               const isSelected = cell.date === selectedDate;
               const isToday = cell.date === today;

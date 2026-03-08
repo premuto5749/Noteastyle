@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DayCalendarStrip } from "@/components/DayCalendarStrip";
 import { MonthlyCalendar } from "@/components/MonthlyCalendar";
 import { ReservationList } from "@/components/ReservationList";
 import { VoiceNote } from "@/components/VoiceNote";
+import { CameraDrawer } from "@/components/CameraDrawer";
 import { useShopApi } from "@/hooks/useShopApi";
 import { type Reservation } from "@/lib/api";
 
@@ -17,20 +17,14 @@ function formatDate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function formatHeaderDate(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00");
-  const dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${d.getMonth() + 1}/${d.getDate()} ${dayLabels[d.getDay()]}`;
-}
-
 export default function TasksPage() {
   const router = useRouter();
   const { api, isReady } = useShopApi();
   const [selectedDate, setSelectedDate] = useState(() => formatDate(new Date()));
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [voiceNoteReservation, setVoiceNoteReservation] = useState<Reservation | null>(null);
+  const [cameraReservation, setCameraReservation] = useState<Reservation | null>(null);
 
   // Monthly calendar state
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -41,11 +35,13 @@ export default function TasksPage() {
   const [monthCounts, setMonthCounts] = useState<Record<string, number>>({});
   const fetchingMonth = useRef<string>("");
 
+  // Week counts for the strip
+  const [weekCounts, setWeekCounts] = useState<Record<string, number>>({});
+
   const isToday = selectedDate === formatDate(new Date());
 
   const loadReservations = useCallback(async (date: string) => {
     setLoading(true);
-    setExpandedId(null);
     try {
       const data = await api.getReservations(date);
       setReservations(data);
@@ -56,10 +52,23 @@ export default function TasksPage() {
     }
   }, [api]);
 
+  // Load week counts when selected date changes
+  const loadWeekCounts = useCallback(async (centerDate: string) => {
+    const d = new Date(centerDate + "T00:00:00");
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    try {
+      const data = await api.getReservationCounts(month);
+      setWeekCounts(prev => ({ ...prev, ...data }));
+    } catch {
+      // ignore
+    }
+  }, [api]);
+
   useEffect(() => {
     if (!isReady) return;
     loadReservations(selectedDate);
-  }, [selectedDate, loadReservations, isReady]);
+    loadWeekCounts(selectedDate);
+  }, [selectedDate, loadReservations, loadWeekCounts, isReady]);
 
   // Fetch monthly counts when calendar month changes
   const loadMonthCounts = useCallback(async (month: string) => {
@@ -79,7 +88,6 @@ export default function TasksPage() {
   }, [calendarMonth, calendarOpen, loadMonthCounts, isReady]);
 
   const handleCalendarOpen = useCallback(() => {
-    // Set month to match currently selected date
     const d = new Date(selectedDate + "T00:00:00");
     const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     setCalendarMonth(month);
@@ -87,11 +95,7 @@ export default function TasksPage() {
     setCalendarOpen(true);
   }, [selectedDate]);
 
-  const handleToggle = (id: string) => {
-    setExpandedId((prev) => (prev === id ? null : id));
-  };
-
-  // Ensure treatment exists, then navigate
+  // Ensure treatment exists, then return its ID
   const ensureTreatment = useCallback(
     async (reservation: Reservation): Promise<string | null> => {
       if (reservation.treatment_id) {
@@ -109,21 +113,25 @@ export default function TasksPage() {
     [selectedDate, loadReservations, api]
   );
 
-  const handleVoiceMemo = useCallback(
-    (reservation: Reservation) => {
-      setVoiceNoteReservation(reservation);
-    },
-    []
-  );
+  const handleVoiceMemo = useCallback((reservation: Reservation) => {
+    setVoiceNoteReservation(reservation);
+  }, []);
 
-  const handleCamera = useCallback(
-    async (reservation: Reservation) => {
-      const treatmentId = await ensureTreatment(reservation);
+  const handleCamera = useCallback((reservation: Reservation) => {
+    setCameraReservation(reservation);
+  }, []);
+
+  const handleCameraAction = useCallback(
+    async (type: "gallery" | "video" | "camera") => {
+      if (!cameraReservation) return;
+      const treatmentId = await ensureTreatment(cameraReservation);
+      setCameraReservation(null);
       if (treatmentId) {
-        router.push(`/treatments/${treatmentId}/capture?type=before`);
+        const captureType = type === "gallery" ? "before" : type === "video" ? "before" : "before";
+        router.push(`/treatments/${treatmentId}/capture?type=${captureType}&source=${type}`);
       }
     },
-    [ensureTreatment, router]
+    [cameraReservation, ensureTreatment, router]
   );
 
   const handleDetail = useCallback(
@@ -138,17 +146,13 @@ export default function TasksPage() {
 
   return (
     <div className="pb-4">
-      {/* Date indicator + Calendar strip */}
+      {/* Calendar strip (sticky below header) */}
       <div className="sticky top-12 z-10">
-        <div className="bg-card px-4 py-2 flex items-center justify-end">
-          <span className="text-sm text-muted-foreground font-medium">
-            {formatHeaderDate(selectedDate)}
-          </span>
-        </div>
         <DayCalendarStrip
           selectedDate={selectedDate}
           onDateSelect={setSelectedDate}
           onCalendarOpen={handleCalendarOpen}
+          reservationCounts={weekCounts}
         />
       </div>
 
@@ -157,35 +161,12 @@ export default function TasksPage() {
         <ReservationList
           reservations={reservations}
           loading={loading}
-          expandedId={expandedId}
-          onToggle={handleToggle}
           onVoiceMemo={handleVoiceMemo}
           onCamera={handleCamera}
           onDetail={handleDetail}
           isToday={isToday}
         />
       </div>
-
-      {/* Walk-in FAB */}
-      <Link
-        href="/reservation"
-        className="fixed bottom-20 right-4 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40"
-        style={{ maxWidth: "calc((480px - 32px))", right: "max(16px, calc((100vw - 480px) / 2 + 16px))" }}
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </Link>
 
       {/* Monthly Calendar */}
       <MonthlyCalendar
@@ -209,6 +190,13 @@ export default function TasksPage() {
           onClose={() => setVoiceNoteReservation(null)}
         />
       )}
+
+      {/* Camera Drawer */}
+      <CameraDrawer
+        isOpen={!!cameraReservation}
+        onClose={() => setCameraReservation(null)}
+        onSelect={handleCameraAction}
+      />
     </div>
   );
 }
