@@ -6,12 +6,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { getDesignerPublicProfile, type DesignerPublicProfile } from "@/lib/api";
 import { calcDuration, maskAddress } from "@/lib/utils/resume";
+import { useShop } from "@/contexts/ShopContext";
+import { useShopApi } from "@/hooks/useShopApi";
+import { ProposalModal } from "@/components/ProposalModal";
 
 export default function DesignerProfilePage() {
   const { memberId } = useParams<{ memberId: string }>();
+  const { currentShop } = useShop();
+  const { api: shopApi, isReady: shopApiReady } = useShopApi();
   const [profile, setProfile] = useState<DesignerPublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showProposalModal, setShowProposalModal] = useState(false);
+  const [remainingCredits, setRemainingCredits] = useState(0);
+  const [proposalSent, setProposalSent] = useState(false);
+
+  const canPropose =
+    (currentShop?.role === "owner" || currentShop?.role === "admin") && shopApiReady;
 
   useEffect(() => {
     if (!memberId) return;
@@ -21,6 +32,17 @@ export default function DesignerProfilePage() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [memberId]);
+
+  const handleOpenProposalModal = async () => {
+    if (!shopApiReady) return;
+    try {
+      const credits = await shopApi.getProposalCredits();
+      setRemainingCredits(credits.total_credits);
+    } catch {
+      setRemainingCredits(0);
+    }
+    setShowProposalModal(true);
+  };
 
   if (loading) {
     return <div className="px-4 py-8 text-center text-subtle">불러오는 중...</div>;
@@ -72,7 +94,14 @@ export default function DesignerProfilePage() {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-foreground">{profile.display_name}</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-lg font-bold text-foreground">{profile.display_name}</h2>
+                {profile.open_to_proposals && (
+                  <span className="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full font-medium">
+                    제안 수신 중
+                  </span>
+                )}
+              </div>
               {profile.specialty && (
                 <p className="text-sm text-accent">{profile.specialty}</p>
               )}
@@ -261,6 +290,38 @@ export default function DesignerProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Floating proposal button */}
+      {canPropose && profile.open_to_proposals && !proposalSent && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[480px] px-4">
+          <button
+            onClick={handleOpenProposalModal}
+            className="w-full py-3.5 bg-primary text-primary-foreground rounded-2xl text-sm font-semibold shadow-lg"
+          >
+            제안 보내기
+          </button>
+        </div>
+      )}
+      {proposalSent && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[480px] px-4">
+          <div className="w-full py-3.5 bg-green-500 text-white rounded-2xl text-sm font-semibold text-center">
+            제안을 보냈습니다 ✓
+          </div>
+        </div>
+      )}
+
+      {showProposalModal && profile && (
+        <ProposalModal
+          memberId={memberId as string}
+          memberName={profile.display_name}
+          remainingCredits={remainingCredits}
+          onClose={() => setShowProposalModal(false)}
+          onSuccess={() => {
+            setShowProposalModal(false);
+            setProposalSent(true);
+          }}
+        />
+      )}
     </div>
   );
 }

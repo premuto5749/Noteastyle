@@ -69,6 +69,7 @@ export async function GET(
     address: profile.address ?? null,
     sns_links: profile.sns_links ?? {},
     show_contact: profile.show_contact,
+    open_to_proposals: profile.open_to_proposals ?? false,
     shop: shop ?? { id: member.shop_id, name: "", shop_type: "" },
     portfolios: portfolios ?? [],
   });

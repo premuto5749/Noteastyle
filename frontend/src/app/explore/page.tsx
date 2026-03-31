@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { getExplorePortfolio, type ExplorePortfolioItem } from "@/lib/api";
+import { getExplorePortfolio, togglePortfolioLike, type ExplorePortfolioItem } from "@/lib/api";
+import { useShopApi } from "@/hooks/useShopApi";
+import { useShop } from "@/contexts/ShopContext";
 import { DesignerBadge } from "@/components/DesignerBadge";
 
 const SHOP_TYPE_FILTERS = [
@@ -15,7 +18,15 @@ const SHOP_TYPE_FILTERS = [
 
 const PAGE_SIZE = 20;
 
+type SortType = "latest" | "popular";
+type TabType = "portfolio" | "talent";
+
 export default function ExplorePage() {
+  const router = useRouter();
+  const { currentShop } = useShop();
+  const { api: shopApi, isReady: shopApiReady } = useShopApi();
+
+  const [tab, setTab] = useState<TabType>("portfolio");
   const [items, setItems] = useState<ExplorePortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -23,6 +34,11 @@ export default function ExplorePage() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [hasMore, setHasMore] = useState(true);
+  const [sort, setSort] = useState<SortType>("latest");
+  const [likingIds, setLikingIds] = useState<Set<string>>(new Set());
+  const [bookmarkingIds, setBookmarkingIds] = useState<Set<string>>(new Set());
+
+  const canBookmark = currentShop?.role === "owner" || currentShop?.role === "admin";
 
   const loadItems = useCallback(
     async (reset: boolean = true) => {
@@ -37,6 +53,7 @@ export default function ExplorePage() {
         const data = await getExplorePortfolio({
           shop_type: shopType || undefined,
           search: search || undefined,
+          sort,
           skip,
           limit: PAGE_SIZE,
         });
@@ -54,16 +71,63 @@ export default function ExplorePage() {
         setLoadingMore(false);
       }
     },
-    [shopType, search, items.length]
+    [shopType, search, sort, items.length]
   );
+
+  useEffect(() => {
+    if (tab === "talent") {
+      router.push("/explore/talent");
+    }
+  }, [tab, router]);
 
   useEffect(() => {
     loadItems(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shopType, search]);
+  }, [shopType, search, sort]);
 
   const handleSearch = () => {
     setSearch(searchInput.trim());
+  };
+
+  const handleLike = async (item: ExplorePortfolioItem) => {
+    if (likingIds.has(item.id)) return;
+    setLikingIds((prev) => new Set(prev).add(item.id));
+    try {
+      const result = await togglePortfolioLike(item.id);
+      setItems((prev) =>
+        prev.map((p) =>
+          p.id === item.id
+            ? {
+                ...p,
+                liked: result.liked,
+                like_count: (p.like_count ?? 0) + (result.liked ? 1 : -1),
+              }
+            : p
+        )
+      );
+    } finally {
+      setLikingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }
+  };
+
+  const handleBookmark = async (item: ExplorePortfolioItem) => {
+    if (!shopApiReady || bookmarkingIds.has(item.id)) return;
+    setBookmarkingIds((prev) => new Set(prev).add(item.id));
+    try {
+      await shopApi.addBookmark(item.id);
+    } catch {
+      // ignore duplicate error
+    } finally {
+      setBookmarkingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
+      });
+    }
   };
 
   return (
@@ -74,6 +138,30 @@ export default function ExplorePage() {
       </div>
 
       <div className="px-4 space-y-3">
+        {/* Tab switcher */}
+        <div className="flex border-b border-border">
+          <button
+            onClick={() => setTab("portfolio")}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${
+              tab === "portfolio"
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted-foreground"
+            }`}
+          >
+            포트폴리오
+          </button>
+          <button
+            onClick={() => setTab("talent")}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${
+              tab === "talent"
+                ? "text-primary border-b-2 border-primary"
+                : "text-muted-foreground"
+            }`}
+          >
+            인재풀
+          </button>
+        </div>
+
         {/* Search bar */}
         <div className="flex gap-2">
           <input
@@ -92,21 +180,31 @@ export default function ExplorePage() {
           </button>
         </div>
 
-        {/* Shop type filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-          {SHOP_TYPE_FILTERS.map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => setShopType(filter.value)}
-              className={`px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                shopType === filter.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
+        {/* Shop type filter + sort */}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 flex-1 -mx-0">
+            {SHOP_TYPE_FILTERS.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setShopType(filter.value)}
+                className={`px-3.5 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  shopType === filter.value
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortType)}
+            className="shrink-0 px-2 py-1.5 text-xs border border-border rounded-lg bg-card text-foreground"
+          >
+            <option value="latest">최신순</option>
+            <option value="popular">인기순</option>
+          </select>
         </div>
 
         {/* Content */}
@@ -157,6 +255,19 @@ export default function ExplorePage() {
                         </svg>
                       </div>
                     )}
+                    {/* Bookmark button */}
+                    {canBookmark && (
+                      <button
+                        onClick={() => handleBookmark(item)}
+                        disabled={bookmarkingIds.has(item.id)}
+                        className="absolute top-2 right-2 p-1.5 bg-black/40 rounded-full text-white backdrop-blur-sm"
+                        aria-label="찜하기"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
                   <div className="p-2.5">
                     {item.shop && (
@@ -184,6 +295,28 @@ export default function ExplorePage() {
                     {item.designer?.is_public && (
                       <DesignerBadge designer={item.designer} />
                     )}
+                    {/* Like button */}
+                    <div className="flex items-center justify-end mt-1.5">
+                      <button
+                        onClick={() => handleLike(item)}
+                        disabled={likingIds.has(item.id)}
+                        className="flex items-center gap-1 text-xs text-muted-foreground"
+                        aria-label="좋아요"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill={item.liked ? "currentColor" : "none"}
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className={item.liked ? "text-red-500" : "text-muted-foreground"}
+                        >
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        <span>{item.like_count ?? 0}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

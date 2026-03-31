@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useShop } from "@/contexts/ShopContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const MAIN_PAGES = ["/", "/tasks", "/customers", "/portfolio"];
 
@@ -38,7 +39,9 @@ export function AppHeader() {
           )}
         </div>
 
-        {/* Right: Hamburger menu */}
+        {/* Right: Notification Bell + Hamburger menu */}
+        <div className="flex items-center gap-1">
+        <NotificationBell />
         <button
           onClick={open}
           className="p-2 -mr-2 text-foreground hover:text-accent transition-colors"
@@ -59,6 +62,7 @@ export function AppHeader() {
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
+        </div>
       </div>
     </header>
   );

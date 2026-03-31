@@ -56,3 +56,4 @@ nul
 
 # bkit temp files
 .bkit/
+tests/e2e/screenshots/
