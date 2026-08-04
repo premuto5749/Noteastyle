@@ -56,3 +56,10 @@ nul
 
 # bkit temp files
 .bkit/
+
+# 임시 파일 (2026-08-04)
+screenshots/
+*.bak
+docs/.pdca-snapshots/
+Ctempcapture_origin.txt
+*tempcapture_origin.txt
